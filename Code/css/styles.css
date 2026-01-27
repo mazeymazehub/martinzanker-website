@@ -16,6 +16,45 @@
     font-style: normal;
 }
 
+/* =============== CSS CUSTOM PROPERTIES =============== */
+/* Responsive values using clamp(min, preferred, max) */
+
+:root {
+    /* Colors */
+    --color-primary: #ff6633;
+    --color-dark: #333333;
+    --color-light: #E9E9E4;
+    --color-gray: #cccccc;
+    --color-gray-dark: #666666;
+
+    /* Typography - fluid scaling */
+    --font-size-heading-large: clamp(48px, 8vw + 1rem, 108px);
+    --font-size-heading-medium: clamp(36px, 6vw + 0.5rem, 81px);
+    --font-size-body: clamp(14px, 1vw + 0.5rem, 18px);
+    --font-size-body-large: clamp(16px, 1.2vw + 0.5rem, 20px);
+
+    /* Spacing - fluid scaling */
+    --spacing-section: clamp(40px, 8vh, 100px);
+    --spacing-container: clamp(16px, 5vw, 80px);
+    --spacing-box-padding: clamp(24px, 4vw, 80px);
+
+    /* Frame sizes */
+    --frame-width: clamp(12px, 1.5vw, 20px);
+    --nav-height: 30px;
+    --header-height-max: 123px;
+    --header-height-min: 43px;
+
+    /* Image sizes - responsive */
+    --image-ben-width: clamp(200px, 35vw, 420px);
+    --image-daniel-height: clamp(200px, 40vh, 500px);
+
+    /* Position offsets - these replace hard-coded vh values */
+    --heading-top-offset: clamp(100px, 18vh, 200px);
+    --konzept-offset: clamp(300px, 53vh, 600px);
+    --gesichten-offset: clamp(250px, 47vh, 550px);
+    --box-margin-offset: clamp(400px, 73vh, 800px);
+}
+
 /* =============== RESET / BASIS =============== */
 
 * {
@@ -314,8 +353,8 @@ header {
     display: grid;
     place-items: start center;
     min-height: 100vh;
-    padding-top: 18vh; /* 18% from top of viewport */
-    z-index: 5; /* Explicit z-index for global stacking context */
+    padding-top: var(--heading-top-offset);
+    z-index: 5;
 }
 
 /* =============== KONZEPT HEADING =============== */
@@ -325,14 +364,13 @@ header {
     display: grid;
     place-items: start start;
     min-height: 100vh;
-    padding-top: calc(50vh + 18.5vh); /* 68.5vh vom Viewport-Top */
-    padding-left: 8%;
-    /* No z-index on container to avoid creating stacking context */
+    padding-top: calc(50vh + 18.5vh);
+    padding-left: var(--spacing-container);
 }
 
 .konzept-heading {
     font-family: 'Inter', sans-serif;
-    font-size: 108px;
+    font-size: var(--font-size-heading-large);
     font-weight: 700;
     letter-spacing: -0.08em;
     text-transform: uppercase;
@@ -361,31 +399,31 @@ header {
 }
 
 .konzept-heading-anchor {
-    color: #cccccc;
+    color: var(--color-gray);
     position: relative;
-    top: -53vh; /* Proportional zum Viewport */
+    top: calc(var(--konzept-offset) * -1);
     pointer-events: none;
     will-change: transform;
     font-family: 'Inter', sans-serif;
-    font-size: 108px;
+    font-size: var(--font-size-heading-large);
     font-weight: 700;
     letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
     grid-column: 1;
     grid-row: 1;
-    z-index: 0; /* Behind filled (1) */
+    z-index: 0;
 }
 
 .konzept-heading-outline {
     color: transparent;
-    -webkit-text-stroke: 2px #333333;
-    text-stroke: 2px #333333;
+    -webkit-text-stroke: 2px var(--color-dark);
+    text-stroke: 2px var(--color-dark);
     grid-column: 1;
     grid-row: 1;
     margin: 0;
     position: relative;
-    z-index: 5; /* In front of everything */
+    z-index: 5;
 }
 
 /* =============== CONTENT BOX =============== */
@@ -393,14 +431,14 @@ header {
 .content-box-wrapper {
     position: relative;
     padding-top: 0px;
-    margin-top: -73.5vh; /* Proportional zum Viewport */
-    padding-left: 8%;
+    margin-top: calc(var(--box-margin-offset) * -1);
+    padding-left: var(--spacing-container);
     z-index: 2;
 }
 
 .content-box {
-    background-color: #cccccc;
-    padding: 5rem;
+    background-color: var(--color-gray);
+    padding: var(--spacing-box-padding);
     width: 120vw;
     max-width: none;
     border-radius: 0;
@@ -443,16 +481,15 @@ header {
     display: grid;
     place-items: start start;
     min-height: 100vh;
-    padding-top: calc(50vh + 18.5vh); /* 68.5vh - gleich wie KONZEPT */
-    padding-left: 8%;
-    /* No z-index on container to avoid creating stacking context */
+    padding-top: calc(50vh + 18.5vh);
+    padding-left: var(--spacing-container);
 }
 
 .gesichten-anchor-filled,
 .gesichten-anchor-outline,
 .gesichten-anchor-gray {
     font-family: 'Inter', sans-serif;
-    font-size: 81px;
+    font-size: var(--font-size-heading-medium);
     font-weight: 700;
     letter-spacing: -0.08em;
     text-transform: uppercase;
@@ -460,18 +497,18 @@ header {
 }
 
 .gesichten-anchor-filled {
-    color: #333333;
+    color: var(--color-dark);
     grid-column: 1;
     grid-row: 1;
     position: relative;
-    top: 47vh; /* Proportional zum Viewport */
+    top: var(--gesichten-offset);
     z-index: 1;
 }
 
 .gesichten-anchor-gray {
-    color: #cccccc;
+    color: var(--color-gray);
     position: relative;
-    top: -51.5vh; /* Proportional zum Viewport */
+    top: clamp(-300px, -51.5vh, -200px);
     pointer-events: none;
     will-change: transform;
     grid-column: 1;
@@ -481,12 +518,12 @@ header {
 
 .gesichten-anchor-outline {
     color: transparent;
-    -webkit-text-stroke: 2px #333333;
-    text-stroke: 2px #333333;
+    -webkit-text-stroke: 2px var(--color-dark);
+    text-stroke: 2px var(--color-dark);
     grid-column: 1;
     grid-row: 1;
     position: relative;
-    top: 47vh; /* Proportional zum Viewport */
+    top: var(--gesichten-offset);
     z-index: 5;
 }
 
@@ -495,22 +532,22 @@ header {
 .content-box-wrapper-2 {
     position: relative;
     padding-top: 0px;
-    margin-top: -74vh; /* Proportional zum Viewport - 12vh höher */
-    padding-right: 8%;
+    margin-top: clamp(-500px, -74vh, -350px);
+    padding-right: var(--spacing-container);
     z-index: 2;
 }
 
 .content-box-2 {
-    background-color: #cccccc;
-    padding: 5rem;
-    padding-top: calc(5rem - 10px);
+    background-color: var(--color-gray);
+    padding: var(--spacing-box-padding);
+    padding-top: calc(var(--spacing-box-padding) - 10px);
     width: 120vw;
     max-width: none;
     border-radius: 0;
     position: relative;
     will-change: transform;
     overflow: hidden;
-    margin-left: -20vw; /* Nach links versetzt */
+    margin-left: -20vw;
 }
 
 .content-box-2 h2,
@@ -549,13 +586,12 @@ header {
     place-items: start start;
     min-height: 100vh;
     padding-top: calc(50vh + 735px);
-    padding-left: 8%;
-    /* No z-index on container to avoid creating stacking context */
+    padding-left: var(--spacing-container);
 }
 
 .unterpunkt-heading {
     font-family: 'Inter', sans-serif;
-    font-size: 81px;
+    font-size: var(--font-size-heading-medium);
     font-weight: 700;
     letter-spacing: -0.08em;
     text-transform: uppercase;
@@ -563,29 +599,28 @@ header {
 }
 
 .unterpunkt-heading-filled {
-    color: #333333;
+    color: var(--color-dark);
     grid-column: 1;
     grid-row: 1;
     margin: 0;
     position: relative;
-    z-index: 1; /* Behind box (2) */
+    z-index: 1;
 }
-
 
 .unterpunkt-heading-outline {
     color: transparent;
-    -webkit-text-stroke: 2px #333333;
-    text-stroke: 2px #333333;
+    -webkit-text-stroke: 2px var(--color-dark);
+    text-stroke: 2px var(--color-dark);
     grid-column: 1;
     grid-row: 1;
     margin: 0;
     position: relative;
-    z-index: 5; /* In front of everything */
+    z-index: 5;
 }
 
 .unterpunkt-heading-image {
     width: auto;
-    height: 50vh; /* Half viewport height */
+    height: var(--image-daniel-height);
     object-fit: cover;
     will-change: transform;
 }
@@ -593,8 +628,8 @@ header {
 /* Container for unterpunkt heading image */
 .unterpunkt-heading-container .image-with-info {
     position: absolute;
-    right: 55px;
-    /* top wird per JavaScript berechnet (relativ zur Textmitte) */
+    right: clamp(20px, 5vw, 55px);
+    /* top wird per JavaScript berechnet */
     grid-column: 1;
     grid-row: 1;
     z-index: 6; /* Above outline (5) */
@@ -602,15 +637,15 @@ header {
 
 .main-heading {
     font-family: 'Inter', sans-serif;
-    font-size: 108px;
+    font-size: var(--font-size-heading-large);
     font-weight: 700;
-    letter-spacing: -0.08em; /* Negative spacing to push letters together */
+    letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
 }
 
 .main-heading-filled {
-    color: #333333;
+    color: var(--color-dark);
     grid-column: 1;
     grid-row: 1;
     z-index: 1;
@@ -618,7 +653,7 @@ header {
 
 .main-heading-image {
     width: 100%;
-    max-width: 420px; /* 65% of 650px = ~420px (35% smaller) */
+    max-width: var(--image-ben-width);
     height: auto;
     object-fit: cover;
     will-change: transform;
@@ -629,13 +664,13 @@ header {
     grid-column: 1;
     grid-row: 1;
     z-index: 2;
-    margin-top: 13vh; /* Proportional zum Viewport */
+    margin-top: clamp(60px, 13vh, 150px);
 }
 
 .main-heading-outline {
     color: transparent;
-    -webkit-text-stroke: 2px #333333;
-    text-stroke: 2px #333333;
+    -webkit-text-stroke: 2px var(--color-dark);
+    text-stroke: 2px var(--color-dark);
     grid-column: 1;
     grid-row: 1;
     z-index: 3;
@@ -841,36 +876,79 @@ section {
 }
 
 /* =============== RESPONSIVE DESIGN =============== */
+/* 3 Breakpoints: Desktop (>1024px), Tablet (601-1024px), Mobile (<=600px) */
 
-/* Breakpoint für schmale Bildschirme: Daniel unter Text */
-@media (max-width: 900px) {
+/* ===== TABLET (max-width: 1024px) ===== */
+@media (max-width: 1024px) {
+    :root {
+        --spacing-container: clamp(16px, 4vw, 60px);
+        --spacing-box-padding: clamp(20px, 3vw, 60px);
+        --image-ben-width: clamp(180px, 40vw, 350px);
+        --image-daniel-height: clamp(180px, 35vh, 400px);
+    }
+}
+
+/* ===== TABLET - Daniel neben Text (601-1024px) ===== */
+@media (max-width: 1024px) and (min-width: 601px) {
+    .unterpunkt-heading-container .image-with-info {
+        right: clamp(20px, 3vw, 40px);
+    }
+
+    .content-box-2 p {
+        max-width: calc(100vw - 40px - 8rem);
+        margin-left: calc(20vw + 20px + 120px);
+    }
+}
+
+/* ===== MOBILE (max-width: 600px) ===== */
+@media (max-width: 600px) {
+    :root {
+        --spacing-container: 16px;
+        --spacing-box-padding: 20px;
+        --image-ben-width: clamp(160px, 60vw, 280px);
+        --image-daniel-height: clamp(150px, 45vh, 300px);
+        --heading-top-offset: clamp(80px, 15vh, 120px);
+        --konzept-offset: clamp(200px, 40vh, 350px);
+        --gesichten-offset: clamp(180px, 35vh, 300px);
+        --box-margin-offset: clamp(280px, 55vh, 450px);
+    }
+
     /* Daniel-Bild unter den Text, mittig */
     .unterpunkt-heading-container .image-with-info {
         position: relative;
         right: auto;
-        top: auto !important; /* Überschreibt JS-Positionierung */
+        left: 50%;
+        transform: translateX(-50%);
         display: block;
         margin: 2rem auto 0;
         text-align: center;
     }
 
-    .unterpunkt-heading-image {
-        height: 40vh;
-    }
-
     /* Text nimmt volle Breite ein (kein Daniel daneben) */
     .content-box-2 p {
-        max-width: calc(100vw - 40px - 10rem);
+        max-width: calc(100vw - 40px - 3rem);
+        margin-left: calc(20vw + 20px);
+    }
+
+    /* Boxen weniger breit auf Mobile */
+    .content-box,
+    .content-box-2 {
+        width: 110vw;
+    }
+
+    .content-box-2 {
+        margin-left: -10vw;
     }
 }
 
+/* ===== MOBILE NAVIGATION (max-width: 768px) ===== */
 @media (max-width: 768px) {
     .nav-menu {
         position: absolute;
         top: 30px;
         left: 0;
         width: 100%;
-        background-color: #333366;
+        background-color: var(--color-dark);
         flex-direction: column;
         align-items: center;
         padding: 1rem 0;
@@ -888,15 +966,7 @@ section {
 
     .nav-container {
         padding: 0 5%;
-        justify-content: flex-end; /* Move hamburger menu to right side */
-    }
-
-    .main-nav {
-        height: 30px;
-    }
-
-    .nav-container {
-        height: 30px;
+        justify-content: flex-end;
     }
 
     .shrinking-header {
@@ -911,14 +981,8 @@ section {
         height: 28px;
     }
 
-    /* Logo size for fixed header on mobile (matches 50px header size) */
-
-    .hero-section {
-        /* margin-top set dynamically by JavaScript */
-    }
-
     .page-title-section {
-        margin-top: 73px; /* Nav (30px) + Fixed Header (43px on mobile) */
+        margin-top: 73px;
     }
 
     .text-behind,
@@ -960,7 +1024,12 @@ section {
     }
 }
 
+/* ===== SMALL MOBILE (max-width: 480px) ===== */
 @media (max-width: 480px) {
+    :root {
+        --nav-height: 25px;
+    }
+
     .main-nav {
         font-size: 14px;
         height: 25px;
@@ -979,10 +1048,8 @@ section {
     }
 
     .fixed-header .logo-gif {
-        height: 34px;
+        height: 24px;
     }
-
-    /* Logo size for fixed header on smallest mobile */
 
     .hero-section {
         /* margin-top set dynamically by JavaScript */
@@ -1489,9 +1556,14 @@ body.dark-mode .gesichten-anchor-container .gesichten-anchor-outline {
 
 /* =============== DARK MODE STYLES =============== */
 
+/* Dark mode variable overrides */
 body.dark-mode {
+    --color-primary: #ff6633;
+    --color-dark: #ff6633;
+    --color-gray: #666666;
+    --color-gray-dark: #4d4d4d;
     background-color: #333333;
-    color: #ff6633;
+    color: var(--color-primary);
 }
 
 /* Dark mode html background - needed because header is semi-transparent */
