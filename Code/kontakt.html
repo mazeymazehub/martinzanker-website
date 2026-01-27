@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontakt - Martin Zanker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Background stripes -->
+    <div class="background-stripe-top"></div>
+    <div class="background-stripe-left"></div>
+    <div class="background-stripe-right"></div>
+    <div class="background-stripe-bottom"></div>
+
+    <!-- Frame borders -->
+    <div class="frame-border-left"></div>
+    <div class="frame-border-right"></div>
+
+    <!-- Header backdrop - solid orange behind blur -->
+    <div class="header-backdrop"></div>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <label class="theme-switch">
+                <input type="checkbox" class="theme-switch__checkbox">
+                <div class="theme-switch__sun"></div>
+                <div class="theme-switch__moon"></div>
+            </label>
+            <button class="nav-toggle" aria-label="Navigation öffnen" onclick="event.stopPropagation()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="werke.html">Werke</a></li>
+                <li><a href="ausstellungen.html">Ausstellungen</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+                <li><a href="impressum.html">Impressum</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header mit Logo -->
+    <header class="fixed-header" onclick="window.location.href='index.html'" style="cursor: pointer;">
+        <div class="header-content">
+            <img src="img/05_Logo_Inter.gif" alt="Martin Zanker Logo" class="logo-gif logo-gif-light">
+            <img src="img/05_Logo_Inter_orange_Transparent.gif" alt="Martin Zanker Logo" class="logo-gif logo-gif-dark">
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title-section">
+        <h1 class="page-title">Kontakt</h1>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="contact-content">
+
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h2>Kontaktinformationen</h2>
+                <p><strong>E-Mail:</strong> <a href="mailto:mail@martinzanker.com">mail@martinzanker.com</a></p>
+                <p><strong>Atelier:</strong> Anglerstraße 2, 80339 München</p>
+                <p><strong>Öffnungszeiten:</strong> Nach Vereinbarung</p>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h2>Nachricht senden</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-Mail *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Betreff</label>
+                        <input type="text" id="subject" name="subject">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Nachricht *</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-button">Absenden</button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Simple form handling - replace with actual backend integration
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Vielen Dank für Ihre Nachricht! Diese Funktion wird noch mit einem Backend verbunden.');
+            this.reset();
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="impressum.html">Impressum</a>
+                <a href="kontakt.html">Kontakt</a>
+            </div>
+            <p>&copy; 2026 Martin Zanker</p>
+        </div>
+    </footer>
+</body>
+</html>

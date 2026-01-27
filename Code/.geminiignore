@@ -1,0 +1,12 @@
+# macOS metadata
+.DS_Store
+
+# Documentation
+docs/
+
+# Generated font files
+fonts/converted-fonts/
+
+# Image assets
+*.psd
+img/logo alternatives/

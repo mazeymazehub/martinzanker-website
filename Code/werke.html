@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werke - Martin Zanker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Background stripes -->
+    <div class="background-stripe-top"></div>
+    <div class="background-stripe-left"></div>
+    <div class="background-stripe-right"></div>
+    <div class="background-stripe-bottom"></div>
+
+    <!-- Frame borders -->
+    <div class="frame-border-left"></div>
+    <div class="frame-border-right"></div>
+
+    <!-- Header backdrop - solid orange behind blur -->
+    <div class="header-backdrop"></div>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <label class="theme-switch">
+                <input type="checkbox" class="theme-switch__checkbox">
+                <div class="theme-switch__sun"></div>
+                <div class="theme-switch__moon"></div>
+            </label>
+            <button class="nav-toggle" aria-label="Navigation öffnen" onclick="event.stopPropagation()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="werke.html">Werke</a></li>
+                <li><a href="ausstellungen.html">Ausstellungen</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+                <li><a href="impressum.html">Impressum</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header mit Logo -->
+    <header class="fixed-header" onclick="window.location.href='index.html'" style="cursor: pointer;">
+        <div class="header-content">
+            <img src="img/05_Logo_Inter.gif" alt="Martin Zanker Logo" class="logo-gif logo-gif-light">
+            <img src="img/05_Logo_Inter_orange_Transparent.gif" alt="Martin Zanker Logo" class="logo-gif logo-gif-dark">
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title-section">
+        <h1 class="page-title">Werke</h1>
+    </section>
+
+    <!-- Gallery Grid -->
+    <section class="works-gallery">
+        <div class="gallery-categories">
+            <button class="category-filter active" data-category="all">Alle</button>
+            <button class="category-filter" data-category="portraits">Portraits</button>
+            <button class="category-filter" data-category="landscapes">Landschaften</button>
+            <button class="category-filter" data-category="abstract">Abstrakt</button>
+        </div>
+
+        <div class="works-grid">
+            <!-- Existing Images -->
+            <div class="work-item" data-category="portraits">
+                <div class="work-image-wrapper">
+                    <img src="img/parallax/Ben.jpg" alt="Portrait Ben" class="work-image">
+                    <div class="work-overlay">
+                        <h3>Portrait Ben</h3>
+                        <p>Öl auf Leinwand, 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="portraits">
+                <div class="work-image-wrapper">
+                    <img src="img/Gesichten/Michael.jpg" alt="Portrait Michael" class="work-image">
+                    <div class="work-overlay">
+                        <h3>Portrait Michael</h3>
+                        <p>Öl auf Leinwand, 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="portraits">
+                <div class="work-image-wrapper">
+                    <img src="img/Gesichten/Marcus.jpg" alt="Portrait Marcus" class="work-image">
+                    <div class="work-overlay">
+                        <h3>Portrait Marcus</h3>
+                        <p>Öl auf Leinwand, 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="portraits">
+                <div class="work-image-wrapper">
+                    <img src="img/Gesichten/Kai Schreck.jpg" alt="Portrait Kai Schreck" class="work-image">
+                    <div class="work-overlay">
+                        <h3>Portrait Kai Schreck</h3>
+                        <p>Öl auf Leinwand, 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="portraits">
+                <div class="work-image-wrapper">
+                    <img src="img/Gesichten/Daniel.jpg" alt="Portrait Daniel" class="work-image">
+                    <div class="work-overlay">
+                        <h3>Portrait Daniel</h3>
+                        <p>Öl auf Leinwand, 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dummy Images - Replace with actual images later -->
+            <div class="work-item" data-category="landscapes">
+                <div class="work-image-wrapper">
+                    <div class="dummy-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span>Landschaft 1</span>
+                    </div>
+                    <div class="work-overlay">
+                        <h3>Landschaft 1</h3>
+                        <p>Öl auf Leinwand, 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="landscapes">
+                <div class="work-image-wrapper">
+                    <div class="dummy-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <span>Landschaft 2</span>
+                    </div>
+                    <div class="work-overlay">
+                        <h3>Landschaft 2</h3>
+                        <p>Acryl auf Leinwand, 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="abstract">
+                <div class="work-image-wrapper">
+                    <div class="dummy-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <span>Abstrakt 1</span>
+                    </div>
+                    <div class="work-overlay">
+                        <h3>Abstrakt 1</h3>
+                        <p>Mischtechnik, 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="abstract">
+                <div class="work-image-wrapper">
+                    <div class="dummy-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <span>Abstrakt 2</span>
+                    </div>
+                    <div class="work-overlay">
+                        <h3>Abstrakt 2</h3>
+                        <p>Öl auf Leinwand, 2023</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="landscapes">
+                <div class="work-image-wrapper">
+                    <div class="dummy-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <span>Landschaft 3</span>
+                    </div>
+                    <div class="work-overlay">
+                        <h3>Landschaft 3</h3>
+                        <p>Aquarell, 2023</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="portraits">
+                <div class="work-image-wrapper">
+                    <div class="dummy-image" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                        <span>Portrait 6</span>
+                    </div>
+                    <div class="work-overlay">
+                        <h3>Portrait 6</h3>
+                        <p>Öl auf Leinwand, 2023</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-item" data-category="abstract">
+                <div class="work-image-wrapper">
+                    <div class="dummy-image" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                        <span>Abstrakt 3</span>
+                    </div>
+                    <div class="work-overlay">
+                        <h3>Abstrakt 3</h3>
+                        <p>Mischtechnik, 2023</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/script.js"></script>
+    <script src="js/works.js"></script>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="impressum.html">Impressum</a>
+                <a href="kontakt.html">Kontakt</a>
+            </div>
+            <p>&copy; 2026 Martin Zanker</p>
+        </div>
+    </footer>
+</body>
+</html>
