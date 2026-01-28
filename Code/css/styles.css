@@ -48,11 +48,20 @@
     --image-ben-width: clamp(200px, 35vw, 420px);
     --image-daniel-height: clamp(200px, 40vh, 500px);
 
+    /* Komposition: Abstand MALEREI-Oberkante zu Ben-Oberkante */
+    --malerei-ben-gap: clamp(50px, 8vw, 100px);
+
+    /* Komposition: Abstand KONZEPT-Anchor-Oberkante zu Box-Oberkante */
+    --konzept-anchor-box-gap: 80px;
+    /* Kalibrierung für Anchor-Position (fester Pixel-Wert) */
+    --konzept-anchor-calibration: 200px;
+
     /* Position offsets - these replace hard-coded vh values */
     --heading-top-offset: clamp(100px, 18vh, 200px);
     --konzept-offset: clamp(300px, 53vh, 600px);
     --gesichten-offset: clamp(250px, 47vh, 550px);
-    --box-margin-offset: clamp(400px, 73vh, 800px);
+    /* Box-Offset jetzt fix in Pixel für konstanten Anchor-Abstand */
+    --box-margin-offset: 550px;
 }
 
 /* =============== RESET / BASIS =============== */
@@ -266,7 +275,7 @@ body.dark-mode::after {
     top: 0;
     left: 0;
     right: 0;
-    height: 73px; /* Nav (30px) + fixed Header (43px) */
+    height: 153px; /* Nav (30px) + shrinking Header max (123px) */
     background-color: #ff6633;
     z-index: 2; /* Above background-stripes (1), below content (5) */
     pointer-events: none;
@@ -319,6 +328,7 @@ header {
 .logo-gif {
     height: 86px; /* 20% smaller than MALEREI (108px × 0.8 = 86px) */
     width: auto;
+    max-width: calc(100vw - 2rem - 40px); /* Nie breiter als Fenster minus Padding und Rahmen */
     will-change: transform, height;
     transition: none;
     position: absolute;
@@ -365,6 +375,8 @@ header {
     place-items: start start;
     min-height: 100vh;
     padding-top: calc(50vh + 18.5vh);
+    /* Bei schmalem Fenster nach rechts verschieben (26px bei ≤400px, 0px bei ≥1400px) */
+    margin-left: max(0px, calc(26px - (100vw - 400px) * 0.026));
     padding-left: var(--spacing-container);
 }
 
@@ -400,8 +412,10 @@ header {
 
 .konzept-heading-anchor {
     color: var(--color-gray);
-    position: relative;
-    top: calc(var(--konzept-offset) * -1);
+    position: absolute;
+    /* Position wird per JavaScript basierend auf Box-Position gesetzt */
+    top: 0;
+    left: 0; /* Gleiche X-Position wie andere KONZEPT-Schriften (durch grid) */
     pointer-events: none;
     will-change: transform;
     font-family: 'Inter', sans-serif;
@@ -412,7 +426,7 @@ header {
     margin: 0;
     grid-column: 1;
     grid-row: 1;
-    z-index: 0;
+    z-index: 0; /* Hinter filled (1), hinter box (2), hinter outline (5) */
 }
 
 .konzept-heading-outline {
@@ -508,7 +522,7 @@ header {
 .gesichten-anchor-gray {
     color: var(--color-gray);
     position: relative;
-    top: clamp(-300px, -51.5vh, -200px);
+    top: -51.5vh; /* Fester Wert - scrollt mit fester Geschwindigkeit */
     pointer-events: none;
     will-change: transform;
     grid-column: 1;
@@ -660,11 +674,12 @@ header {
 }
 
 /* Container for main heading image */
+/* Ben's top edge is --malerei-ben-gap below MALEREI's top edge */
 .main-heading-container .image-with-info {
     grid-column: 1;
     grid-row: 1;
     z-index: 2;
-    margin-top: clamp(60px, 13vh, 150px);
+    margin-top: var(--malerei-ben-gap);
 }
 
 .main-heading-outline {
@@ -885,6 +900,9 @@ section {
         --spacing-box-padding: clamp(20px, 3vw, 60px);
         --image-ben-width: clamp(180px, 40vw, 350px);
         --image-daniel-height: clamp(180px, 35vh, 400px);
+        /* Box-Offset und Kalibrierung fix für Tablet */
+        --box-margin-offset: 450px;
+        --konzept-anchor-calibration: 160px;
     }
 }
 
@@ -905,12 +923,15 @@ section {
     :root {
         --spacing-container: 16px;
         --spacing-box-padding: 20px;
-        --image-ben-width: clamp(160px, 60vw, 280px);
+        --image-ben-width: clamp(220px, 75vw, 350px); /* Größer auf Mobile */
         --image-daniel-height: clamp(150px, 45vh, 300px);
         --heading-top-offset: clamp(80px, 15vh, 120px);
         --konzept-offset: clamp(200px, 40vh, 350px);
         --gesichten-offset: clamp(180px, 35vh, 300px);
-        --box-margin-offset: clamp(280px, 55vh, 450px);
+        /* Box-Offset fix für Mobile */
+        --box-margin-offset: 350px;
+        /* Kalibrierung für Mobile (fester Pixel-Wert) */
+        --konzept-anchor-calibration: 120px;
     }
 
     /* Daniel-Bild unter den Text, mittig */
@@ -1435,10 +1456,22 @@ section {
 }
 
 /* Position info below and left-aligned for main-heading-image (Ben) */
+/* Dynamisch skalierend mit Ben */
 .main-heading-container .image-info {
-    left: 5px;
-    top: calc(100% - 3px); /* 3px higher than before (was 0px, now -3px) */
+    left: clamp(5px, 1.5vw, 12px); /* Kleiner Abstand vom linken Rand */
+    top: calc(100% + clamp(4px, 1vw, 8px)); /* Abstand skaliert mit Viewport */
     transform: none;
+    width: calc(100% - clamp(5px, 1.5vw, 12px)); /* Breite minus left-offset */
+    white-space: normal; /* Text umbricht bei schmalen Bildschirmen */
+}
+
+.main-heading-container .info-line {
+    font-size: clamp(12px, 2.5vw, 16px); /* Schriftgröße skaliert */
+}
+
+.main-heading-container .info-details {
+    font-size: clamp(10px, 2vw, 14px); /* Details etwas kleiner */
+    margin-left: 0;
 }
 
 /* Position info below and left-aligned for unterpunkt-heading-image (Daniel) */
@@ -1448,18 +1481,12 @@ section {
     transform: none;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments - nur Daniel, Ben behält Position unter Bild */
 @media (max-width: 768px) {
-    .info-line {
-        font-size: 14px;
-    }
-
-    .main-heading-container .image-info,
     .unterpunkt-heading-container .image-info {
-        left: 20px;
-        right: auto;
-        top: auto;
-        bottom: 20px;
+        left: 5px;
+        top: calc(100% + 5px);
+        bottom: auto;
         transform: none;
     }
 }

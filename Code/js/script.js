@@ -1,4 +1,166 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // =============== DYNAMISCHE PARALLAX-GESCHWINDIGKEIT ===============
+    // Geschwindigkeit passt sich an Viewport-Größe an
+
+    const DESKTOP_WIDTH = 1400; // Referenz-Breite für Desktop
+    const BASE_PARALLAX_SPEED = 0.35; // Feste Geschwindigkeit für Boxen, Anchors, Bilder
+    const BASE_DANIEL_SPEED = 0.50; // Feste Geschwindigkeit für Daniel
+
+    // Nur für GESICHTEN filled/outline - dynamische Geschwindigkeit
+    let parallaxSpeed = BASE_PARALLAX_SPEED;
+
+    function updateParallaxSpeeds() {
+        // Faktor basierend auf Viewport-Breite (0.6 bis 1.0)
+        const viewportFactor = Math.max(0.6, Math.min(window.innerWidth / DESKTOP_WIDTH, 1));
+        parallaxSpeed = BASE_PARALLAX_SPEED * viewportFactor;
+    }
+
+    // Initial berechnen
+    updateParallaxSpeeds();
+
+    // Bei Resize neu berechnen
+    window.addEventListener('resize', updateParallaxSpeeds);
+
+    // =============== KONZEPT A (filled/outline) PARALLAX-BERECHNUNG ===============
+    // A scrollt mit berechneter Geschwindigkeit, um Anchor bei MEETING_POINT zu treffen
+
+    // Treffpunkt dynamisch: bei schmalem Fenster höher (10%), bei breitem Fenster tiefer (20%)
+    const MEETING_RATIO_NARROW = 0.10; // 10% bei sehr schmalem Fenster
+    const MEETING_RATIO_WIDE = 0.20;   // 20% bei breitem Fenster
+    const NARROW_WIDTH = 400;          // Untergrenze
+    const WIDE_WIDTH = 1400;           // Obergrenze
+
+    let konzeptAParallaxSpeed = BASE_PARALLAX_SPEED; // Wird dynamisch berechnet
+
+    // Hilfsfunktion: Dokumentposition ohne Transforms ermitteln
+    function getDocumentTop(element) {
+        let top = 0;
+        while (element) {
+            top += element.offsetTop;
+            element = element.offsetParent;
+        }
+        return top;
+    }
+
+    function calculateKonzeptAParallaxSpeed() {
+        const konzeptFilled = document.querySelector('.konzept-heading-filled');
+        const benImage = document.querySelector('.main-heading-image');
+        const konzeptAnchor = document.querySelector('.konzept-heading-anchor');
+
+        if (!konzeptFilled || !benImage || !konzeptAnchor) return;
+
+        // Treffpunkt dynamisch basierend auf Viewport-Breite
+        const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
+        const meetingRatio = MEETING_RATIO_NARROW + widthFactor * (MEETING_RATIO_WIDE - MEETING_RATIO_NARROW);
+        const meetY = window.innerHeight * meetingRatio;
+
+        // A's Startposition: Dokumentposition ohne Transforms
+        const aStart = getDocumentTop(konzeptFilled);
+
+        // Anchor's Startposition berechnen aus der Beziehung zu Ben
+        // Anchor = Ben.bottom + BOX_BEN_GAP - anchorGap - Anchor.height
+        const benStart = getDocumentTop(benImage);
+        const benHeight = benImage.offsetHeight;
+        const anchorHeight = konzeptAnchor.offsetHeight;
+        const anchorGap = getKonzeptAnchorGap();
+        const anchorStart = benStart + benHeight + BOX_BEN_GAP - anchorGap - anchorHeight;
+
+        // Anchor's effektive Geschwindigkeit (wie Ben/Box)
+        const anchorEffectiveSpeed = BASE_PARALLAX_SPEED; // 0.35
+
+        // Berechne erforderliche Geschwindigkeit für A
+        // Formel: speedA = 1 - (aStart - meetY) * (1 - anchorSpeed) / (anchorStart - meetY)
+        const numerator = (aStart - meetY) * (1 - anchorEffectiveSpeed);
+        const denominator = anchorStart - meetY;
+
+        console.log('=== KONZEPT A Parallax Berechnung ===');
+        console.log('Viewport:', window.innerWidth, 'x', window.innerHeight);
+        console.log('Meeting Ratio:', (meetingRatio * 100).toFixed(0) + '%', '→ meetY:', meetY.toFixed(0));
+        console.log('A Start (Dokument):', aStart.toFixed(0));
+        console.log('Anchor Start (berechnet):', anchorStart.toFixed(0));
+        console.log('Distanz A->meetY:', (aStart - meetY).toFixed(0));
+        console.log('Distanz Anchor->meetY:', (anchorStart - meetY).toFixed(0));
+
+        if (Math.abs(denominator) < 10) {
+            // Anchor startet sehr nah am Treffpunkt, verwende Default
+            konzeptAParallaxSpeed = anchorEffectiveSpeed;
+        } else {
+            konzeptAParallaxSpeed = 1 - numerator / denominator;
+        }
+
+        // Begrenze auf erweiterten Bereich (-0.5 bis 1)
+        // Negative Werte bedeuten: A scrollt schneller als normal (nötig wenn A unter Anchor startet)
+        konzeptAParallaxSpeed = Math.max(-0.5, Math.min(1, konzeptAParallaxSpeed));
+
+        console.log('Berechnete Speed für A:', konzeptAParallaxSpeed.toFixed(3));
+        console.log('=====================================');
+    }
+
+    // =============== KONZEPT ANCHOR POSITIONIERUNG ===============
+    // Anchor-Position wird basierend auf Box-Position berechnet
+    // Dies ermöglicht sowohl fixen Abstand ALS AUCH korrekte Z-Schichtung
+
+    // Abstand Anchor-Unterkante zu Box-Oberkante (negativ = überlappt)
+    // Dynamisch: bei schmalem Fenster mehr Überlappung, bei breitem weniger
+    const ANCHOR_GAP_NARROW = -40;  // Bei schmalem Fenster: Anchor ragt mehr heraus
+    const ANCHOR_GAP_WIDE = -75;    // Bei breitem Fenster: weniger Überlappung
+
+    function getKonzeptAnchorGap() {
+        const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
+        return ANCHOR_GAP_NARROW + widthFactor * (ANCHOR_GAP_WIDE - ANCHOR_GAP_NARROW);
+    }
+
+    function positionKonzeptAnchor() {
+        const konzeptAnchor = document.querySelector('.konzept-heading-anchor');
+        const contentBox = document.querySelector('.content-box');
+        const konzeptFilled = document.querySelector('.konzept-heading-filled');
+
+        if (!konzeptAnchor || !contentBox || !konzeptFilled) return;
+
+        // Aktuelle visuelle Position der Box (inkl. aller Transforms)
+        const boxRect = contentBox.getBoundingClientRect();
+        // X-Position von KONZEPT (filled) übernehmen
+        const filledRect = konzeptFilled.getBoundingClientRect();
+        // Höhe des Anchors
+        const anchorHeight = konzeptAnchor.offsetHeight;
+
+        // Zielposition: Anchor-Unterkante soll dynamischen Gap über Box-Oberkante haben
+        // Berechne absolute Viewport-Position für Anchor-Oberkante
+        const anchorGap = getKonzeptAnchorGap();
+        const targetAnchorTop = boxRect.top - anchorGap - anchorHeight;
+
+        // Setze position: fixed für exakte Positionierung
+        konzeptAnchor.style.position = 'fixed';
+        konzeptAnchor.style.top = `${targetAnchorTop}px`;
+        konzeptAnchor.style.left = `${filledRect.left}px`; // X-Position angleichen
+        konzeptAnchor.style.transform = 'none';
+    }
+
+    // =============== CONTENT BOX POSITIONIERUNG ===============
+    // Box wird relativ zu Ben positioniert (fixer Abstand)
+
+    const BOX_BEN_GAP = 290; // Abstand Ben-Unterkante zu Box-Oberkante
+
+    function positionContentBox() {
+        const benImage = document.querySelector('.main-heading-image');
+        const contentBoxWrapper = document.querySelector('.content-box-wrapper');
+
+        if (!benImage || !contentBoxWrapper) return;
+
+        // Aktuelle visuelle Position von Ben (inkl. Parallax-Transform)
+        const benRect = benImage.getBoundingClientRect();
+
+        // Zielposition: Box-Oberkante soll BOX_BEN_GAP unter Ben-Unterkante liegen
+        const targetBoxTop = benRect.bottom + BOX_BEN_GAP;
+
+        // Setze position: fixed für exakte Positionierung
+        contentBoxWrapper.style.position = 'fixed';
+        contentBoxWrapper.style.top = `${targetBoxTop}px`;
+        contentBoxWrapper.style.left = '0';
+        contentBoxWrapper.style.width = '100%';
+        contentBoxWrapper.style.marginTop = '0'; // CSS margin-top entfernen
+    }
+
     // =============== GESICHTEN & BOX 2 POSITIONIERUNG ===============
     // "Bus-Prinzip": GESICHTEN erscheint an idealer Position (68.5vh),
     // aber wird nach unten verschoben falls Box 1 im Weg ist
@@ -72,6 +234,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial positionieren nach Laden aller Bilder
     window.addEventListener('load', () => {
+        positionContentBox();
+        positionKonzeptAnchor();
+        calculateKonzeptAParallaxSpeed(); // Geschwindigkeit berechnen
         positionGesichtenAndBox2();
         positionDaniel();
     });
@@ -139,6 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTextVisibility();
         applyParallaxEffect(latestScroll);
         updateMainHeadingVisibility();
+        positionContentBox(); // Box-Position basierend auf Ben aktualisieren
+        positionKonzeptAnchor(); // Anchor-Position basierend auf Box aktualisieren
         if (isShrinkingHeader) {
             updateHeaderSize(latestScroll);
         }
@@ -214,6 +381,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (heroSection) {
             heroSection.style.marginTop = `${navHeight + newHeight}px`;
         }
+
+        // Update header backdrop height to match
+        const headerBackdrop = document.querySelector('.header-backdrop');
+        if (headerBackdrop) {
+            headerBackdrop.style.height = `${navHeight + newHeight}px`;
+        }
     }
 
     // Main heading fade out animation
@@ -273,51 +446,65 @@ document.addEventListener('DOMContentLoaded', function() {
         const allParallaxImages = document.querySelectorAll('.parallax-image');
         const allHoverImages = document.querySelectorAll('.hover-image');
 
-        // Main heading image - slow parallax (higher value = slower scroll relative to page)
-        // Transform the container so both image and info scroll together
+        // Main heading image - FESTE Geschwindigkeit (wie vor Dynamisierung)
         const mainHeadingImageContainer = document.querySelector('.main-heading-container .image-with-info');
         if (mainHeadingImageContainer) {
-            const mainImageSpeed = scrollY * 0.35; // Slower scroll - image stays visible longer
+            const mainImageSpeed = scrollY * BASE_PARALLAX_SPEED;
             mainHeadingImageContainer.style.transform = `translate3d(0, ${mainImageSpeed}px, 0)`;
         }
 
-        // Unterpunkt heading image (Daniel) - medium scroll (faster than boxes, slower than text)
-        // Transform the container so both image and info scroll together
+        // Unterpunkt heading image (Daniel) - FESTE Geschwindigkeit
         const unterpunktHeadingImageContainer = document.querySelector('.unterpunkt-heading-container .image-with-info');
         if (unterpunktHeadingImageContainer) {
-            // Faster than boxes (0.35), slower than text (1.0) - use 0.50
-            const danielImageSpeed = scrollY * 0.50;
-            unterpunktHeadingImageContainer.style.transform = `translate3d(0, ${danielImageSpeed}px, 0)`;
+            const danielImageSpeedCalc = scrollY * BASE_DANIEL_SPEED;
+            unterpunktHeadingImageContainer.style.transform = `translate3d(0, ${danielImageSpeedCalc}px, 0)`;
         }
 
-        // Content box - same parallax speed as main heading image
+        // Content box wrapper - Position wird via positionContentBox() basierend auf Ben gesetzt
+        // Kein Parallax-Transform hier, da position: fixed verwendet wird
+
+        // Content box - nur horizontaler Offset
         const contentBox = document.querySelector('.content-box');
         if (contentBox) {
-            const contentBoxSpeed = scrollY * 0.35; // Same speed as Ben image
-            contentBox.style.transform = `translate3d(20%, ${contentBoxSpeed}px, 0)`;
+            contentBox.style.transform = `translate3d(20%, 0, 0)`;
         }
 
-        // KONZEPT anchor - scrolls with box speed
-        const konzeptAnchor = document.querySelector('.konzept-heading-anchor');
-        if (konzeptAnchor) {
-            const anchorSpeed = scrollY * 0.35; // Same speed as box
-            konzeptAnchor.style.transform = `translate3d(0, ${anchorSpeed}px, 0)`;
+        // KONZEPT filled & outline (A) - mit BERECHNETER Geschwindigkeit
+        const konzeptFilled = document.querySelector('.konzept-heading-filled');
+        const konzeptOutline = document.querySelector('.konzept-heading-outline');
+        if (konzeptFilled) {
+            const konzeptFilledSpeed = scrollY * konzeptAParallaxSpeed;
+            konzeptFilled.style.transform = `translate3d(0, ${konzeptFilledSpeed}px, 0)`;
+        }
+        if (konzeptOutline) {
+            const konzeptOutlineSpeed = scrollY * konzeptAParallaxSpeed;
+            konzeptOutline.style.transform = `translate3d(0, ${konzeptOutlineSpeed}px, 0)`;
         }
 
-        // Content box grain removed - it's a child of content-box, so it moves with the parent automatically
-
-        // Second content box (left) - same parallax speed
+        // Second content box (left) - FESTE Geschwindigkeit (scrollt mit GESICHTEN anchor)
         const contentBoxLeft = document.querySelector('.content-box-2');
         if (contentBoxLeft) {
-            const contentBoxLeftSpeed = scrollY * 0.35;
+            const contentBoxLeftSpeed = scrollY * BASE_PARALLAX_SPEED;
             contentBoxLeft.style.transform = `translate3d(-20vw, ${contentBoxLeftSpeed}px, 0)`;
         }
 
-        // GESICHTEN anchor (gray) - scrolls with box speed
+        // GESICHTEN anchor (gray) - FESTE Geschwindigkeit (scrollt mit Box)
         const gesichtenAnchorGray = document.querySelector('.gesichten-anchor-gray');
         if (gesichtenAnchorGray) {
-            const anchorSpeed = scrollY * 0.35; // Same speed as box
-            gesichtenAnchorGray.style.transform = `translate3d(0, ${anchorSpeed}px, 0)`;
+            const gesichtenAnchorSpeed = scrollY * BASE_PARALLAX_SPEED;
+            gesichtenAnchorGray.style.transform = `translate3d(0, ${gesichtenAnchorSpeed}px, 0)`;
+        }
+
+        // GESICHTEN filled & outline - NUR DIESE mit DYNAMISCHER Geschwindigkeit
+        const gesichtenFilled = document.querySelector('.gesichten-anchor-filled');
+        const gesichtenOutline = document.querySelector('.gesichten-anchor-outline');
+        if (gesichtenFilled) {
+            const gesichtenFilledSpeed = scrollY * parallaxSpeed;
+            gesichtenFilled.style.transform = `translate3d(0, ${gesichtenFilledSpeed}px, 0)`;
+        }
+        if (gesichtenOutline) {
+            const gesichtenOutlineSpeed = scrollY * parallaxSpeed;
+            gesichtenOutline.style.transform = `translate3d(0, ${gesichtenOutlineSpeed}px, 0)`;
         }
 
         allTextBehinds.forEach(el => {
@@ -366,6 +553,9 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
             updateScene();
+            positionContentBox();
+            positionKonzeptAnchor();
+            calculateKonzeptAParallaxSpeed(); // Geschwindigkeit bei Resize neu berechnen
             positionGesichtenAndBox2();
             positionDaniel();
         }, 250);
