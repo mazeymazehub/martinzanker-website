@@ -74,7 +74,7 @@
 
 html {
     scroll-behavior: smooth;
-    background-color: #ff6633;
+    background-color: #E9E9E4; /* Light frame color for overscroll */
 }
 
 body {
@@ -120,6 +120,22 @@ body::before {
 
 .frame-border-right {
     right: 0;
+}
+
+/* Fix for Safari bottom bar color sampling */
+.bottom-bar-fix {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #E9E9E4; /* Match light frame */
+    z-index: 10001; /* Above everything */
+    pointer-events: none;
+}
+
+body.dark-mode .bottom-bar-fix {
+    background-color: #1a1a1a; /* Match dark frame */
 }
 
 /* Paper texture overlay - coarser grain for main page */
@@ -478,10 +494,11 @@ header {
 
 .content-box p {
     color: #ff6633;
-    font-size: 1.1rem;
+    font-size: clamp(0.9rem, 0.7rem + 1vw, 1.2rem);
     line-height: 1.8;
     margin-bottom: 1.2rem;
-    max-width: calc(70vw - 20px - 10rem); /* Text wraps at 70vw minus frame and box padding */
+    max-width: calc(80vw - 95px); /* Adjusted for frame */
+    hyphens: auto;
 }
 
 .content-box p:last-child {
@@ -493,17 +510,18 @@ header {
 .gesichten-anchor-container {
     position: relative;
     display: grid;
-    place-items: start start;
+    place-items: start end; /* Rechtsbündig */
     min-height: 100vh;
     padding-top: calc(50vh + 18.5vh);
-    padding-left: var(--spacing-container);
+    /* Abstand zum rechten Rand (gleich wie Box 1 zum linken Rand) */
+    padding-right: var(--spacing-container);
 }
 
 .gesichten-anchor-filled,
 .gesichten-anchor-outline,
 .gesichten-anchor-gray {
     font-family: 'Inter', sans-serif;
-    font-size: var(--font-size-heading-medium);
+    font-size: var(--font-size-heading-large);
     font-weight: 700;
     letter-spacing: -0.08em;
     text-transform: uppercase;
@@ -521,8 +539,10 @@ header {
 
 .gesichten-anchor-gray {
     color: var(--color-gray);
-    position: relative;
-    top: -51.5vh; /* Fester Wert - scrollt mit fester Geschwindigkeit */
+    position: absolute;
+    /* Position wird per JavaScript basierend auf Box2-Position gesetzt */
+    top: 0;
+    right: 0; /* Rechtsbündig wie filled/outline */
     pointer-events: none;
     will-change: transform;
     grid-column: 1;
@@ -547,6 +567,7 @@ header {
     position: relative;
     padding-top: 0px;
     margin-top: clamp(-500px, -74vh, -350px);
+    /* Rechts-Offset wird per JavaScript im Transform gesteuert */
     padding-right: var(--spacing-container);
     z-index: 2;
 }
@@ -581,7 +602,7 @@ header {
 
 .content-box-2 p {
     color: #ff6633;
-    font-size: 1.1rem;
+    font-size: clamp(0.9rem, 0.7rem + 1vw, 1.2rem);
     line-height: 1.8;
     margin-bottom: 1.2rem;
     max-width: calc(70vw - 20px - 10rem - 150px);
@@ -642,11 +663,11 @@ header {
 /* Container for unterpunkt heading image */
 .unterpunkt-heading-container .image-with-info {
     position: absolute;
-    right: clamp(20px, 5vw, 55px);
+    right: calc(clamp(20px, 5vw, 55px) + 80px); /* 80px weiter links */
     /* top wird per JavaScript berechnet */
     grid-column: 1;
     grid-row: 1;
-    z-index: 6; /* Above outline (5) */
+    z-index: 4; /* Unter GESICHTEN Outline (5) */
 }
 
 .main-heading {
@@ -913,7 +934,7 @@ section {
     }
 
     .content-box-2 p {
-        max-width: calc(100vw - 40px - 8rem);
+        max-width: calc(60vw - 40px - 8rem);
         margin-left: calc(20vw + 20px + 120px);
     }
 }
@@ -934,15 +955,32 @@ section {
         --konzept-anchor-calibration: 120px;
     }
 
-    /* Daniel-Bild unter den Text, mittig */
+    /* Daniel-Bild unter den Text, mittig (ohne transform für JS-Parallax) */
     .unterpunkt-heading-container .image-with-info {
-        position: relative;
+        position: absolute;
         right: auto;
         left: 50%;
         transform: translateX(-50%);
-        display: block;
-        margin: 2rem auto 0;
-        text-align: center;
+        /* top wird per JavaScript berechnet */
+    }
+
+    /* Hover-Text unter dem Bild (wie bei Ben) */
+    .unterpunkt-heading-container .image-info {
+        position: absolute;
+        left: clamp(5px, 1.5vw, 12px);
+        top: calc(100% + clamp(4px, 1vw, 8px));
+        transform: none;
+        width: calc(100% - clamp(5px, 1.5vw, 12px));
+        white-space: normal;
+    }
+
+    .unterpunkt-heading-container .info-line {
+        font-size: clamp(12px, 2.5vw, 16px);
+    }
+
+    .unterpunkt-heading-container .info-details {
+        font-size: clamp(10px, 2vw, 14px);
+        margin-left: 0;
     }
 
     /* Text nimmt volle Breite ein (kein Daniel daneben) */
@@ -1595,7 +1633,7 @@ body.dark-mode {
 
 /* Dark mode html background - needed because header is semi-transparent */
 html.dark-mode {
-    background-color: #333333;
+    background-color: #1a1a1a; /* Dark frame color for overscroll */
 }
 
 /* Dark mode frame borders */
