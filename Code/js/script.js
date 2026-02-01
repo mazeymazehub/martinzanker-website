@@ -24,6 +24,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return top;
     }
 
+    // Hilfsfunktion: Dynamischen Treffpunkt-Ratio berechnen
+    function getMeetingRatio() {
+        const aspectRatio = window.innerHeight / window.innerWidth;
+        // Für hohe/schmale Bildschirme (z.B. iPad Portrait) einen tieferen Treffpunkt wählen
+        if (aspectRatio > 1.2) { 
+            return 0.25; // Fester, tieferer Wert
+        }
+        // Originale Logik für breitere Bildschirme (Landscape)
+        const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
+        return MEETING_RATIO_NARROW + widthFactor * (MEETING_RATIO_WIDE - MEETING_RATIO_NARROW);
+    }
+
     function calculateKonzeptAParallaxSpeed() {
         const konzeptFilled = document.querySelector('.konzept-heading-filled');
         const benImage = document.querySelector('.main-heading-image');
@@ -31,9 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!konzeptFilled || !benImage || !konzeptAnchor) return;
 
-        // Treffpunkt dynamisch basierend auf Viewport-Breite
-        const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
-        const meetingRatio = MEETING_RATIO_NARROW + widthFactor * (MEETING_RATIO_WIDE - MEETING_RATIO_NARROW);
+        // Treffpunkt dynamisch berechnen
+        const meetingRatio = getMeetingRatio();
         const meetY = window.innerHeight * meetingRatio;
 
         // A's Startposition: Dokumentposition ohne Transforms
@@ -45,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const benHeight = benImage.offsetHeight;
         const anchorHeight = konzeptAnchor.offsetHeight;
         const anchorGap = getKonzeptAnchorGap();
-        const anchorStart = benStart + benHeight + BOX_BEN_GAP - anchorGap - anchorHeight;
+        const anchorStart = benStart + benHeight + getBoxBenGap() - anchorGap - anchorHeight;
 
         // Anchor's effektive Geschwindigkeit (wie Ben/Box)
         const anchorEffectiveSpeed = BASE_PARALLAX_SPEED; // 0.35
@@ -54,14 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Formel: speedA = 1 - (aStart - meetY) * (1 - anchorSpeed) / (anchorStart - meetY)
         const numerator = (aStart - meetY) * (1 - anchorEffectiveSpeed);
         const denominator = anchorStart - meetY;
-
-        console.log('=== KONZEPT A Parallax Berechnung ===');
-        console.log('Viewport:', window.innerWidth, 'x', window.innerHeight);
-        console.log('Meeting Ratio:', (meetingRatio * 100).toFixed(0) + '%', '→ meetY:', meetY.toFixed(0));
-        console.log('A Start (Dokument):', aStart.toFixed(0));
-        console.log('Anchor Start (berechnet):', anchorStart.toFixed(0));
-        console.log('Distanz A->meetY:', (aStart - meetY).toFixed(0));
-        console.log('Distanz Anchor->meetY:', (anchorStart - meetY).toFixed(0));
 
         if (Math.abs(denominator) < 10) {
             // Anchor startet sehr nah am Treffpunkt, verwende Default
@@ -74,8 +77,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Negative Werte bedeuten: A scrollt schneller als normal (nötig wenn A unter Anchor startet)
         konzeptAParallaxSpeed = Math.max(-0.5, Math.min(1, konzeptAParallaxSpeed));
 
-        console.log('Berechnete Speed für A:', konzeptAParallaxSpeed.toFixed(3));
-        console.log('=====================================');
+        console.log('--- KONZEPT CALCULATION ---');
+        console.log({
+            meetingRatio,
+            meetY,
+            aStart,
+            anchorStart,
+            benStart,
+            benHeight,
+            boxBenGap: getBoxBenGap(),
+            anchorGap,
+            anchorHeight,
+            numerator,
+            denominator,
+            calculatedSpeed: 1 - numerator / denominator,
+            finalSpeed: konzeptAParallaxSpeed
+        });
     }
 
     // =============== KONZEPT ANCHOR POSITIONIERUNG ===============
@@ -144,9 +161,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!gesichtenFilled || !contentBox2 || !gesichtenAnchor) return;
 
-        // Treffpunkt dynamisch basierend auf Viewport-Breite (gleich wie KONZEPT)
-        const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
-        const meetingRatio = MEETING_RATIO_NARROW + widthFactor * (MEETING_RATIO_WIDE - MEETING_RATIO_NARROW);
+        // Treffpunkt dynamisch berechnen (gleich wie KONZEPT)
+        const meetingRatio = getMeetingRatio();
         const meetY = window.innerHeight * meetingRatio;
 
         // A's Startposition: Dokumentposition ohne Transforms
@@ -166,14 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const numerator = (aStart - meetY) * (1 - anchorEffectiveSpeed);
         const denominator = anchorStart - meetY;
 
-        console.log('=== GESICHTEN A Parallax Berechnung ===');
-        console.log('Viewport:', window.innerWidth, 'x', window.innerHeight);
-        console.log('Meeting Ratio:', (meetingRatio * 100).toFixed(0) + '%', '→ meetY:', meetY.toFixed(0));
-        console.log('A Start (Dokument):', aStart.toFixed(0));
-        console.log('Anchor Start (berechnet):', anchorStart.toFixed(0));
-        console.log('Distanz A->meetY:', (aStart - meetY).toFixed(0));
-        console.log('Distanz Anchor->meetY:', (anchorStart - meetY).toFixed(0));
-
         if (Math.abs(denominator) < 10) {
             gesichtenAParallaxSpeed = anchorEffectiveSpeed;
         } else {
@@ -183,8 +191,20 @@ document.addEventListener('DOMContentLoaded', function() {
         // Begrenze auf erweiterten Bereich (-0.5 bis 1)
         gesichtenAParallaxSpeed = Math.max(-0.5, Math.min(1, gesichtenAParallaxSpeed));
 
-        console.log('Berechnete Speed für A:', gesichtenAParallaxSpeed.toFixed(3));
-        console.log('========================================');
+        console.log('--- GESICHTEN CALCULATION ---');
+        console.log({
+            meetingRatio,
+            meetY,
+            aStart,
+            anchorStart,
+            box2Start,
+            anchorGap,
+            anchorHeight,
+            numerator,
+            denominator,
+            calculatedSpeed: 1 - numerator / denominator,
+            finalSpeed: gesichtenAParallaxSpeed
+        });
     }
 
     // =============== GESICHTEN ANCHOR POSITIONIERUNG ===============
@@ -218,7 +238,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============== CONTENT BOX POSITIONIERUNG ===============
     // Box wird relativ zu Ben positioniert (fixer Abstand)
 
-    const BOX_BEN_GAP = 290; // Abstand Ben-Unterkante zu Box-Oberkante
+    // Dynamischer Abstand Ben-Unterkante zu Box-Oberkante
+    const BOX_BEN_GAP_NARROW = 150; // Kleinerer Abstand für schmale Fenster
+    const BOX_BEN_GAP_WIDE = 290;   // Originalwert für breite Fenster
+
+    function getBoxBenGap() {
+        const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
+        return BOX_BEN_GAP_NARROW + widthFactor * (BOX_BEN_GAP_WIDE - BOX_BEN_GAP_NARROW);
+    }
 
     function positionContentBox() {
         const benImage = document.querySelector('.main-heading-image');
@@ -230,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const benRect = benImage.getBoundingClientRect();
 
         // Zielposition: Box-Oberkante soll BOX_BEN_GAP unter Ben-Unterkante liegen
-        const targetBoxTop = benRect.bottom + BOX_BEN_GAP;
+        const targetBoxTop = benRect.bottom + getBoxBenGap();
 
         // Setze position: fixed für exakte Positionierung
         contentBoxWrapper.style.position = 'fixed';
@@ -275,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // (So wie es positionContentBox() macht)
         const benBaseTop = getDocumentTop(benImage);
         const benHeight = benImage.offsetHeight;
-        const box1LogicalTop = benBaseTop + benHeight + BOX_BEN_GAP;
+        const box1LogicalTop = benBaseTop + benHeight + getBoxBenGap();
         const box1Height = box1.offsetHeight;
         const box1LogicalBottom = box1LogicalTop + box1Height;
 
@@ -308,8 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!danielContainer || !contentBox2) return;
 
         // Treffpunkt: Daniel soll bei diesem Viewport-Anteil erscheinen
-        const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
-        const meetingRatio = MEETING_RATIO_NARROW + widthFactor * (MEETING_RATIO_WIDE - MEETING_RATIO_NARROW);
+        const meetingRatio = getMeetingRatio();
         const meetY = window.innerHeight * meetingRatio;
 
         // Daniel's Startposition
@@ -357,7 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Box 1's logische Position (wie in positionGesichtenAndBox2)
         const benBaseTop = getDocumentTop(benImage);
         const benHeight = benImage.offsetHeight;
-        const box1LogicalTop = benBaseTop + benHeight + BOX_BEN_GAP;
+        const box1LogicalTop = benBaseTop + benHeight + getBoxBenGap();
         const box1Height = box1.offsetHeight;
         const box1LogicalBottom = box1LogicalTop + box1Height;
 
@@ -373,149 +399,76 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function positionDaniel() {
-
         const danielContainer = document.querySelector('.unterpunkt-heading-container .image-with-info');
-
         const danielImage = document.querySelector('.unterpunkt-heading-image');
-
         const contentBox2 = document.querySelector('.content-box-2');
-
         const unterpunktContainer = document.querySelector('.unterpunkt-heading-container');
-
         const gesichtenContainer = document.querySelector('.gesichten-anchor-container');
-
         const gesichtenAnchor = document.querySelector('.gesichten-anchor-gray');
-
     
-
         if (!danielContainer || !danielImage || !contentBox2 || !unterpunktContainer || !gesichtenContainer || !gesichtenAnchor) return;
-
     
-
         // WICHTIG: Zuerst top zurücksetzen, um die natürliche Position zu messen
-
         danielContainer.style.top = '0px';
-
     
-
         // Logische/natürliche Positionen der Elemente ermitteln
-
         const box2LogicalTop = getBox2LogicalTop();
-
         const box2Height = contentBox2.offsetHeight;
-
         const danielNaturalTop = getDocumentTop(danielContainer);
-
     
-
         // Bei schmalen Bildschirmen (Mobile): Stelle die ursprüngliche, komplexere Logik wieder her.
-
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-
             const box2LogicalBottom = box2LogicalTop + box2Height;
-
     
-
             // Originale Logik für danielContainerLogicalTop wiederherstellen
-
             const benImage = document.querySelector('.main-heading-image');
-
             const box1 = document.querySelector('.content-box');
-
             if (!benImage || !box1) return;
-
             const benBaseTop = getDocumentTop(benImage);
-
             const benHeight = benImage.offsetHeight;
-
-            const box1LogicalBottom = benBaseTop + benHeight + BOX_BEN_GAP + box1.offsetHeight;
-
+            const box1LogicalBottom = benBaseTop + benHeight + getBoxBenGap() + box1.offsetHeight;
             const minGap = getBoxGap();
-
             const gesichtenLogicalTop = box1LogicalBottom + minGap;
-
             const danielContainerRelativeTop = getDocumentTop(unterpunktContainer) - getDocumentTop(gesichtenContainer);
-
             const danielContainerLogicalTop = gesichtenLogicalTop + danielContainerRelativeTop;
-
     
-
             // Daniel soll DANIEL_BOX2_GAP unter Box2-Unterkante liegen
-
             const targetDanielTop = box2LogicalBottom + DANIEL_BOX2_GAP;
-
             const offset = targetDanielTop - danielContainerLogicalTop;
-
             danielContainer.style.top = `${offset}px`;
-
             return;
-
         }
-
     
-
         // Bei breiten Bildschirmen: NEUE, PRÄZISE REGEL (bleibt unverändert)
-
         // Leitet den nötigen Offset ab, damit die Bildmitte die Boxmitte an dem exakten Scrollpunkt trifft,
-
         // an dem die "GESICHTEN"-Texte sich überlagern.
-
     
-
         // 1. Parameter sammeln
-
         const naturalTop_Box = box2LogicalTop;
-
         const naturalTop_Daniel = danielNaturalTop;
-
         const boxHeight = contentBox2.offsetHeight;
-
         const danielHeight = danielImage.offsetHeight;
-
         const speed_Box = BASE_PARALLAX_SPEED;
-
         const speed_Daniel = BASE_DANIEL_SPEED;
-
         const anchorGap = getGesichtenAnchorGap();
-
         const anchorHeight = gesichtenAnchor.offsetHeight;
-
     
-
         // 2. Treffpunkt 'meetY' berechnen (wo die anvisierten Texte sich treffen sollen)
-
-        const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
-
-        const meetingRatio = MEETING_RATIO_NARROW + widthFactor * (MEETING_RATIO_WIDE - MEETING_RATIO_NARROW);
-
+        const meetingRatio = getMeetingRatio();
         const meetY = window.innerHeight * meetingRatio;
-
     
-
         // 3. Den Scroll-Punkt 'S_meet' berechnen, an dem der Anchor den Treffpunkt erreicht
-
         const S_meet_numerator = naturalTop_Box - anchorGap - anchorHeight - meetY;
-
         const S_meet_denominator = (1 - speed_Box);
-
         if (Math.abs(S_meet_denominator) < 0.001) return; // Division durch Null vermeiden
-
         const S_meet = S_meet_numerator / S_meet_denominator;
-
     
-
         // 4. Den finalen Offset für Daniel berechnen, um die Zentrierung bei 'S_meet' zu erreichen
-
         const alignmentOffset = (naturalTop_Box - naturalTop_Daniel) + (boxHeight - danielHeight) / 2;
-
         const parallaxCorrection = S_meet * (speed_Box - speed_Daniel);
-
         const finalOffset = alignmentOffset + parallaxCorrection;
-
     
-
         danielContainer.style.top = `${finalOffset}px`;
-
     }    // Initial positionieren nach Laden aller Bilder
     window.addEventListener('load', () => {
         positionContentBox();
@@ -864,13 +817,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (themeSwitch) {
         // Function to set the theme
         const setTheme = (isDark) => {
+            const themeColorMeta = document.querySelector("meta[name='theme-color']");
             if (isDark) {
                 document.body.classList.add('dark-mode');
                 document.documentElement.classList.add('dark-mode');
+                if (themeColorMeta) themeColorMeta.setAttribute('content', '#1a1a1a');
                 themeSwitch.checked = true;
             } else {
                 document.body.classList.remove('dark-mode');
                 document.documentElement.classList.remove('dark-mode');
+                if (themeColorMeta) themeColorMeta.setAttribute('content', '#E9E9E4');
                 themeSwitch.checked = false;
             }
         };
