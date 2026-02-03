@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let konzeptAParallaxSpeed = BASE_PARALLAX_SPEED; // Wird dynamisch berechnet
 
+    // =============== SCROLL-TRIGGERED THEME TOGGLE ===============
+    // Scroll-Positionen, an denen sich die Parallax-Schriften treffen
+    // Light → Dark → Light → Dark → Light
+    let sMeetThresholds = [];      // [{scrollPos, section}, ...] sortiert
+    let scrollThemeEnabled = true; // false = manueller Toggle hat übernommen
+
     // Hilfsfunktion: Dokumentposition ohne Transforms ermitteln
     function getDocumentTop(element) {
         let top = 0;
@@ -384,6 +390,103 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // positionRivusAnchor() entfällt — Anchor wird in positionAnchors() via transform positioniert.
+
+    // =============== S_MEET BERECHNUNG (Scroll-Treffpunkte) ===============
+    // Berechnet die Scroll-Positionen, an denen sich die Parallax-Schriften treffen.
+    // Wird nach allen Positionierungsfunktionen aufgerufen (load + resize).
+
+    function calculateAllSMeetValues() {
+        const results = [];
+
+        // KONZEPT S_meet
+        const konzeptAnchorEl = document.querySelector('.konzept-heading-anchor');
+        const alexImage = document.querySelector('.main-heading-image');
+        if (konzeptAnchorEl && alexImage) {
+            const meetingRatio = getMeetingRatio();
+            let meetY = window.innerHeight * meetingRatio;
+            if (window.innerHeight / window.innerWidth > 1.2) meetY += 80;
+
+            const alexStart = getDocumentTop(alexImage);
+            const alexHeight = alexImage.offsetHeight;
+            const anchorHeight = konzeptAnchorEl.offsetHeight;
+            const anchorGap = getKonzeptAnchorGap();
+            const anchorStart = alexStart + alexHeight + getBoxAlexGap() - anchorGap - anchorHeight;
+
+            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
+            if (sMeet > 0) results.push({ scrollPos: sMeet, section: 'KONZEPT' });
+        }
+
+        // RIVUS S_meet
+        const contentBox2 = document.querySelector('.content-box-2');
+        const gesichtenAnchorEl = document.querySelector('.gesichten-anchor-gray');
+        if (contentBox2 && gesichtenAnchorEl) {
+            const meetingRatio = getMeetingRatio();
+            let meetY = window.innerHeight * meetingRatio - 75;
+            if (window.innerHeight / window.innerWidth > 1.2) meetY += 60;
+
+            const box2Start = getDocumentTop(contentBox2);
+            const anchorHeight = gesichtenAnchorEl.offsetHeight;
+            const anchorGap = getGesichtenAnchorGap();
+            const anchorStart = box2Start - anchorGap - anchorHeight;
+
+            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED) - 70;
+            if (sMeet > 0) results.push({ scrollPos: sMeet, section: 'RIVUS' });
+        }
+
+        // MYTHUS S_meet
+        const mythusBox = document.getElementById('mythus-box');
+        const mythusAnchorEl = document.getElementById('mythus-anchor');
+        if (mythusBox && mythusAnchorEl) {
+            const meetingRatio = getMeetingRatio();
+            const meetY = window.innerHeight * meetingRatio;
+
+            const mythusBoxStart = getMythusBoxLogicalTop();
+            const anchorHeight = mythusAnchorEl.offsetHeight;
+            const anchorGap = getKonzeptAnchorGap();
+            const anchorStart = mythusBoxStart - anchorGap - anchorHeight;
+
+            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
+            if (sMeet > 0) results.push({ scrollPos: sMeet, section: 'MYTHUS' });
+        }
+
+        // GESICHTEN S_meet
+        const rivusContentBox = document.getElementById('rivus-content-box');
+        const rivusAnchorEl = document.getElementById('rivus-anchor-gray');
+        if (rivusContentBox && rivusAnchorEl) {
+            const meetingRatio = getMeetingRatio();
+            const meetY = window.innerHeight * meetingRatio;
+
+            const box3Start = getBox3LogicalTop();
+            const anchorHeight = rivusAnchorEl.offsetHeight;
+            const anchorGap = getGesichtenAnchorGap();
+            const anchorStart = box3Start - anchorGap - anchorHeight;
+
+            let sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
+            // Portrait-Modus: Schwelle früher auslösen
+            if (window.innerHeight / window.innerWidth > 1.2) {
+                sMeet -= 80;
+            }
+            if (sMeet > 0) results.push({ scrollPos: sMeet, section: 'GESICHTEN' });
+        }
+
+        results.sort((a, b) => a.scrollPos - b.scrollPos);
+        sMeetThresholds = results;
+    }
+
+    // Bestimmt ob Dark Mode aktiv sein soll basierend auf Scroll-Position
+    // Start = Light, jede Schwelle togglet: Light → Dark → Light → Dark → Light
+    function getScrollThemeDark(scrollY) {
+        let crossedCount = 0;
+        for (let i = 0; i < sMeetThresholds.length; i++) {
+            if (scrollY >= sMeetThresholds[i].scrollPos) {
+                crossedCount++;
+            } else {
+                break;
+            }
+        }
+        // Start = Dark, jede Schwelle togglet: Dark → Light → Dark → ...
+        return crossedCount % 2 === 0;
+    }
 
     // =============== CONTENT BOX POSITIONIERUNG ===============
     // Box wird relativ zu Alex positioniert (fixer Abstand)
@@ -850,6 +953,13 @@ document.addEventListener('DOMContentLoaded', function() {
         positionMichaelAndMarcus();
         calculateMichaelMobileParallaxSpeed();
         positionAnchors();
+        calculateAllSMeetValues();
+
+        // Sanfte Theme-Transitions erst nach initialem Rendern aktivieren
+        requestAnimationFrame(() => {
+            document.body.classList.add('theme-transitioning');
+            document.documentElement.classList.add('theme-transitioning');
+        });
     });
 
     // Mobile Navigation Toggle
@@ -1000,6 +1110,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (isShrinkingHeader) {
             updateHeaderSize(latestScroll);
+        }
+
+        // Phase 4: Scroll-triggered Theme Toggle
+        if (scrollThemeEnabled && sMeetThresholds.length > 0) {
+            const shouldBeDark = getScrollThemeDark(latestScroll);
+            const isDark = document.body.classList.contains('dark-mode');
+            if (shouldBeDark !== isDark) {
+                setTheme(shouldBeDark);
+            }
         }
     }
 
@@ -1307,50 +1426,44 @@ document.addEventListener('DOMContentLoaded', function() {
             positionMichaelAndMarcus();
             calculateMichaelMobileParallaxSpeed();
             positionAnchors();
+            calculateAllSMeetValues();
         }, 250);
     });
 
     // =============== THEME TOGGLE ===============
     const themeSwitch = document.querySelector('.theme-switch__checkbox');
-    if (themeSwitch) {
-        // Function to set the theme
-        const setTheme = (isDark) => {
-            const themeColorMeta = document.querySelector("meta[name='theme-color']");
-            if (isDark) {
-                document.body.classList.add('dark-mode');
-                document.documentElement.classList.add('dark-mode');
-                if (themeColorMeta) themeColorMeta.setAttribute('content', '#1a1a1a');
-                themeSwitch.checked = true;
-            } else {
-                document.body.classList.remove('dark-mode');
-                document.documentElement.classList.remove('dark-mode');
-                if (themeColorMeta) themeColorMeta.setAttribute('content', '#E9E9E4');
-                themeSwitch.checked = false;
-            }
-        };
 
-        // Check for saved theme in localStorage
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            setTheme(savedTheme === 'dark');
+    // setTheme im äußeren Scope, damit updateScene() darauf zugreifen kann
+    const setTheme = (isDark) => {
+        const themeColorMeta = document.querySelector("meta[name='theme-color']");
+        if (isDark) {
+            document.body.classList.add('dark-mode');
+            document.documentElement.classList.add('dark-mode');
+            if (themeColorMeta) themeColorMeta.setAttribute('content', '#1a1a1a');
+            if (themeSwitch) themeSwitch.checked = true;
         } else {
-            // If no theme is saved, check the user's OS preference
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            setTheme(prefersDark);
+            document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
+            if (themeColorMeta) themeColorMeta.setAttribute('content', '#E9E9E4');
+            if (themeSwitch) themeSwitch.checked = false;
         }
+    };
 
-        // Add event listener for the toggle
+    // Seite startet immer im Dark-Mode (Scroll-Steuerung übernimmt)
+    setTheme(true);
+
+    if (themeSwitch) {
+        // Manueller Toggle deaktiviert Scroll-Steuerung
         themeSwitch.addEventListener('change', () => {
             const isDark = themeSwitch.checked;
+            scrollThemeEnabled = false;
             setTheme(isDark);
-            // Save the theme preference to localStorage
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
 
-        // Also listen for changes in OS preference
+        // OS-Preference nur wenn kein manuelles Theme gesetzt
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            // Only change if no theme has been manually set by the user
-            if (!localStorage.getItem('theme')) {
+            if (!localStorage.getItem('theme') && !scrollThemeEnabled) {
                 setTheme(e.matches);
             }
         });

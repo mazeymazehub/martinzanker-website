@@ -1,6 +1,6 @@
 /* =============== FONTS =============== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap');
 
 @font-face {
     font-family: 'ZIGZAG';
@@ -348,6 +348,7 @@ header {
     height: 86px; /* 20% smaller than MALEREI (108px × 0.8 = 86px) */
     width: auto;
     max-width: calc(100vw - 2rem - 40px); /* Nie breiter als Fenster minus Padding und Rahmen */
+    object-fit: contain; /* Seitenverhältnis beibehalten, nie stauchen */
     will-change: transform, height;
     transition: none;
     position: absolute;
@@ -402,7 +403,7 @@ header {
 .konzept-heading {
     font-family: 'Inter', sans-serif;
     font-size: var(--font-size-heading-large);
-    font-weight: 700;
+    font-weight: 900;
     letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
@@ -439,7 +440,7 @@ header {
     will-change: transform;
     font-family: 'Inter', sans-serif;
     font-size: var(--font-size-heading-large);
-    font-weight: 700;
+    font-weight: 900;
     letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
@@ -523,7 +524,7 @@ header {
 .gesichten-anchor-gray {
     font-family: 'Inter', sans-serif;
     font-size: var(--font-size-heading-large);
-    font-weight: 700;
+    font-weight: 900;
     letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
@@ -627,7 +628,7 @@ header {
 .unterpunkt-heading {
     font-family: 'Inter', sans-serif;
     font-size: var(--font-size-heading-medium);
-    font-weight: 700;
+    font-weight: 900;
     letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
@@ -674,7 +675,7 @@ header {
 .main-heading {
     font-family: 'Inter', sans-serif;
     font-size: var(--font-size-heading-large);
-    font-weight: 700;
+    font-weight: 900;
     letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
@@ -1793,6 +1794,54 @@ body.dark-mode .form-group textarea:focus {
 body.dark-mode .submit-button {
     background-color: #ff6633;
     color: #333333;
+}
+
+/* =============== SANFTE THEME-ÜBERGÄNGE =============== */
+/* Nur aktiv wenn .theme-transitioning gesetzt (nach initialem Laden) */
+/* prefers-reduced-motion überschreibt dies automatisch (Zeile 1146) */
+
+body.theme-transitioning,
+body.theme-transitioning .content-box,
+body.theme-transitioning .content-box-2,
+body.theme-transitioning .header-backdrop,
+body.theme-transitioning header,
+body.theme-transitioning .main-nav {
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+html.theme-transitioning {
+    transition: background-color 0.5s ease;
+}
+
+body.theme-transitioning::before,
+body.theme-transitioning::after,
+body.theme-transitioning .bottom-bar-fix {
+    transition: background-color 0.5s ease;
+}
+
+body.theme-transitioning .main-heading-filled,
+body.theme-transitioning .main-heading-outline,
+body.theme-transitioning .konzept-heading-filled,
+body.theme-transitioning .konzept-heading-outline,
+body.theme-transitioning .konzept-heading-anchor,
+body.theme-transitioning .gesichten-anchor-filled,
+body.theme-transitioning .gesichten-anchor-outline,
+body.theme-transitioning .gesichten-anchor-gray,
+body.theme-transitioning .unterpunkt-heading-filled,
+body.theme-transitioning .unterpunkt-heading-outline {
+    transition: color 0.5s ease, -webkit-text-stroke-color 0.5s ease;
+}
+
+body.theme-transitioning .content-box p,
+body.theme-transitioning .content-box-2 p,
+body.theme-transitioning .content-box h2,
+body.theme-transitioning .content-box-2 h2 {
+    transition: color 0.5s ease;
+}
+
+body.theme-transitioning .frame-border-left,
+body.theme-transitioning .frame-border-right {
+    transition: background-color 0.5s ease;
 }
 
 /* =============== RESPONSIVE ADDITIONS =============== */
