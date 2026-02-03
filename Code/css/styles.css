@@ -612,10 +612,6 @@ header {
     margin-top: -10px;
 }
 
-/* Erster Absatz der RIVUS-Box: Zeilenumbruch 610px weiter rechts */
-.content-box-2:not(#rivus-content-box) p:first-of-type {
-    max-width: calc(70vw - 20px - 10rem + 460px);
-}
 
 /* =============== UNTERPUNKT 1 HEADING =============== */
 
@@ -967,6 +963,10 @@ section {
         left: 50%;
         transform: translateX(-50%);
         /* top wird per JavaScript berechnet */
+    }
+
+    #mythus-daniel-container .image-with-info {
+        transform: translateX(calc(-50% + 7px));
     }
 
     /* Hover-Text unter dem Bild (wie bei Ben) */
@@ -1890,6 +1890,11 @@ body.dark-mode .submit-button {
     left: 80px;
 }
 
+/* Marcus 7/6 so hoch wie Michael (140cm vs 120cm Originalgemälde) */
+#marcus-image-with-info .unterpunkt-heading-image {
+    height: calc(var(--image-ben-height) * 7 / 6);
+}
+
 /* RIVUS-Schriften 20px tiefer + 15px weiter links */
 #rivus-heading-container {
     padding-right: calc(var(--spacing-container) + 15px);
@@ -1964,13 +1969,39 @@ body.dark-mode .submit-button {
         padding-top: 51vh;   /* Blockabstände (Landscape: 68.5vh) */
     }
     #ben-container .unterpunkt-heading-image {
-        height: calc(var(--image-ben-height) * 0.924); /* Ben-Bild: ca. 66% der Landscape-Größe (10% größer als vorher) */
-        margin-top: 270px;
+        height: calc(var(--image-ben-height) * 1.067); /* Ben-Bild: ca. 76% der Landscape-Größe (27% größer als vorher) */
+        margin-top: 300px;
     }
 
     /* Ben im Portrait-Modus 15px weiter rechts */
     #ben-container .image-with-info {
-        right: calc(clamp(20px, 5vw, 55px) + 40px);
+        right: calc(clamp(20px, 5vw, 55px) + 10px);
+    }
+    /* Erster Absatz der RIVUS-Box: Zeilenumbruch 610px weiter rechts (nur Portrait) */
+    .content-box-2:not(#rivus-content-box) p:first-of-type {
+        max-width: calc(70vw - 20px - 10rem + 460px);
+    }
+    /* RIVUS-Box: Text 50px tiefer, Box nach unten verlängert */
+    .content-box-2:not(#rivus-content-box) {
+        padding-top: calc(var(--spacing-box-padding) - 10px + 50px);
+    }
+    /* MYTHUS-Box Text: linke Kante 30px nach rechts, Umbruch 15px nach rechts */
+    #mythus-box {
+        padding-left: calc(var(--spacing-box-padding) + 230px);
+    }
+    #mythus-box p {
+        max-width: calc(80vw - 175px - 215px);
+    }
+    /* Michael + Marcus: 40px näher zusammen */
+    #michael-marcus-wrapper {
+        gap: 0px;
+    }
+    #marcus-image-with-info {
+        left: 40px;
+    }
+    /* Daniel 3px nach rechts im Portrait */
+    #mythus-daniel-container .image-with-info {
+        left: calc(clamp(20px, 5vw, 55px) + 105px - 180px + 40px + 20px + 3px);
     }
 }
 

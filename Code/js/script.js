@@ -67,7 +67,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Treffpunkt dynamisch berechnen
         const meetingRatio = getMeetingRatio();
-        const meetY = window.innerHeight * meetingRatio;
+        let meetY = window.innerHeight * meetingRatio;
+        // Portrait-Modus: Treffpunkt 80px tiefer
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            meetY += 80;
+        }
 
         // A's Startposition: Dokumentposition ohne Transforms
         const aStart = getDocumentTop(konzeptFilled);
@@ -146,7 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         mythusContainer.style.marginTop = '0px';
 
-        const minGap = getBoxGap();
+        let minGap = getBoxGap();
+        // Portrait-Modus: MYTHUS-Block 350px tiefer (200 + 150)
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            minGap += 350;
+        }
 
         const box2LogicalTop = getBox2LogicalTop();
         const box2Height = box2.offsetHeight;
@@ -227,7 +235,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const danielContainerLogicalTop = mythusLogicalTop + danielContainerRelativeTop;
 
             const targetDanielTop = mythusBoxLogicalBottom + UNTERPUNKT_BOX_GAP;
-            const offset = targetDanielTop - danielContainerLogicalTop + 100;
+            let offset = targetDanielTop - danielContainerLogicalTop + 100;
+            // Portrait-Modus: Daniel 370px höher
+            if (window.innerHeight / window.innerWidth > 1.2) {
+                offset -= 370;
+            }
             mythusDaniel.style.top = `${offset}px`;
             return;
         }
@@ -252,7 +264,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const alignmentOffset = (naturalTop_Box - naturalTop_Daniel) + (boxHeight - danielHeight) / 2;
         const parallaxCorrection = S_meet * (speed_Box - speed_Daniel);
-        const finalOffset = alignmentOffset + parallaxCorrection + 100;
+        let finalOffset = alignmentOffset + parallaxCorrection + 100;
+        // Portrait-Modus: Daniel 125px höher
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            finalOffset -= 125;
+        }
 
         mythusDaniel.style.top = `${finalOffset}px`;
     }
@@ -377,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const BOX_ALEX_GAP_WIDE = 290;   // Originalwert für breite Fenster
 
     // Portrait-Modus: zusätzlicher Abstand Alex→KONZEPT-Box (siehe Portrait-Kommentarblock bei getMeetingRatio())
-    const PORTRAIT_BOX_OFFSET = 40;
+    const PORTRAIT_BOX_OFFSET = 70;
 
     function getBoxAlexGap() {
         const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
@@ -420,9 +436,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Dynamischer Mindestabstand (- 150px: alle Blöcke ab Block 2 höher)
         let minGap = getBoxGap() - 165;
-        // Portrait-Modus: RIVUS-Anchor + Textbox 80px tiefer
+        // Portrait-Modus: RIVUS-Anchor + Textbox 230px tiefer (80 + 150)
         if (window.innerHeight / window.innerWidth > 1.2) {
-            minGap += 80;
+            minGap += 230;
         }
 
         // Box 1 als Referenz (RIVUS ist jetzt direkt nach Box 1)
@@ -447,7 +463,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         rivusContainer.style.marginTop = '0px';
 
-        const minGap = getBoxGap();
+        let minGap = getBoxGap();
+        // Portrait-Modus: GESICHTEN-Block 20px tiefer
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            minGap += 20;
+        }
 
         const mythusBoxLogicalTop = getMythusBoxLogicalTop();
         const mythusBoxHeight = mythusBox.offsetHeight;
@@ -629,7 +649,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // 4. Den finalen Offset für Ben berechnen, um die Zentrierung bei 'S_meet' zu erreichen
         const alignmentOffset = (naturalTop_Box - naturalTop_Ben) + (boxHeight - benImageHeight) / 2;
         const parallaxCorrection = S_meet * (speed_Box - speed_Ben);
-        const finalOffset = alignmentOffset + parallaxCorrection;
+        let finalOffset = alignmentOffset + parallaxCorrection;
+        // Portrait-Modus: Ben 90px tiefer
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            finalOffset += 90;
+        }
 
         benContainer.style.top = `${finalOffset}px`;
     }
@@ -725,7 +749,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const alignmentOffset = (naturalTop_Box - naturalTop_Michael) + (boxHeight - michaelHeight) / 2;
         const parallaxCorrection = S_meet * (speed_Box - speed_Michael);
-        const finalOffset = alignmentOffset + parallaxCorrection;
+        let finalOffset = alignmentOffset + parallaxCorrection;
+        // Portrait-Modus: Michael + Marcus 150px tiefer
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            finalOffset += 150;
+        }
 
         const finalTop = `${finalOffset + 200}px`;
         michaelContainer.style.top = finalTop;
