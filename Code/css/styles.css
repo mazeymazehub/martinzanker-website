@@ -45,11 +45,11 @@
     --header-height-min: 43px;
 
     /* Image sizes - responsive */
-    --image-ben-width: clamp(200px, 35vw, 420px);
-    --image-daniel-height: clamp(200px, 40vh, 500px);
+    --image-alex-width: clamp(200px, 35vw, 420px);
+    --image-ben-height: clamp(200px, 40vh, 500px);
 
-    /* Komposition: Abstand MALEREI-Oberkante zu Ben-Oberkante */
-    --malerei-ben-gap: clamp(50px, 8vw, 100px);
+    /* Komposition: Abstand MALEREI-Oberkante zu Alex-Oberkante */
+    --malerei-alex-gap: clamp(50px, 8vw, 100px);
 
     /* Komposition: Abstand KONZEPT-Anchor-Oberkante zu Box-Oberkante */
     --konzept-anchor-box-gap: 80px;
@@ -74,6 +74,7 @@
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden; /* Verhindert horizontalen Viewport-Overflow durch 120vw-Boxen (v.a. Portrait) */
     background-color: #E9E9E4; /* Light frame color for overscroll */
 }
 
@@ -86,6 +87,8 @@ body {
     color: #333333;
     background-color: #ff6633; /* Match html background - prevents transparency issues */
     overscroll-behavior-y: none; /* Prevent rubber band effect */
+    hyphens: auto;
+    -webkit-hyphens: auto;
 }
 
 /* Fixed frame border - split into separate elements for different z-indexes */
@@ -429,9 +432,9 @@ header {
 .konzept-heading-anchor {
     color: var(--color-gray);
     position: absolute;
-    /* Position wird per JavaScript basierend auf Box-Position gesetzt */
+    /* Position (top/left) wird per JavaScript auf load/resize gesetzt */
     top: 0;
-    left: 0; /* Gleiche X-Position wie andere KONZEPT-Schriften (durch grid) */
+    left: 0;
     pointer-events: none;
     will-change: transform;
     font-family: 'Inter', sans-serif;
@@ -440,9 +443,7 @@ header {
     letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
-    grid-column: 1;
-    grid-row: 1;
-    z-index: 0; /* Hinter filled (1), hinter box (2), hinter outline (5) */
+    z-index: 0; /* Hinter box (DOM-Reihenfolge: Box überdeckt Anchor-Überlappung) */
 }
 
 .konzept-heading-outline {
@@ -497,7 +498,7 @@ header {
     font-size: clamp(0.9rem, 0.7rem + 1vw, 1.2rem);
     line-height: 1.8;
     margin-bottom: 1.2rem;
-    max-width: calc(80vw - 95px); /* Adjusted for frame */
+    max-width: calc(80vw - 175px); /* Adjusted for frame, +80px weiter links */
     hyphens: auto;
 }
 
@@ -505,7 +506,7 @@ header {
     margin-bottom: 0;
 }
 
-/* =============== GESICHTEN ANCHOR CONTAINER =============== */
+/* =============== RIVUS ANCHOR CONTAINER =============== */
 
 .gesichten-anchor-container {
     position: relative;
@@ -540,13 +541,11 @@ header {
 .gesichten-anchor-gray {
     color: var(--color-gray);
     position: absolute;
-    /* Position wird per JavaScript basierend auf Box2-Position gesetzt */
+    /* Position (top/left) wird per JavaScript auf load/resize gesetzt */
     top: 0;
-    right: 0; /* Rechtsbündig wie filled/outline */
+    left: 0;
     pointer-events: none;
     will-change: transform;
-    grid-column: 1;
-    grid-row: 1;
     z-index: 0;
 }
 
@@ -613,6 +612,11 @@ header {
     margin-top: -10px;
 }
 
+/* Erster Absatz der RIVUS-Box: Zeilenumbruch 610px weiter rechts */
+.content-box-2:not(#rivus-content-box) p:first-of-type {
+    max-width: calc(70vw - 20px - 10rem + 460px);
+}
+
 /* =============== UNTERPUNKT 1 HEADING =============== */
 
 .unterpunkt-heading-container {
@@ -655,7 +659,7 @@ header {
 
 .unterpunkt-heading-image {
     width: auto;
-    height: var(--image-daniel-height);
+    height: var(--image-ben-height);
     object-fit: cover;
     will-change: transform;
 }
@@ -667,8 +671,9 @@ header {
     /* top wird per JavaScript berechnet */
     grid-column: 1;
     grid-row: 1;
-    z-index: 4; /* Unter GESICHTEN Outline (5) */
+    z-index: 4; /* Unter RIVUS Outline (5) */
 }
+
 
 .main-heading {
     font-family: 'Inter', sans-serif;
@@ -688,19 +693,19 @@ header {
 
 .main-heading-image {
     width: 100%;
-    max-width: var(--image-ben-width);
+    max-width: var(--image-alex-width);
     height: auto;
     object-fit: cover;
     will-change: transform;
 }
 
 /* Container for main heading image */
-/* Ben's top edge is --malerei-ben-gap below MALEREI's top edge */
+/* Alex's top edge is --malerei-alex-gap below MALEREI's top edge */
 .main-heading-container .image-with-info {
     grid-column: 1;
     grid-row: 1;
     z-index: 2;
-    margin-top: var(--malerei-ben-gap);
+    margin-top: var(--malerei-alex-gap);
 }
 
 .main-heading-outline {
@@ -919,15 +924,15 @@ section {
     :root {
         --spacing-container: clamp(16px, 4vw, 60px);
         --spacing-box-padding: clamp(20px, 3vw, 60px);
-        --image-ben-width: clamp(180px, 40vw, 350px);
-        --image-daniel-height: clamp(180px, 35vh, 400px);
+        --image-alex-width: clamp(180px, 40vw, 350px);
+        --image-ben-height: clamp(180px, 35vh, 400px);
         /* Box-Offset und Kalibrierung fix für Tablet */
         --box-margin-offset: 450px;
         --konzept-anchor-calibration: 160px;
     }
 }
 
-/* ===== TABLET - Daniel neben Text (601-1024px) ===== */
+/* ===== TABLET - Ben neben Text (601-1024px) ===== */
 @media (max-width: 1024px) and (min-width: 601px) {
     .unterpunkt-heading-container .image-with-info {
         right: clamp(20px, 3vw, 40px);
@@ -944,8 +949,8 @@ section {
     :root {
         --spacing-container: 16px;
         --spacing-box-padding: 20px;
-        --image-ben-width: clamp(220px, 75vw, 350px); /* Größer auf Mobile */
-        --image-daniel-height: clamp(150px, 45vh, 300px);
+        --image-alex-width: clamp(220px, 75vw, 350px); /* Größer auf Mobile */
+        --image-ben-height: clamp(150px, 45vh, 300px);
         --heading-top-offset: clamp(80px, 15vh, 120px);
         --konzept-offset: clamp(200px, 40vh, 350px);
         --gesichten-offset: clamp(180px, 35vh, 300px);
@@ -955,7 +960,7 @@ section {
         --konzept-anchor-calibration: 120px;
     }
 
-    /* Daniel-Bild unter den Text, mittig (ohne transform für JS-Parallax) */
+    /* Unterpunkt-Bild unter den Text, mittig (ohne transform für JS-Parallax) */
     .unterpunkt-heading-container .image-with-info {
         position: absolute;
         right: auto;
@@ -983,7 +988,7 @@ section {
         margin-left: 0;
     }
 
-    /* Text nimmt volle Breite ein (kein Daniel daneben) */
+    /* Text nimmt volle Breite ein (kein Ben daneben) */
     .content-box-2 p {
         max-width: calc(100vw - 40px - 3rem);
         margin-left: calc(20vw + 20px);
@@ -1512,14 +1517,14 @@ section {
     margin-left: 0;
 }
 
-/* Position info below and left-aligned for unterpunkt-heading-image (Daniel) */
+/* Position info below and left-aligned for unterpunkt-heading-image (Ben) */
 .unterpunkt-heading-container .image-info {
     left: 5px;
     top: calc(100% - 3px);
     transform: none;
 }
 
-/* Responsive adjustments - nur Daniel, Ben behält Position unter Bild */
+/* Responsive adjustments - nur Ben, Position bleibt unter Bild */
 @media (max-width: 768px) {
     .unterpunkt-heading-container .image-info {
         left: 5px;
@@ -1840,3 +1845,132 @@ body.dark-mode .submit-button {
         padding: 1.5rem;
     }
 }
+
+#rivus-anchor-gray {
+    color: var(--color-gray);
+}
+
+
+#rivus-anchor-container {
+    place-items: start center; /* Mittig */
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#rivus-content-box {
+    width: 60vw;
+    margin-left: 0; /* Override -20vw from .content-box-2 */
+}
+
+
+#rivus-content-box p {
+    margin-left: 0;
+    max-width: 90%;
+}
+
+#michael-marcus-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    align-items: center;
+    width: 100%; /* Ensure the wrapper takes full width to center its children */
+}
+
+#michael-marcus-wrapper .image-with-info {
+    position: relative;
+    right: auto;
+}
+
+#michael-marcus-container {
+    padding-left: 0;
+    place-items: start center;
+}
+
+#marcus-image-with-info {
+    left: 80px;
+}
+
+/* RIVUS-Schriften 20px tiefer + 15px weiter links */
+#rivus-heading-container {
+    padding-right: calc(var(--spacing-container) + 15px);
+}
+#rivus-heading-container .gesichten-anchor-filled,
+#rivus-heading-container .gesichten-anchor-outline {
+    top: calc(var(--gesichten-offset) + 40px);
+}
+
+/* Ben-Bild bei RIVUS: größer + 30px tiefer */
+#ben-container .unterpunkt-heading-image {
+    height: calc(var(--image-ben-height) * 1.4);
+    margin-top: 70px;
+}
+
+/* =============== MYTHUS BLOCK (gespiegelt wie KONZEPT) =============== */
+
+/* MYTHUS Box: Text 100px weiter rechts, Box-Größe bleibt */
+#mythus-box {
+    padding-left: calc(var(--spacing-box-padding) + 100px);
+}
+
+/* Zeilenumbruch wie Konzept-Box: max-width um 100px reduziert (Ausgleich für extra padding) */
+#mythus-box p {
+    max-width: calc(80vw - 175px - 100px);
+}
+
+/* MYTHUS Daniel: links statt rechts (gespiegelt) */
+#mythus-daniel-container .image-with-info {
+    right: auto;
+    left: calc(clamp(20px, 5vw, 55px) + 105px - 180px + 40px + 20px);
+}
+
+/* Tablet: MYTHUS Daniel links */
+@media (max-width: 1024px) and (min-width: 601px) {
+    #mythus-daniel-container .image-with-info {
+        right: auto;
+        left: clamp(20px, 3vw, 40px);
+    }
+}
+
+/* =============== PORTRAIT-MODUS (height/width > 1.2) ===============
+   Greift bei max-aspect-ratio: 5/6 (entspricht JS-Check: innerHeight/innerWidth > 1.2).
+
+   Seitenstruktur (von oben nach unten):
+     MALEREI (Hauptüberschrift) → Alex (Bild) → KONZEPT-Box → Ben (Bild) →
+     MYTHUS-Box → Daniel (Bild) → GESICHTEN-Box → Michael + Marcus (Bilder)
+
+   Portrait-Anpassungen hier (CSS):
+     --image-alex-width ........... Größe des Alex-Bildes (KONZEPT-Block)
+     --malerei-alex-gap ........... Abstand MALEREI-Überschrift ↔ Alex-Bild
+     --heading-top-offset ......... Vertikale Position der MALEREI-Überschrift
+     --font-size-heading-large .... Schriftgröße MALEREI
+     min-height / padding-top ..... Abstände zwischen den Heading-Containern
+     #ben-container ............... Größe des Ben-Bildes (RIVUS-Block)
+
+   Portrait-Anpassungen im JS (script.js):
+     getMeetingRatio() ............ Treffpunkt der Parallax-Schriften (Zeile ~32)
+     PORTRAIT_BOX_OFFSET ......... Zusätzlicher Abstand Alex → KONZEPT-Box (Zeile ~354)
+     getBoxAlexGap() .............. Addiert PORTRAIT_BOX_OFFSET wenn Portrait (Zeile ~356)
+*/
+@media (max-aspect-ratio: 5/6) {
+    :root {
+        --image-alex-width: clamp(440px, 82.5vw, 770px);    /* Alex-Bild: Breite */
+        --malerei-alex-gap: calc(clamp(50px, 8vw, 100px) + 50px); /* MALEREI ↔ Alex */
+        --font-size-heading-large: 108px;                    /* MALEREI Schriftgröße */
+        --heading-top-offset: calc(clamp(100px, 18vh, 200px) - 50px); /* MALEREI Position */
+    }
+    .konzept-heading-container,
+    .gesichten-anchor-container {
+        min-height: 75vh;    /* Blockabstände (Landscape: 100vh) */
+        padding-top: 51vh;   /* Blockabstände (Landscape: 68.5vh) */
+    }
+    #ben-container .unterpunkt-heading-image {
+        height: calc(var(--image-ben-height) * 0.924); /* Ben-Bild: ca. 66% der Landscape-Größe (10% größer als vorher) */
+        margin-top: 270px;
+    }
+
+    /* Ben im Portrait-Modus 15px weiter rechts */
+    #ben-container .image-with-info {
+        right: calc(clamp(20px, 5vw, 55px) + 40px);
+    }
+}
+
