@@ -6,7 +6,7 @@
     <title>Impressum - Martin Zanker</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="sub-page">
 
     <!-- Background stripes -->
     <div class="background-stripe-top"></div>
@@ -24,21 +24,80 @@
     <!-- Navigation -->
     <nav class="main-nav">
         <div class="nav-container">
+            <!-- Sprachniveau-Toggle -->
+            <div class="lang-switch" role="group" aria-label="Sprachniveau">
+                <button class="lang-switch__btn" data-lang="easy" title="Leichte Sprache" aria-label="Leichte Sprache">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.63 283.46" fill="currentColor">
+                        <path d="M116.81,97.14c26.83,0,48.57-21.75,48.57-48.57S143.64,0,116.81,0s-48.57,21.75-48.57,48.57,21.75,48.57,48.57,48.57"/>
+                        <path d="M231.74,91.31c-10.75-.28-65.42.69-113.04,45.67-.53.5-1.2.75-1.88.75s-1.35-.25-1.88-.75C67.31,92,12.64,91.03,1.89,91.31c-1.06.03-1.89.9-1.89,1.95v141.84c0,1.07.85,1.93,1.92,1.95,10.86.2,65.77,3.36,113.04,45.7.53.47,1.19.71,1.86.71s1.33-.24,1.86-.71c47.27-42.33,102.18-45.49,113.04-45.7,1.07-.02,1.92-.89,1.92-1.95V93.26c0-1.06-.83-1.93-1.89-1.95"/>
+                    </svg>
+                </button>
+                <button class="lang-switch__btn" data-lang="clear" title="Verständlicher Text" aria-label="Verständlicher Text">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 5 Q4 3 6 3 H18 Q20 3 20 5 V13 Q20 15 18 15 H13 L9 19 V15 H6 Q4 15 4 13 Z"/>
+                        <line x1="7" y1="7.5" x2="17" y2="7.5"/>
+                        <line x1="7" y1="10.5" x2="17" y2="10.5"/>
+                        <line x1="7" y1="13.5" x2="13" y2="13.5"/>
+                    </svg>
+                </button>
+                <button class="lang-switch__btn active" data-lang="expert" title="Fachsprache" aria-label="Fachsprache">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 6 C9 5.5 5 5.5 3 6 V19 C5 18.5 9 18.5 12 19"/>
+                        <path d="M12 6 C15 5.5 19 5.5 21 6 V19 C19 18.5 15 18.5 12 19"/>
+                        <line x1="12" y1="6" x2="12" y2="19"/>
+                        <line x1="5.5" y1="9" x2="9.5" y2="9"/>
+                        <line x1="5.5" y1="12" x2="9.5" y2="12"/>
+                        <line x1="5.5" y1="15" x2="9.5" y2="15"/>
+                        <line x1="14.5" y1="9" x2="18.5" y2="9"/>
+                        <line x1="14.5" y1="12" x2="18.5" y2="12"/>
+                        <line x1="14.5" y1="15" x2="18.5" y2="15"/>
+                    </svg>
+                </button>
+            </div>
+
             <label class="theme-switch">
                 <input type="checkbox" class="theme-switch__checkbox">
                 <div class="theme-switch__sun"></div>
                 <div class="theme-switch__moon"></div>
             </label>
+            <!-- Locale-Toggle (DE/EN) -->
+            <div class="locale-switch" role="group" aria-label="Sprache / Language">
+                <button class="locale-switch__btn active" data-locale="de" title="Deutsch" aria-label="Deutsch">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3">
+                        <rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/>
+                        <rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/>
+                        <rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="en" title="English" aria-label="English">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
+                        <rect width="60" height="30" fill="currentColor" opacity="0.4"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/>
+                        <rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/>
+                        <rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/>
+                        <rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/>
+                        <rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="es" title="Español" aria-label="Español">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2">
+                        <rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/>
+                        <rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/>
+                        <rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/>
+                    </svg>
+                </button>
+            </div>
+
             <button class="nav-toggle" aria-label="Navigation öffnen" onclick="event.stopPropagation()">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
             <ul class="nav-menu">
-                <li><a href="werke.html">Werke</a></li>
-                <li><a href="ausstellungen.html">Ausstellungen</a></li>
-                <li><a href="kontakt.html">Kontakt</a></li>
-                <li><a href="impressum.html">Impressum</a></li>
+                <li><a href="werke.html" data-de="Werke" data-en="Works" data-es="Obras">Werke</a></li>
+                <li><a href="reden.html" data-de="Reden" data-en="Speeches" data-es="Discursos">Reden</a></li>
+                <li><a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a></li>
+                <li><a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a></li>
             </ul>
         </div>
     </nav>
@@ -53,62 +112,136 @@
 
     <!-- Page Title -->
     <section class="page-title-section">
-        <h1 class="page-title">Impressum</h1>
+        <h1 class="page-title" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</h1>
     </section>
 
     <!-- Impressum Section -->
     <section class="impressum-section">
         <div class="impressum-content">
 
-            <h2>Angaben gemäß § 5 TMG</h2>
+            <h2 data-de="Angaben gemäß § 5 TMG" data-en="Information per § 5 TMG" data-es="Información según § 5 TMG">Angaben gemäß § 5 TMG</h2>
             <p>Dr. Martin Zanker</p>
             <p>Anglerstraße 2</p>
             <p>80339 München</p>
 
-            <h2>Kontakt</h2>
+            <h2 data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</h2>
             <p>E-Mail: mail@martinzanker.com</p>
 
-            <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+            <h2 data-de="Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV" data-en="Responsible for content per § 55 Abs. 2 RStV" data-es="Responsable del contenido según § 55 Abs. 2 RStV">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
             <p>Dr. Martin Zanker</p>
             <p>Anglerstraße 2</p>
             <p>80339 München</p>
 
-            <h2>Haftungsausschluss</h2>
-            <p><strong>Haftung für Inhalte</strong></p>
-            <p>
-                Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt.
-                Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte
-                können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß
-                § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen
-                verantwortlich.
-            </p>
+            <h2 data-de="Haftungsausschluss" data-en="Disclaimer" data-es="Aviso de responsabilidad">Haftungsausschluss</h2>
+            <div class="locale-de active">
+                <p><strong>Haftung für Inhalte</strong></p>
+                <p>
+                    Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt.
+                    Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte
+                    können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß
+                    § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen
+                    verantwortlich.
+                </p>
+                <p><strong>Haftung für Links</strong></p>
+                <p>
+                    Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir
+                    keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine
+                    Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige
+                    Anbieter oder Betreiber der Seiten verantwortlich.
+                </p>
+            </div>
+            <div class="locale-en">
+                <p><strong>Liability for Content</strong></p>
+                <p>
+                    The contents of our pages were created with the utmost care.
+                    However, we cannot guarantee the accuracy, completeness, or
+                    timeliness of the content. As a service provider, we are responsible
+                    for our own content on these pages in accordance with general laws
+                    pursuant to § 7 Abs. 1 TMG.
+                </p>
+                <p><strong>Liability for Links</strong></p>
+                <p>
+                    Our website contains links to external third-party websites over whose
+                    content we have no control. We therefore cannot accept any liability
+                    for this external content. The respective provider or operator of the
+                    linked pages is always responsible for the content of those pages.
+                </p>
+            </div>
+            <div class="locale-es">
+                <p><strong>Responsabilidad por contenidos</strong></p>
+                <p>
+                    Los contenidos de nuestras páginas han sido creados con la máxima diligencia.
+                    Sin embargo, no podemos garantizar la exactitud, integridad ni actualidad
+                    de los contenidos. Como proveedor de servicios, somos responsables de
+                    nuestros propios contenidos conforme a las leyes generales según § 7 Abs. 1 TMG.
+                </p>
+                <p><strong>Responsabilidad por enlaces</strong></p>
+                <p>
+                    Nuestra oferta contiene enlaces a sitios web externos de terceros sobre
+                    cuyos contenidos no tenemos influencia. Por tanto, no podemos asumir
+                    ninguna responsabilidad por dichos contenidos externos. El proveedor u
+                    operador de las páginas enlazadas es siempre el responsable de sus contenidos.
+                </p>
+            </div>
 
-            <p><strong>Haftung für Links</strong></p>
-            <p>
-                Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir
-                keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine
-                Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige
-                Anbieter oder Betreiber der Seiten verantwortlich.
-            </p>
+            <h2 data-de="Urheberrecht" data-en="Copyright" data-es="Derechos de autor">Urheberrecht</h2>
+            <div class="locale-de active">
+                <p>
+                    Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
+                    unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung,
+                    Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes
+                    bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
+                    Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen
+                    Gebrauch gestattet.
+                </p>
+            </div>
+            <div class="locale-en">
+                <p>
+                    The content and works created by the site operators on these pages are subject
+                    to German copyright law. Reproduction, editing, distribution, and any kind of
+                    exploitation outside the limits of copyright law require the written consent of
+                    the respective author or creator. Downloads and copies of this site are permitted
+                    for private, non-commercial use only.
+                </p>
+            </div>
+            <div class="locale-es">
+                <p>
+                    Los contenidos y obras creados por los operadores del sitio en estas páginas
+                    están sujetos a la legislación alemana de derechos de autor. La reproducción,
+                    edición, distribución y cualquier tipo de explotación fuera de los límites
+                    de la ley de derechos de autor requieren el consentimiento por escrito del
+                    autor o creador. Las descargas y copias de este sitio solo están permitidas
+                    para uso privado y no comercial.
+                </p>
+            </div>
 
-            <h2>Urheberrecht</h2>
-            <p>
-                Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
-                unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung,
-                Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes
-                bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
-                Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen
-                Gebrauch gestattet.
-            </p>
-
-            <h2>Datenschutz</h2>
-            <p>
-                Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten
-                möglich. Soweit auf unseren Seiten personenbezogene Daten (beispielsweise Name,
-                Anschrift oder E-Mail-Adressen) erhoben werden, erfolgt dies, soweit möglich,
-                stets auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche
-                Zustimmung nicht an Dritte weitergegeben.
-            </p>
+            <h2 data-de="Datenschutz" data-en="Privacy Policy" data-es="Política de privacidad">Datenschutz</h2>
+            <div class="locale-de active">
+                <p>
+                    Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten
+                    möglich. Soweit auf unseren Seiten personenbezogene Daten (beispielsweise Name,
+                    Anschrift oder E-Mail-Adressen) erhoben werden, erfolgt dies, soweit möglich,
+                    stets auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche
+                    Zustimmung nicht an Dritte weitergegeben.
+                </p>
+            </div>
+            <div class="locale-en">
+                <p>
+                    The use of our website is generally possible without providing personal data.
+                    Where personal data (such as name, address, or email address) is collected on
+                    our pages, this is always done on a voluntary basis wherever possible. This data
+                    will not be passed on to third parties without your explicit consent.
+                </p>
+            </div>
+            <div class="locale-es">
+                <p>
+                    El uso de nuestro sitio web es posible en general sin proporcionar datos
+                    personales. En la medida en que se recopilen datos personales (por ejemplo,
+                    nombre, dirección o dirección de correo electrónico) en nuestras páginas,
+                    esto se hará siempre de forma voluntaria en la medida de lo posible. Estos
+                    datos no serán transmitidos a terceros sin su consentimiento expreso.
+                </p>
+            </div>
 
         </div>
     </section>
@@ -119,8 +252,8 @@
     <footer class="main-footer">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="impressum.html">Impressum</a>
-                <a href="kontakt.html">Kontakt</a>
+                <a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a>
+                <a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a>
             </div>
             <p>&copy; 2026 Martin Zanker</p>
         </div>

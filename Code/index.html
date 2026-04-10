@@ -28,21 +28,80 @@
     <!-- Navigation -->
     <nav class="main-nav">
         <div class="nav-container">
+            <!-- Sprachniveau-Toggle -->
+            <div class="lang-switch" role="group" aria-label="Sprachniveau">
+                <button class="lang-switch__btn" data-lang="easy" title="Leichte Sprache" aria-label="Leichte Sprache">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.63 283.46" fill="currentColor">
+                        <path d="M116.81,97.14c26.83,0,48.57-21.75,48.57-48.57S143.64,0,116.81,0s-48.57,21.75-48.57,48.57,21.75,48.57,48.57,48.57"/>
+                        <path d="M231.74,91.31c-10.75-.28-65.42.69-113.04,45.67-.53.5-1.2.75-1.88.75s-1.35-.25-1.88-.75C67.31,92,12.64,91.03,1.89,91.31c-1.06.03-1.89.9-1.89,1.95v141.84c0,1.07.85,1.93,1.92,1.95,10.86.2,65.77,3.36,113.04,45.7.53.47,1.19.71,1.86.71s1.33-.24,1.86-.71c47.27-42.33,102.18-45.49,113.04-45.7,1.07-.02,1.92-.89,1.92-1.95V93.26c0-1.06-.83-1.93-1.89-1.95"/>
+                    </svg>
+                </button>
+                <button class="lang-switch__btn" data-lang="clear" title="Verständlicher Text" aria-label="Verständlicher Text">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 5 Q4 3 6 3 H18 Q20 3 20 5 V13 Q20 15 18 15 H13 L9 19 V15 H6 Q4 15 4 13 Z"/>
+                        <line x1="7" y1="7.5" x2="17" y2="7.5"/>
+                        <line x1="7" y1="10.5" x2="17" y2="10.5"/>
+                        <line x1="7" y1="13.5" x2="13" y2="13.5"/>
+                    </svg>
+                </button>
+                <button class="lang-switch__btn active" data-lang="expert" title="Fachsprache" aria-label="Fachsprache">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 6 C9 5.5 5 5.5 3 6 V19 C5 18.5 9 18.5 12 19"/>
+                        <path d="M12 6 C15 5.5 19 5.5 21 6 V19 C19 18.5 15 18.5 12 19"/>
+                        <line x1="12" y1="6" x2="12" y2="19"/>
+                        <line x1="5.5" y1="9" x2="9.5" y2="9"/>
+                        <line x1="5.5" y1="12" x2="9.5" y2="12"/>
+                        <line x1="5.5" y1="15" x2="9.5" y2="15"/>
+                        <line x1="14.5" y1="9" x2="18.5" y2="9"/>
+                        <line x1="14.5" y1="12" x2="18.5" y2="12"/>
+                        <line x1="14.5" y1="15" x2="18.5" y2="15"/>
+                    </svg>
+                </button>
+            </div>
+
             <label class="theme-switch">
                 <input type="checkbox" class="theme-switch__checkbox">
                 <div class="theme-switch__sun"></div>
                 <div class="theme-switch__moon"></div>
             </label>
+            <!-- Locale-Toggle (DE/EN) -->
+            <div class="locale-switch" role="group" aria-label="Sprache / Language">
+                <button class="locale-switch__btn active" data-locale="de" title="Deutsch" aria-label="Deutsch">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3">
+                        <rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/>
+                        <rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/>
+                        <rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="en" title="English" aria-label="English">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
+                        <rect width="60" height="30" fill="currentColor" opacity="0.4"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/>
+                        <rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/>
+                        <rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/>
+                        <rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/>
+                        <rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="es" title="Español" aria-label="Español">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2">
+                        <rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/>
+                        <rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/>
+                        <rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/>
+                    </svg>
+                </button>
+            </div>
+
             <button class="nav-toggle" aria-label="Navigation öffnen" onclick="event.stopPropagation()">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
             <ul class="nav-menu">
-                <li><a href="werke.html">Werke</a></li>
-                <li><a href="ausstellungen.html">Ausstellungen</a></li>
-                <li><a href="kontakt.html">Kontakt</a></li>
-                <li><a href="impressum.html">Impressum</a></li>
+                <li><a href="werke.html" data-de="Werke" data-en="Works" data-es="Obras">Werke</a></li>
+                <li><a href="reden.html" data-de="Reden" data-en="Speeches" data-es="Discursos">Reden</a></li>
+                <li><a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a></li>
+                <li><a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a></li>
             </ul>
         </div>
     </nav>
@@ -57,33 +116,78 @@
 
     <!-- Main Heading -->
     <div class="main-heading-container">
-        <h1 class="main-heading main-heading-filled">MALEREI</h1>
+        <h1 class="main-heading main-heading-filled" data-de="MALEREI" data-en="PAINTING" data-es="PINTURA">MALEREI</h1>
         <div class="image-with-info">
             <img src="img/Werke/Mythus/Alex.jpeg" alt="Alex" class="main-heading-image">
             <div class="image-info">
                 <div class="info-line">
                     <span class="info-title">Alex</span>
                     <span class="info-year">(2025)</span>
-                    <span class="info-details">Acryl, Bleistift und Farbstift auf Leinwand, 100 × 100 cm</span>
+                    <span class="info-details" data-de="Acryl, Bleistift und Farbstift auf Leinwand, 100 × 100 cm" data-en="Acrylic, pencil and coloured pencil on canvas, 100 × 100 cm" data-es="Acrílico, lápiz y lápiz de color sobre lienzo, 100 × 100 cm">Acryl, Bleistift und Farbstift auf Leinwand, 100 × 100 cm</span>
                 </div>
             </div>
         </div>
-        <h1 class="main-heading main-heading-outline">MALEREI</h1>
+        <h1 class="main-heading main-heading-outline" data-de="MALEREI" data-en="PAINTING" data-es="PINTURA">MALEREI</h1>
     </div>
 
     <!-- KONZEPT Heading -->
     <div class="konzept-heading-container">
-        <h2 class="konzept-heading konzept-heading-filled">KONZEPT</h2>
-        <h2 class="konzept-heading konzept-heading-outline">KONZEPT</h2>
+        <h2 class="konzept-heading konzept-heading-filled" data-de="KONZEPT" data-en="CONCEPT" data-es="CONCEPTO">KONZEPT</h2>
+        <h2 class="konzept-heading konzept-heading-outline" data-de="KONZEPT" data-en="CONCEPT" data-es="CONCEPTO">KONZEPT</h2>
     </div>
 
     <!-- Content Box -->
-    <h2 class="konzept-heading-anchor">KONZEPT</h2>
+    <h2 class="konzept-heading-anchor" data-de="KONZEPT" data-en="CONCEPT" data-es="CONCEPTO" data-es="CONCEPTO">KONZEPT</h2>
     <div class="content-box-wrapper">
         <div class="content-box">
             <div class="content-box-grain"></div>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <div class="lang-container">
+                <div class="lang-text lang-easy">
+                    <div class="locale-de active">
+                        <p>Viele Menschen können malen wie ich. Meine Bilder zeigen, wie es gehen könnte.</p>
+                        <p>Jeder Mensch kann gemalt werden. Die Bilder gehören nicht nur ein paar Menschen.</p>
+                        <p>Die Bilder zeigen den Menschen, dass sie gut sind. Die Bilder zeigen den Menschen auch, dass sie noch besser sein können.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>Many people can paint like me. My pictures show how it could be done.</p>
+                        <p>Every person can be painted. The pictures do not belong to just a few people.</p>
+                        <p>The pictures show people that they are good. The pictures also show people that they can be even better.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>Muchas personas pueden pintar como yo. Mis cuadros muestran cómo podría hacerse.</p>
+                        <p>Cualquier persona puede ser pintada. Los cuadros no pertenecen solo a unas pocas personas.</p>
+                        <p>Los cuadros muestran a las personas que son buenas. Los cuadros también les muestran que pueden ser aún mejores.</p>
+                    </div>
+                </div>
+                <div class="lang-text lang-clear">
+                    <div class="locale-de active">
+                        <p>Durch Spuren des Malens verraten meine Werke ihre Machart und verzichten damit auf den Versuch elitär zu wirken. Die Nachahmung bekannter Bildinhalte und -gattungen erleichtert den Zugang. Die Materialwahl, teils noch sichtbare Vorzeichnungen und unbemalt gebliebene Stellen kratzen an der Erhabenheit des Bildes.</p>
+                        <p>Die Arbeiten setzen die Gemalten in einen aufholbaren Rückstand zu einer besseren Version der eigenen Person. Das Bild ist ein Zerrspiegel. Es verherrlicht das eigene Leben und stellt gleichzeitig ein besseres in Aussicht. In diesem Spannungsfeld zielen die Arbeiten gleichzeitig auf die Akzeptanz und die Aktualisierung des Selbst.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>Through traces of the painting process, my works reveal how they are made and thus forgo any attempt to appear elitist. The imitation of well-known imagery and genres makes them easier to approach. The choice of materials, partly still visible preliminary drawings, and areas left unpainted scratch at the sublimity of the image.</p>
+                        <p>The works place the painted subjects in a recoverable deficit relative to a better version of themselves. The image is a distorting mirror. It glorifies one's own life while simultaneously holding out the prospect of a better one. In this tension, the works aim at both the acceptance and the actualisation of the self.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>A través de las huellas del proceso pictórico, mis obras revelan cómo están hechas y renuncian así a cualquier intento de parecer elitistas. La imitación de imágenes y géneros conocidos facilita el acceso. La elección de materiales, los dibujos preliminares aún parcialmente visibles y las zonas sin pintar arañan la sublimidad de la imagen.</p>
+                        <p>Las obras sitúan a los pintados en un déficit recuperable respecto a una versión mejor de sí mismos. La imagen es un espejo deformante. Glorifica la propia vida y, al mismo tiempo, ofrece la perspectiva de una mejor. En esta tensión, las obras apuntan tanto a la aceptación como a la actualización del yo.</p>
+                    </div>
+                </div>
+                <div class="lang-text lang-expert active">
+                    <div class="locale-de active">
+                        <p>In Artefakten des malerischen Prozesses verraten meine Werke ihre Fabrizität und verzichten damit auf den elitären Schein künstlerischer Arbeiten. Die Emulation und Imitation bekannter Sujets und Bildgattungen erleichtert den Zugang. Die unprätentiöse Materialwahl, teils noch sichtbare Vorzeichnungen und unbemalt gebliebene Stellen unterminieren die Erhabenheit des Bildes.</p>
+                        <p>Die Arbeiten setzen die Porträtierten in einen aufholbaren Rückstand zu einem idealisierten Selbst. Das Bild fungiert als Zerrbild. Es glorifiziert das eigene Leben und stellt gleichzeitig dessen mögliche Steigerung in Aussicht. In diesem Spannungsfeld zielen die Arbeiten auf Selbstakzeptanz und Selbstaktualisierung.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>Through artefacts of the painting process, my works reveal their fabrication and thus forgo the elitist veneer of artistic works. The emulation and imitation of well-known subjects and pictorial genres facilitates access. The unpretentious choice of materials, partly still visible preliminary drawings, and areas left unpainted undermine the sublimity of the image.</p>
+                        <p>The works place the portrayed in a recoverable deficit relative to an idealised self. The image functions as a distortion. It glorifies one's own life while simultaneously holding out the prospect of its possible enhancement. In this tension, the works aim at self-acceptance and self-actualisation.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>A través de artefactos del proceso pictórico, mis obras revelan su fabricación y renuncian así a la apariencia elitista de las obras artísticas. La emulación e imitación de temas y géneros pictóricos conocidos facilita el acceso. La elección despretenciosa de materiales, los dibujos preliminares aún parcialmente visibles y las zonas sin pintar socavan la sublimidad de la imagen.</p>
+                        <p>Las obras sitúan a los retratados en un déficit recuperable respecto a un yo idealizado. La imagen funciona como una distorsión. Glorifica la propia vida y, al mismo tiempo, ofrece la perspectiva de su posible mejora. En esta tensión, las obras apuntan a la autoaceptación y la autoactualización.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -94,28 +198,87 @@
     </div>
 
     <!-- RIVUS Content Box -->
-    <h2 class="gesichten-anchor-gray">RIVUS</h2>
     <div class="content-box-wrapper-2">
         <div class="content-box-2">
             <div class="content-box-grain"></div>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <div class="lang-container">
+                <div class="lang-text lang-easy">
+                    <div class="locale-de active">
+                        <p>In diesen Kunst-Werken geht es um Männer. Diese Männer waren wichtig für mich. Manchmal wollte ich so sein wie sie. Manchmal wollte ich anders sein als sie.</p>
+                        <p>Das Wort „Konkurrenz" kommt aus einer alten Sprache. Es bedeutet: zusammen gehen. Oder: zusammen laufen.</p>
+                        <p>Die Männer auf den Bildern sind heute älter. Sie sehen anders aus als früher. Sie haben auch mehr erlebt als früher.</p>
+                        <p>Wenn ich die Bilder anschaue, merke ich: Ich lebe immer in Verbindung mit anderen Menschen.</p>
+                        <p>Das Wort RIVUS kommt auch aus einer alten Sprache. Es bedeutet: Fluss. Von diesem Wort kommen zwei andere Wörter: „River" bedeutet Fluss auf Englisch. „Rivale" bedeutet Gegner. Ein Rivale war früher jemand, der am gleichen Fluss gelebt hat. Also: Die Männer sind meine Nachbarn am Fluss.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>These artworks are about men. These men were important to me. Sometimes I wanted to be like them. Sometimes I wanted to be different from them.</p>
+                        <p>The word "Konkurrenz" comes from an old language. It means: walking together. Or: running together.</p>
+                        <p>The men in the pictures are older now. They look different from before. They have also experienced more than before.</p>
+                        <p>When I look at the pictures, I realise: I always live in connection with other people.</p>
+                        <p>The word RIVUS also comes from an old language. It means: river. Two other words come from this word: "River" means river in English. "Rival" means opponent. A rival used to be someone who lived on the same river. So: The men are my neighbours on the river.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>Estas obras tratan sobre hombres. Estos hombres fueron importantes para mí. A veces quería ser como ellos. A veces quería ser diferente a ellos.</p>
+                        <p>La palabra «Konkurrenz» viene de un idioma antiguo. Significa: caminar juntos. O: correr juntos.</p>
+                        <p>Los hombres en los cuadros son ahora más mayores. Se ven diferentes a antes. También han vivido más que antes.</p>
+                        <p>Cuando miro los cuadros, me doy cuenta: Siempre vivo en conexión con otras personas.</p>
+                        <p>La palabra RIVUS también viene de un idioma antiguo. Significa: río. De esta palabra vienen otras dos palabras: «River» significa río en inglés. «Rival» significa oponente. Un rival era antes alguien que vivía en el mismo río. Es decir: Los hombres son mis vecinos en el río.</p>
+                    </div>
+                </div>
+                <div class="lang-text lang-clear">
+                    <div class="locale-de active">
+                        <p>Im Werkzyklus RIVUS setze ich mich mit den Männern auseinander, die mir Rivalen wie auch Vorbilder waren. »Konkurrenz«, von »concurre« bedeutet im ursprünglichen Wortsinn »miteinander gehend/laufend«. Im Wettbewerb um Männlichkeit galten mir dieselben Menschen mal als schillernde Ideale und mal als Abgrenzungsobjekte.</p>
+                        <p>In Kompendien von Pathosformeln finden die Abgebildeten sowohl Affirmation, erleben sich jedoch auch immer im entstandenen Unterschied zu einem Selbst aus vergangener Zeit. Sie sind sowohl körperlich gealtert, wie auch reicher an Erfahrung. Ich selbst erkenne, dass ich immer in Bezug zu anderen lebe.</p>
+                        <p>»River« und »Rivale« stammen von RIVUS: Meine Nachbarn am Fluss.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>In the work cycle RIVUS, I engage with the men who were both rivals and role models to me. "Konkurrenz" (competition), from "concurrere", originally means "running/walking together." In the competition for masculinity, the same people appeared to me at times as dazzling ideals and at other times as objects of distinction.</p>
+                        <p>In compendia of pathos formulae, the depicted find both affirmation, yet also always experience the difference that has arisen from a former self. They have both aged physically and grown richer in experience. I myself recognise that I always live in relation to others.</p>
+                        <p>"River" and "rival" both derive from RIVUS: My neighbours on the river.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>En el ciclo de obras RIVUS me confronto con los hombres que fueron para mí tanto rivales como modelos a seguir. «Konkurrenz» (competencia), del latín «concurrere», significa en su sentido original «caminar/correr juntos». En la competencia por la masculinidad, las mismas personas me parecían unas veces ideales deslumbrantes y otras objetos de diferenciación.</p>
+                        <p>En compendios de fórmulas del pathos, los retratados encuentran tanto afirmación como, al mismo tiempo, experimentan la diferencia surgida respecto a un yo del pasado. Han envejecido físicamente, pero también son más ricos en experiencia. Yo mismo reconozco que siempre vivo en relación con otros.</p>
+                        <p>«River» y «Rival» derivan de RIVUS: Mis vecinos en el río.</p>
+                    </div>
+                </div>
+                <div class="lang-text lang-expert active">
+                    <div class="locale-de active">
+                        <p>Im Werkzyklus RIVUS setze ich mich mit den Männern auseinander, die mir Rivalen wie auch Ideal waren. »Konkurrenz«, von »concurre« bedeutet im ursprünglichen Wortsinn »miteinander gehend/laufend«. Im Wettbewerb der Rollenerfüllung der sich wandelnden Männlichkeitsvorstellungen galten mir dieselben Menschen mal als schillernde Ideale und mal als Abgrenzungsobjekte.</p>
+                        <p>In Kompendien von Pathosformeln finden die Abgebildeten sowohl Affirmation, erleben sich jedoch auch immer in einer zwangläufigen Differenz zu einem Selbst aus der Vergangenheit. Sie werden oft konfrontiert mit einem überlegenen körperlichen, dafür aber erfahrungsärmeren Zustand. Ich selbst erkenne, dass ich an der Identifikation mit anderen gewachsen bin.</p>
+                        <p>»River« und »Rivale« stammen von RIVUS: Meine Nachbarn am Fluss.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>In the work cycle RIVUS, I engage with the men who were both rivals and ideals to me. "Konkurrenz" (competition), from "concurrere", originally means "running/walking together." In the competition of fulfilling the shifting expectations of masculinity, the same people appeared to me at times as dazzling ideals and at other times as objects of distinction.</p>
+                        <p>In compendia of pathos formulae, the depicted find both affirmation, yet also always experience an inevitable difference from a former self. They are often confronted with a physically superior, yet less experienced state. I myself recognise that I have grown through my identification with others.</p>
+                        <p>"River" and "rival" both derive from RIVUS: My neighbours on the river.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>En el ciclo de obras RIVUS me confronto con los hombres que fueron para mí tanto rivales como ideales. «Konkurrenz» (competencia), del latín «concurrere», significa en su sentido original «caminar/correr juntos». En la competencia por cumplir las cambiantes expectativas de masculinidad, las mismas personas me parecían unas veces ideales deslumbrantes y otras objetos de diferenciación.</p>
+                        <p>En compendios de fórmulas del pathos, los retratados encuentran tanto afirmación como, al mismo tiempo, experimentan siempre una diferencia inevitable respecto a un yo del pasado. A menudo se ven confrontados con un estado físicamente superior, pero más pobre en experiencia. Yo mismo reconozco que he crecido a través de la identificación con otros.</p>
+                        <p>«River» y «Rival» derivan de RIVUS: Mis vecinos en el río.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Ben Image Container -->
     <div class="unterpunkt-heading-container" id="ben-container">
         <div class="image-with-info" id="ben-image-with-info">
-            <img src="img/Werke/Rivus/Ben.jpg" alt="Ben" class="unterpunkt-heading-image">
+            <div class="image-clip"><img src="img/Werke/Rivus/Ben.jpg" alt="Ben" class="unterpunkt-heading-image"></div>
             <div class="image-info">
                 <div class="info-line">
                     <span class="info-title">Ben</span>
                     <span class="info-year">(2015)</span>
-                    <span class="info-details">Acryl, Bleistift und Farbstift auf Leinwand, 100 × 120 cm</span>
+                    <span class="info-details" data-de="Acryl, Bleistift und Farbstift auf Leinwand, 100 × 120 cm" data-en="Acrylic, pencil and coloured pencil on canvas, 100 × 120 cm" data-es="Acrílico, lápiz y lápiz de color sobre lienzo, 100 × 120 cm">Acryl, Bleistift und Farbstift auf Leinwand, 100 × 120 cm</span>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- RIVUS Anchor Gray – nach Ben, damit es per DOM-Reihenfolge über Ben liegt -->
+    <h2 class="gesichten-anchor-gray">RIVUS</h2>
 
     <!-- MYTHUS Anchor Container (linksbündig wie KONZEPT, gespiegelt) -->
     <div id="mythus-anchor-container" class="konzept-heading-container">
@@ -124,28 +287,93 @@
     </div>
 
     <!-- MYTHUS Content Box -->
-    <h2 id="mythus-anchor" class="konzept-heading-anchor">MYTHUS</h2>
     <div id="mythus-box-wrapper" class="content-box-wrapper">
         <div id="mythus-box" class="content-box">
             <div class="content-box-grain"></div>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <div class="lang-container">
+                <div class="lang-text lang-easy">
+                    <div class="locale-de active">
+                        <p>Ich habe Kunst-Werke gemacht. Die Kunst-Werke heißen zusammen: MYTHUS.</p>
+                        <p>In diesen Kunst-Werken male ich Menschen als Bilder. Solche Bilder nennt man: Porträts.</p>
+                        <p>Ich schaue mir dabei viele Dinge an. Zum Beispiel: Wie ist das Bild aufgebaut? Welche Farben benutze ich? Was zeigt das Bild?</p>
+                        <p>Ich frage mich auch: Welche Aufgabe hatten Porträts früher? Und welche Aufgabe haben sie heute?</p>
+                        <p>Früher hat man wichtige Menschen gemalt. Zum Beispiel Könige und Königinnen. Oder man hat berühmte Geschichten gemalt.</p>
+                        <p>Es gab auch alte Geschichten über Götter und Helden. Diese Geschichten nennt man: Mythen. Die Mythen kamen vor allem aus Europa und aus West-Asien.</p>
+                        <p>Ich benutze diese alten Ideen für meine Kunst. Aber ich male keine Könige oder Götter. Ich male Menschen aus meinem Leben.</p>
+                        <p>Damit möchte ich zwei Dinge zeigen: Ich möchte diesen Menschen Ehre geben. Und ich möchte ihnen Mut machen. Meine Botschaft ist: Ihr seid gut, so wie ihr werdet.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>I have made artworks. The artworks are called together: MYTHUS.</p>
+                        <p>In these artworks I paint people as pictures. Such pictures are called: portraits.</p>
+                        <p>I look at many things. For example: How is the picture structured? What colours do I use? What does the picture show?</p>
+                        <p>I also ask myself: What role did portraits have in the past? And what role do they have today?</p>
+                        <p>In the past, important people were painted. For example, kings and queens. Or famous stories were painted.</p>
+                        <p>There were also old stories about gods and heroes. These stories are called: myths. The myths came mainly from Europe and from West Asia.</p>
+                        <p>I use these old ideas for my art. But I do not paint kings or gods. I paint people from my life.</p>
+                        <p>With this, I want to show two things: I want to give these people honour. And I want to give them courage. My message is: You are good, just as you are becoming.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>He hecho obras de arte. Las obras de arte se llaman en conjunto: MYTHUS.</p>
+                        <p>En estas obras pinto personas como imágenes. Estas imágenes se llaman: retratos.</p>
+                        <p>Observo muchas cosas. Por ejemplo: ¿Cómo está construida la imagen? ¿Qué colores uso? ¿Qué muestra la imagen?</p>
+                        <p>También me pregunto: ¿Qué función tenían los retratos antes? ¿Y qué función tienen hoy?</p>
+                        <p>Antes se pintaba a personas importantes. Por ejemplo, reyes y reinas. O se pintaban historias famosas.</p>
+                        <p>También había historias antiguas sobre dioses y héroes. Estas historias se llaman: mitos. Los mitos venían sobre todo de Europa y de Asia Occidental.</p>
+                        <p>Uso estas ideas antiguas para mi arte. Pero no pinto reyes ni dioses. Pinto personas de mi vida.</p>
+                        <p>Con esto quiero mostrar dos cosas: Quiero dar honra a estas personas. Y quiero darles ánimo. Mi mensaje es: Sois buenos, tal como os vais haciendo.</p>
+                    </div>
+                </div>
+                <div class="lang-text lang-clear">
+                    <div class="locale-de active">
+                        <p>Im Zyklus MYTHUS beschäftige ich mich im Besonderen mit gestalterischen Elementen wie dem Bildaufbau, dem Stil oder der Farbsymbolik. Ich frage nach geschichtlich wichtigen Bildinhalten und der Rolle des Porträts in Vergangenheit und Gegenwart.</p>
+                        <p>Dabei greife ich auf Vorbilder aus der Kunstgeschichte zurück, auf die Herrscherporträts und Historiengemälde der Vormoderne, aber auch auf Mythen aus der europäischen und westasiatischen Antike und Vorantike. Mit diesen Verweisen möchte ich die Menschen in meinem Umfeld ehren und sie zugleich ermutigen:</p>
+                        <p>Ihr seid gut, so wie ihr werdet.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>In the cycle MYTHUS, I am particularly concerned with compositional elements such as the structure of the image, style, or colour symbolism. I inquire into historically significant imagery and the role of the portrait in past and present.</p>
+                        <p>In doing so, I draw on models from art history: the ruler portraits and history paintings of the pre-modern era, but also myths from European and West Asian antiquity and pre-antiquity. With these references, I want to honour the people in my surroundings and encourage them at the same time:</p>
+                        <p>You are good, just as you are becoming.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>En el ciclo MYTHUS me ocupo especialmente de elementos compositivos como la estructura de la imagen, el estilo o el simbolismo del color. Indago en contenidos pictóricos históricamente relevantes y en el papel del retrato en el pasado y en el presente.</p>
+                        <p>Para ello recurro a modelos de la historia del arte: a los retratos de gobernantes y las pinturas históricas de la época premoderna, pero también a mitos de la Antigüedad y la pre-Antigüedad europeas y de Asia Occidental. Con estas referencias quiero honrar a las personas de mi entorno y, al mismo tiempo, animarlas:</p>
+                        <p>Sois buenos, tal como os vais haciendo.</p>
+                    </div>
+                </div>
+                <div class="lang-text lang-expert active">
+                    <div class="locale-de active">
+                        <p>Im Zyklus MYTHUS gehe ich nicht nur formalen und inhaltlichen kunstspezifischen Kategorien, wie Komposition, Stil und Kolorit, Ikonografie und Thematik nach, sondern auch der Funktion des Porträts in vergangener und meiner gegenwärtigen Kultur.</p>
+                        <p>Die Rekursion auf kunsthistorische Vorbilder bedient sich u.a. der Repräsentationskunst der Vormoderne, mit ihren Herrscher·innenbildern und Historiengemälden, nimmt aber auch Anleihen aus den Mythen der überwiegend europäischen und westasiatischen Antike und Vorantike. Sowohl ehre ich die Menschen meines Umfelds mit diesen Verweisen, wie ich sie auch gleichzeitig zu motivieren erhoffe: Ihr seid gut, so wie ihr werdet.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>In the cycle MYTHUS, I pursue not only formal and thematic art-specific categories such as composition, style and colouring, iconography and subject matter, but also the function of the portrait in past and in my present culture.</p>
+                        <p>The recursion to art-historical models draws, among other things, on the representational art of the pre-modern era, with its ruler portraits and history paintings, but also borrows from the myths of predominantly European and West Asian antiquity and pre-antiquity. I both honour the people in my surroundings with these references and hope to encourage them at the same time: You are good, just as you are becoming.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>En el ciclo MYTHUS no solo exploro categorías artísticas formales y temáticas como la composición, el estilo y el colorido, la iconografía y la temática, sino también la función del retrato en la cultura del pasado y en mi cultura presente.</p>
+                        <p>La recursión a modelos histórico-artísticos se nutre, entre otros, del arte de la representación premoderno, con sus retratos de gobernantes y pinturas históricas, pero también toma préstamos de los mitos de la Antigüedad y la pre-Antigüedad, predominantemente europeas y de Asia Occidental. Con estas referencias tanto honro a las personas de mi entorno como espero motivarlas al mismo tiempo: Sois buenos, tal como os vais haciendo.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- MYTHUS Daniel Image Container (gespiegelt - links) -->
     <div class="unterpunkt-heading-container" id="mythus-daniel-container">
         <div class="image-with-info" id="mythus-daniel-image-with-info">
-            <img src="img/Werke/Mythus/Daniel.jpg" alt="Daniel" class="unterpunkt-heading-image">
+            <div class="image-clip"><img src="img/Werke/Mythus/Daniel.jpg" alt="Daniel" class="unterpunkt-heading-image"></div>
             <div class="image-info">
                 <div class="info-line">
-                    <span class="info-title">Daniel (als Patrokles)</span>
+                    <span class="info-title" data-de="Daniel (als Patrokles)" data-en="Daniel (as Patroclus)" data-es="Daniel (como Patroclo)">Daniel (als Patrokles)</span>
                     <span class="info-year">(2015)</span>
-                    <span class="info-details">Acryl und Bleistift auf Leinwand, 100 × 100 cm</span>
+                    <span class="info-details" data-de="Acryl und Bleistift auf Leinwand, 100 × 100 cm" data-en="Acrylic and pencil on canvas, 100 × 100 cm" data-es="Acrílico y lápiz sobre lienzo, 100 × 100 cm">Acryl und Bleistift auf Leinwand, 100 × 100 cm</span>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- MYTHUS Anchor Gray – nach Daniel, damit es per DOM-Reihenfolge über Daniel liegt -->
+    <h2 id="mythus-anchor" class="konzept-heading-anchor">MYTHUS</h2>
 
     <!-- GESICHTEN Section -->
     <div id="rivus-anchor-container" class="gesichten-anchor-container">
@@ -158,7 +386,53 @@
     <div id="rivus-content-box-wrapper" class="content-box-wrapper-2">
         <div id="rivus-content-box" class="content-box-2">
             <div class="content-box-grain"></div>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            <div class="lang-container">
+                <div class="lang-text lang-easy">
+                    <div class="locale-de active">
+                        <p>Menschen schauen Bilder unterschiedlich an.</p>
+                        <p>Manche Menschen schauen auf die Farben. Oder sie sehen auf die Formen im Bild.</p>
+                        <p>Manche Menschen wollen wissen: Was bedeutet das Bild? Gehört das Bild zu anderen Bildern?</p>
+                        <p>Manche Menschen sehen auf Gesichter. Manche Menschen können Gesichter gar nicht erkennen.</p>
+                        <p>Meine Bilder sind für viele Menschen. Viele Menschen sollen etwas in den Bildern finden können.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>People look at pictures in different ways.</p>
+                        <p>Some people look at the colours. Or they look at the shapes in the picture.</p>
+                        <p>Some people want to know: What does the picture mean? Does the picture belong with other pictures?</p>
+                        <p>Some people look at faces. Some people cannot recognise faces at all.</p>
+                        <p>My pictures are for many people. Many people should be able to find something in the pictures.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>Las personas miran los cuadros de maneras diferentes.</p>
+                        <p>Algunas personas miran los colores. O miran las formas en el cuadro.</p>
+                        <p>Algunas personas quieren saber: ¿Qué significa el cuadro? ¿Este cuadro tiene relación con otros cuadros?</p>
+                        <p>Algunas personas miran los rostros. Algunas personas no pueden reconocer rostros en absoluto.</p>
+                        <p>Mis cuadros son para muchas personas. Muchas personas deberían poder encontrar algo en los cuadros.</p>
+                    </div>
+                </div>
+                <div class="lang-text lang-clear">
+                    <div class="locale-de active">
+                        <p>Die meisten Menschen erkennen Gesichter und deren Ausdruck; diese Menschen, aber auch jene Menschen, die Bilder zunächst im Bildaufbau, Körperdarstellung, Pinselführung und Farbenspiel auf sich wirken lassen sollen ähnliches in Bildern finden können, wie wiederum andere, die Lust an Deutung und geschichtlicher Einordnung gewinnen oder wiederum andere, die mit der Schwierigkeit leben, andere Menschen anhand ihrer Gesichter zu erkennen.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>Most people recognise faces and their expression; these people, but also those who first let pictures take effect through their composition, bodily depiction, brushwork, and play of colour, should be able to find similar things in the images, as in turn should others who take pleasure in interpretation and historical contextualisation, or yet others who live with the difficulty of recognising other people by their faces.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>La mayoría de las personas reconocen rostros y su expresión; estas personas, pero también aquellas que primero dejan que las imágenes actúen sobre ellas a través de la composición, la representación corporal, la pincelada y el juego de colores, deberían poder encontrar algo similar en las imágenes, al igual que otras que disfrutan de la interpretación y la contextualización histórica, o aquellas que viven con la dificultad de reconocer a otras personas por sus rostros.</p>
+                    </div>
+                </div>
+                <div class="lang-text lang-expert active">
+                    <div class="locale-de active">
+                        <p>Die meisten Menschen erkennen Gesichter und deren Ausdruck; diese Menschen, aber auch jene Menschen, die Bilder zunächst in Komposition, Gestus, Duktus und Kolorit auf sich wirken lassen sollen ähnliches in Bildern finden können, wie wiederum andere, die Lust an Interpretation und historische Einordnung gewinnen oder wiederum andere, die z.B. mit Prosopagnosie leben.</p>
+                    </div>
+                    <div class="locale-en">
+                        <p>Most people recognise faces and their expression; these people, but also those who first let pictures take effect through composition, gesture, brushwork, and colouring, should be able to find similar things in the images, as in turn should others who take pleasure in interpretation and historical contextualisation, or yet others who live, for example, with prosopagnosia.</p>
+                    </div>
+                    <div class="locale-es">
+                        <p>La mayoría de las personas reconocen rostros y su expresión; estas personas, pero también aquellas que primero dejan que las imágenes actúen sobre ellas a través de la composición, el gesto, la factura y el colorido, deberían poder encontrar algo similar en las imágenes, al igual que otras que disfrutan de la interpretación y la contextualización histórica, o aquellas que viven, por ejemplo, con prosopagnosia.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -166,32 +440,36 @@
     <div class="unterpunkt-heading-container" id="michael-marcus-container">
         <div id="michael-marcus-wrapper" class="multi-image-wrapper">
             <div id="michael-image-with-info" class="image-with-info">
-                <img src="img/Werke/Gesichten/Michael.jpg" alt="Michael" class="unterpunkt-heading-image">
+                <div class="image-clip"><img src="img/Werke/Gesichten/Michael.jpg" alt="Michael" class="unterpunkt-heading-image"></div>
                 <div class="image-info">
                     <div class="info-line">
-                        <span class="info-title">Michael (am Kreuz)</span>
+                        <span class="info-title" data-de="Michael (am Kreuz)" data-en="Michael (at the Cross)" data-es="Michael (en la Cruz)">Michael (am Kreuz)</span>
                         <span class="info-year">(2015)</span>
-                        <span class="info-details">Acryl und Bleistift auf Leinwand, 80 × 120 cm</span>
+                        <span class="info-details" data-de="Acryl und Bleistift auf Leinwand, 80 × 120 cm" data-en="Acrylic and pencil on canvas, 80 × 120 cm" data-es="Acrílico y lápiz sobre lienzo, 80 × 120 cm">Acryl und Bleistift auf Leinwand, 80 × 120 cm</span>
                     </div>
                 </div>
             </div>
             <div id="marcus-image-with-info" class="image-with-info">
-                <img src="img/Werke/Gesichten/Marcus.jpg" alt="Marcus" class="unterpunkt-heading-image">
+                <div class="image-clip"><img src="img/Werke/Gesichten/Marcus.jpg" alt="Marcus" class="unterpunkt-heading-image"></div>
                 <div class="image-info">
                     <div class="info-line">
                         <span class="info-title">Marcus</span>
                         <span class="info-year">(2017)</span>
-                        <span class="info-details">Acryl, Blei- und Holzstift auf Leinwand, 100 x 140</span>
+                        <span class="info-details" data-de="Acryl, Blei- und Holzstift auf Leinwand, 100 × 140 cm" data-en="Acrylic, graphite and wood pencil on canvas, 100 × 140 cm" data-es="Acrílico, lápiz grafito y lápiz de madera sobre lienzo, 100 × 140 cm">Acryl, Blei- und Holzstift auf Leinwand, 100 × 140 cm</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Temporary spacer to enable scrolling -->
-    <div style="height: 300vh;"></div>
+    <!-- Spacer: Höhe wird per JS dynamisch gesetzt (letzter Snap-Punkt + Puffer) -->
+    <div id="scroll-spacer"></div>
 
     <div class="bottom-bar-fix"></div>
+
+    <!-- Copyright -->
+    <p style="text-align: right; padding: 14rem var(--spacing-container) 1.5rem; color: var(--color-dark); font-size: var(--font-size-body);">&copy; 2026 Martin Zanker</p>
+
     <script src="js/script.js"></script>
 </body>
 </html>

@@ -3,8 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontakt - Martin Zanker</title>
+    <title>Reden - Martin Zanker</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .speeches-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-section) var(--spacing-container);
+        }
+
+        .speech-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .speech-item {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--color-gray);
+        }
+
+        .speech-item:first-child {
+            border-top: 1px solid var(--color-gray);
+        }
+
+        .speech-info {
+            flex: 1;
+        }
+
+        .speech-date {
+            font-size: var(--font-size-body);
+            color: var(--color-gray-dark);
+            margin-bottom: 4px;
+        }
+
+        .speech-title {
+            font-size: var(--font-size-body-large);
+            font-weight: 600;
+            color: #333366;
+            margin: 0 0 4px 0;
+        }
+
+        .speech-location {
+            font-size: var(--font-size-body);
+            color: var(--color-gray-dark);
+            margin: 0;
+        }
+
+        .speech-download {
+            flex-shrink: 0;
+        }
+
+        .speech-download a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--color-primary);
+            text-decoration: none;
+            font-size: var(--font-size-body);
+            font-weight: 500;
+            border: 1px solid var(--color-primary);
+            padding: 6px 14px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .speech-download a:hover {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .speech-download a::before {
+            content: '↓';
+        }
+
+        .speeches-note {
+            font-size: var(--font-size-body);
+            color: var(--color-gray-dark);
+            font-style: italic;
+            margin-bottom: 24px;
+        }
+    </style>
 </head>
 <body class="sub-page">
 
@@ -94,10 +176,10 @@
                 <span></span>
             </button>
             <ul class="nav-menu">
-                <li><a href="werke.html" data-de="Werke" data-en="Works" data-es="Obras">Werke</a></li>
-                <li><a href="reden.html" data-de="Reden" data-en="Speeches" data-es="Discursos">Reden</a></li>
-                <li><a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a></li>
-                <li><a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a></li>
+                <li><a href="werke.html" data-de="Werke" data-en="Works">Werke</a></li>
+                <li><a href="reden.html" class="active" data-de="Reden" data-en="Speeches">Reden</a></li>
+                <li><a href="kontakt.html" data-de="Kontakt" data-en="Contact">Kontakt</a></li>
+                <li><a href="impressum.html" data-de="Impressum" data-en="Imprint">Impressum</a></li>
             </ul>
         </div>
     </nav>
@@ -112,79 +194,32 @@
 
     <!-- Page Title -->
     <section class="page-title-section">
-        <h1 class="page-title" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</h1>
+        <h1 class="page-title" data-de="Reden" data-en="Speeches" data-es="Discursos">Reden</h1>
     </section>
 
-    <!-- Contact Section -->
-    <section class="contact-section">
-        <div class="contact-content">
+    <!-- Speeches List -->
+    <section class="speeches-section">
+        <p class="speeches-note locale-de active">Die Reden stehen derzeit nur auf Deutsch zur Verfügung.</p>
+        <p class="speeches-note locale-en">Speeches are currently only available in German.</p>
+        <p class="speeches-note locale-es">Los discursos están disponibles actualmente solo en alemán.</p>
+        <div class="speech-list">
 
-            <!-- Contact Information -->
-            <div class="contact-info">
-                <h2 data-de="Kontaktinformationen" data-en="Contact Information" data-es="Información de contacto">Kontaktinformationen</h2>
-                <div class="locale-de active">
-                    <p><strong>E-Mail:</strong> <a href="mailto:mail@martinzanker.com">mail@martinzanker.com</a></p>
-                    <p><strong>Atelier:</strong> Anglerstraße 2, 80339 München</p>
-                    <p><strong>Öffnungszeiten:</strong> Nach Vereinbarung</p>
+            <!-- Reden hier eintragen -->
+            <div class="speech-item">
+                <div class="speech-info">
+                    <div class="speech-date">Datum</div>
+                    <h2 class="speech-title">Titel der Rede</h2>
+                    <p class="speech-location">Anlass / Ort</p>
                 </div>
-                <div class="locale-en">
-                    <p><strong>E-Mail:</strong> <a href="mailto:mail@martinzanker.com">mail@martinzanker.com</a></p>
-                    <p><strong>Studio:</strong> Anglerstraße 2, 80339 München</p>
-                    <p><strong>Opening Hours:</strong> By appointment</p>
+                <div class="speech-download">
+                    <a href="pdf/rede-beispiel.pdf" download>PDF</a>
                 </div>
-                <div class="locale-es">
-                    <p><strong>E-Mail:</strong> <a href="mailto:mail@martinzanker.com">mail@martinzanker.com</a></p>
-                    <p><strong>Estudio:</strong> Anglerstraße 2, 80339 Múnich</p>
-                    <p><strong>Horario:</strong> Con cita previa</p>
-                </div>
-            </div>
-
-            <!-- Contact Form -->
-            <div class="contact-form">
-                <h2 data-de="Nachricht senden" data-en="Send a Message" data-es="Enviar un mensaje">Nachricht senden</h2>
-                <form id="contactForm">
-                    <div class="form-group">
-                        <label for="name">Name *</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">E-Mail *</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="subject" data-de="Betreff" data-en="Subject" data-es="Asunto">Betreff</label>
-                        <input type="text" id="subject" name="subject">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="message" data-de="Nachricht *" data-en="Message *" data-es="Mensaje *">Nachricht *</label>
-                        <textarea id="message" name="message" required></textarea>
-                    </div>
-
-                    <button type="submit" class="submit-button" data-de="Absenden" data-en="Send" data-es="Enviar">Absenden</button>
-                </form>
             </div>
 
         </div>
     </section>
 
     <script src="js/script.js"></script>
-    <script>
-        // Simple form handling - replace with actual backend integration
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const locale = localStorage.getItem('locale') || 'de';
-            const msg = locale === 'en'
-                ? 'Thank you for your message! This function will be connected to a backend.'
-                : locale === 'es'
-                ? '¡Gracias por su mensaje! Esta función se conectará próximamente con un servidor.'
-                : 'Vielen Dank für Ihre Nachricht! Diese Funktion wird noch mit einem Backend verbunden.';
-            alert(msg);
-            this.reset();
-        });
-    </script>
 
     <!-- Footer -->
     <footer class="main-footer">

@@ -6,7 +6,7 @@
     <title>Ausstellungen - Martin Zanker</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="sub-page">
 
     <!-- Background stripes -->
     <div class="background-stripe-top"></div>
@@ -24,21 +24,80 @@
     <!-- Navigation -->
     <nav class="main-nav">
         <div class="nav-container">
+            <!-- Sprachniveau-Toggle -->
+            <div class="lang-switch" role="group" aria-label="Sprachniveau">
+                <button class="lang-switch__btn" data-lang="easy" title="Leichte Sprache" aria-label="Leichte Sprache">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.63 283.46" fill="currentColor">
+                        <path d="M116.81,97.14c26.83,0,48.57-21.75,48.57-48.57S143.64,0,116.81,0s-48.57,21.75-48.57,48.57,21.75,48.57,48.57,48.57"/>
+                        <path d="M231.74,91.31c-10.75-.28-65.42.69-113.04,45.67-.53.5-1.2.75-1.88.75s-1.35-.25-1.88-.75C67.31,92,12.64,91.03,1.89,91.31c-1.06.03-1.89.9-1.89,1.95v141.84c0,1.07.85,1.93,1.92,1.95,10.86.2,65.77,3.36,113.04,45.7.53.47,1.19.71,1.86.71s1.33-.24,1.86-.71c47.27-42.33,102.18-45.49,113.04-45.7,1.07-.02,1.92-.89,1.92-1.95V93.26c0-1.06-.83-1.93-1.89-1.95"/>
+                    </svg>
+                </button>
+                <button class="lang-switch__btn" data-lang="clear" title="Verständlicher Text" aria-label="Verständlicher Text">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 5 Q4 3 6 3 H18 Q20 3 20 5 V13 Q20 15 18 15 H13 L9 19 V15 H6 Q4 15 4 13 Z"/>
+                        <line x1="7" y1="7.5" x2="17" y2="7.5"/>
+                        <line x1="7" y1="10.5" x2="17" y2="10.5"/>
+                        <line x1="7" y1="13.5" x2="13" y2="13.5"/>
+                    </svg>
+                </button>
+                <button class="lang-switch__btn active" data-lang="expert" title="Fachsprache" aria-label="Fachsprache">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 6 C9 5.5 5 5.5 3 6 V19 C5 18.5 9 18.5 12 19"/>
+                        <path d="M12 6 C15 5.5 19 5.5 21 6 V19 C19 18.5 15 18.5 12 19"/>
+                        <line x1="12" y1="6" x2="12" y2="19"/>
+                        <line x1="5.5" y1="9" x2="9.5" y2="9"/>
+                        <line x1="5.5" y1="12" x2="9.5" y2="12"/>
+                        <line x1="5.5" y1="15" x2="9.5" y2="15"/>
+                        <line x1="14.5" y1="9" x2="18.5" y2="9"/>
+                        <line x1="14.5" y1="12" x2="18.5" y2="12"/>
+                        <line x1="14.5" y1="15" x2="18.5" y2="15"/>
+                    </svg>
+                </button>
+            </div>
+
             <label class="theme-switch">
                 <input type="checkbox" class="theme-switch__checkbox">
                 <div class="theme-switch__sun"></div>
                 <div class="theme-switch__moon"></div>
             </label>
+            <!-- Locale-Toggle (DE/EN) -->
+            <div class="locale-switch" role="group" aria-label="Sprache / Language">
+                <button class="locale-switch__btn active" data-locale="de" title="Deutsch" aria-label="Deutsch">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3">
+                        <rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/>
+                        <rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/>
+                        <rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="en" title="English" aria-label="English">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
+                        <rect width="60" height="30" fill="currentColor" opacity="0.4"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/>
+                        <rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/>
+                        <rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/>
+                        <rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/>
+                        <rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="es" title="Español" aria-label="Español">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2">
+                        <rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/>
+                        <rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/>
+                        <rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/>
+                    </svg>
+                </button>
+            </div>
+
             <button class="nav-toggle" aria-label="Navigation öffnen" onclick="event.stopPropagation()">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
             <ul class="nav-menu">
-                <li><a href="werke.html">Werke</a></li>
-                <li><a href="ausstellungen.html">Ausstellungen</a></li>
-                <li><a href="kontakt.html">Kontakt</a></li>
-                <li><a href="impressum.html">Impressum</a></li>
+                <li><a href="werke.html" data-de="Werke" data-en="Works" data-es="Obras">Werke</a></li>
+                <li><a href="reden.html" data-de="Reden" data-en="Speeches" data-es="Discursos">Reden</a></li>
+                <li><a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a></li>
+                <li><a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a></li>
             </ul>
         </div>
     </nav>
@@ -53,80 +112,195 @@
 
     <!-- Page Title -->
     <section class="page-title-section">
-        <h1 class="page-title">Ausstellungen & Veranstaltungen</h1>
+        <h1 class="page-title" data-de="Ausstellungen &amp; Veranstaltungen" data-en="Exhibitions &amp; Events" data-es="Exposiciones &amp; Eventos">Ausstellungen &amp; Veranstaltungen</h1>
     </section>
 
     <!-- Exhibitions List -->
     <section class="exhibitions-section">
         <div class="exhibition-list">
 
-            <!-- Current/Upcoming Exhibitions -->
             <div class="exhibition-item">
                 <div class="exhibition-date">März 2026</div>
-                <h2>Gesichten - Eine Retrospektive</h2>
-                <p class="exhibition-location">Kunsthalle Berlin, Hauptsaal</p>
-                <p class="exhibition-description">
-                    Eine umfassende Ausstellung meiner Portrait-Serie "Gesichten",
-                    die die Entwicklung meiner malerischen Auseinandersetzung mit dem
-                    menschlichen Antlitz über die letzten fünf Jahre zeigt.
-                    Die Ausstellung präsentiert über 40 Werke in Öl und Mischtechnik.
-                </p>
+                <div class="locale-de active">
+                    <h2>Gesichten – Eine Retrospektive</h2>
+                    <p class="exhibition-location">Kunsthalle Berlin, Hauptsaal</p>
+                    <p class="exhibition-description">
+                        Eine umfassende Ausstellung meiner Portrait-Serie „Gesichten",
+                        die die Entwicklung meiner malerischen Auseinandersetzung mit dem
+                        menschlichen Antlitz über die letzten fünf Jahre zeigt.
+                        Die Ausstellung präsentiert über 40 Werke in Öl und Mischtechnik.
+                    </p>
+                </div>
+                <div class="locale-en">
+                    <h2>Gesichten – A Retrospective</h2>
+                    <p class="exhibition-location">Kunsthalle Berlin, Main Hall</p>
+                    <p class="exhibition-description">
+                        A comprehensive exhibition of my portrait series "Gesichten",
+                        tracing the development of my painterly engagement with the
+                        human face over the past five years.
+                        The exhibition presents over 40 works in oil and mixed media.
+                    </p>
+                </div>
+                <div class="locale-es">
+                    <h2>Gesichten – Una retrospectiva</h2>
+                    <p class="exhibition-location">Kunsthalle Berlín, Sala principal</p>
+                    <p class="exhibition-description">
+                        Una exposición exhaustiva de mi serie de retratos "Gesichten",
+                        que muestra el desarrollo de mi trabajo pictórico con
+                        el rostro humano a lo largo de los últimos cinco años.
+                        La exposición presenta más de 40 obras en óleo y técnica mixta.
+                    </p>
+                </div>
             </div>
 
             <div class="exhibition-item">
                 <div class="exhibition-date">Januar 2026</div>
-                <h2>Farbe und Form - Gruppenausstellung</h2>
-                <p class="exhibition-location">Galerie am Savignyplatz, München</p>
-                <p class="exhibition-description">
-                    Gemeinsam mit zehn anderen zeitgenössischen Künstler*innen
-                    präsentiere ich eine Auswahl abstrakter Arbeiten, die sich mit
-                    dem Verhältnis von Farbe und Form auseinandersetzen.
-                </p>
+                <div class="locale-de active">
+                    <h2>Farbe und Form – Gruppenausstellung</h2>
+                    <p class="exhibition-location">Galerie am Savignyplatz, München</p>
+                    <p class="exhibition-description">
+                        Gemeinsam mit zehn anderen zeitgenössischen Künstler*innen
+                        präsentiere ich eine Auswahl abstrakter Arbeiten, die sich mit
+                        dem Verhältnis von Farbe und Form auseinandersetzen.
+                    </p>
+                </div>
+                <div class="locale-en">
+                    <h2>Colour and Form – Group Exhibition</h2>
+                    <p class="exhibition-location">Galerie am Savignyplatz, Munich</p>
+                    <p class="exhibition-description">
+                        Together with ten other contemporary artists, I present a selection
+                        of abstract works exploring the relationship between colour and form.
+                    </p>
+                </div>
+                <div class="locale-es">
+                    <h2>Color y forma – Exposición colectiva</h2>
+                    <p class="exhibition-location">Galerie am Savignyplatz, Múnich</p>
+                    <p class="exhibition-description">
+                        Junto con diez artistas contemporáneos, presento una selección
+                        de obras abstractas que exploran la relación entre color y forma.
+                    </p>
+                </div>
             </div>
 
-            <!-- Past Exhibitions -->
             <div class="exhibition-item">
                 <div class="exhibition-date">November 2025</div>
-                <h2>Malerei & Theorie - Ein Dialog</h2>
-                <p class="exhibition-location">Akademie der Künste, Hamburg</p>
-                <p class="exhibition-description">
-                    Eine interdisziplinäre Veranstaltungsreihe, die praktische Malerei
-                    mit kunsttheoretischen Diskursen verbindet. Neben der Ausstellung
-                    meiner neuesten Werke fanden begleitende Vorträge und Workshops statt.
-                </p>
+                <div class="locale-de active">
+                    <h2>Malerei &amp; Theorie – Ein Dialog</h2>
+                    <p class="exhibition-location">Akademie der Künste, Hamburg</p>
+                    <p class="exhibition-description">
+                        Eine interdisziplinäre Veranstaltungsreihe, die praktische Malerei
+                        mit kunsttheoretischen Diskursen verbindet. Neben der Ausstellung
+                        meiner neuesten Werke fanden begleitende Vorträge und Workshops statt.
+                    </p>
+                </div>
+                <div class="locale-en">
+                    <h2>Painting &amp; Theory – A Dialogue</h2>
+                    <p class="exhibition-location">Akademie der Künste, Hamburg</p>
+                    <p class="exhibition-description">
+                        An interdisciplinary series of events combining practical painting
+                        with art-theoretical discourse. Alongside the exhibition of my
+                        latest works, accompanying lectures and workshops took place.
+                    </p>
+                </div>
+                <div class="locale-es">
+                    <h2>Pintura &amp; Teoría – Un diálogo</h2>
+                    <p class="exhibition-location">Akademie der Künste, Hamburgo</p>
+                    <p class="exhibition-description">
+                        Una serie interdisciplinar de eventos que combina la pintura
+                        práctica con el discurso teórico artístico. Junto a la exposición
+                        de mis obras más recientes, tuvieron lugar conferencias y talleres.
+                    </p>
+                </div>
             </div>
 
             <div class="exhibition-item">
                 <div class="exhibition-date">August 2025</div>
-                <h2>Sommeratelier - Offene Türen</h2>
-                <p class="exhibition-location">Eigenes Atelier, Frankfurt</p>
-                <p class="exhibition-description">
-                    Im Rahmen der städtischen Atelierrundgänge öffnete ich mein Atelier
-                    für Besucher*innen und gab Einblicke in meine aktuelle Arbeit und
-                    den kreativen Prozess.
-                </p>
+                <div class="locale-de active">
+                    <h2>Sommeratelier – Offene Türen</h2>
+                    <p class="exhibition-location">Eigenes Atelier, Frankfurt</p>
+                    <p class="exhibition-description">
+                        Im Rahmen der städtischen Atelierrundgänge öffnete ich mein Atelier
+                        für Besucher*innen und gab Einblicke in meine aktuelle Arbeit und
+                        den kreativen Prozess.
+                    </p>
+                </div>
+                <div class="locale-en">
+                    <h2>Summer Studio – Open Doors</h2>
+                    <p class="exhibition-location">Private Studio, Frankfurt</p>
+                    <p class="exhibition-description">
+                        As part of the city's studio open-day programme, I opened my studio
+                        to visitors and offered insights into my current work and creative process.
+                    </p>
+                </div>
+                <div class="locale-es">
+                    <h2>Estudio de verano – Puertas abiertas</h2>
+                    <p class="exhibition-location">Estudio propio, Fráncfort</p>
+                    <p class="exhibition-description">
+                        En el marco de las jornadas de puertas abiertas de los estudios
+                        de la ciudad, abrí mi estudio a los visitantes y ofrecí una mirada
+                        a mi trabajo actual y a mi proceso creativo.
+                    </p>
+                </div>
             </div>
 
             <div class="exhibition-item">
                 <div class="exhibition-date">Mai 2025</div>
-                <h2>Landschaften der Erinnerung</h2>
-                <p class="exhibition-location">Galerie Zeitgenössisch, Köln</p>
-                <p class="exhibition-description">
-                    Eine Einzelausstellung, die sich mit der malerischen Darstellung
-                    von Erinnerungsräumen beschäftigt. Die gezeigten Landschaftsbilder
-                    verbinden reale Orte mit inneren Bildwelten.
-                </p>
+                <div class="locale-de active">
+                    <h2>Landschaften der Erinnerung</h2>
+                    <p class="exhibition-location">Galerie Zeitgenössisch, Köln</p>
+                    <p class="exhibition-description">
+                        Eine Einzelausstellung, die sich mit der malerischen Darstellung
+                        von Erinnerungsräumen beschäftigt. Die gezeigten Landschaftsbilder
+                        verbinden reale Orte mit inneren Bildwelten.
+                    </p>
+                </div>
+                <div class="locale-en">
+                    <h2>Landscapes of Memory</h2>
+                    <p class="exhibition-location">Galerie Zeitgenössisch, Cologne</p>
+                    <p class="exhibition-description">
+                        A solo exhibition exploring the painterly representation of memory
+                        spaces. The landscape works on show connect real places with
+                        inner imaginary worlds.
+                    </p>
+                </div>
+                <div class="locale-es">
+                    <h2>Paisajes de la memoria</h2>
+                    <p class="exhibition-location">Galerie Zeitgenössisch, Colonia</p>
+                    <p class="exhibition-description">
+                        Una exposición individual que explora la representación pictórica
+                        de los espacios de la memoria. Las obras paisajísticas expuestas
+                        conectan lugares reales con mundos imaginarios interiores.
+                    </p>
+                </div>
             </div>
 
             <div class="exhibition-item">
                 <div class="exhibition-date">Februar 2025</div>
-                <h2>Nachwuchsförderpreis 2025</h2>
-                <p class="exhibition-location">Kunstverein Stuttgart</p>
-                <p class="exhibition-description">
-                    Präsentation im Rahmen des Nachwuchsförderpreises für junge Kunst.
-                    Die Ausstellung zeigte eine kuratorierte Auswahl meiner Arbeiten
-                    aus den Jahren 2023-2024.
-                </p>
+                <div class="locale-de active">
+                    <h2>Nachwuchsförderpreis 2025</h2>
+                    <p class="exhibition-location">Kunstverein Stuttgart</p>
+                    <p class="exhibition-description">
+                        Präsentation im Rahmen des Nachwuchsförderpreises für junge Kunst.
+                        Die Ausstellung zeigte eine kuratorierte Auswahl meiner Arbeiten
+                        aus den Jahren 2023–2024.
+                    </p>
+                </div>
+                <div class="locale-en">
+                    <h2>Young Artists Award 2025</h2>
+                    <p class="exhibition-location">Kunstverein Stuttgart</p>
+                    <p class="exhibition-description">
+                        Presentation as part of the emerging artists award for young art.
+                        The exhibition showed a curated selection of my works from 2023–2024.
+                    </p>
+                </div>
+                <div class="locale-es">
+                    <h2>Premio a jóvenes artistas 2025</h2>
+                    <p class="exhibition-location">Kunstverein Stuttgart</p>
+                    <p class="exhibition-description">
+                        Presentación en el marco del premio de fomento a jóvenes artistas.
+                        La exposición mostró una selección curada de mis obras de 2023–2024.
+                    </p>
+                </div>
             </div>
 
         </div>
@@ -138,8 +312,8 @@
     <footer class="main-footer">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="impressum.html">Impressum</a>
-                <a href="kontakt.html">Kontakt</a>
+                <a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a>
+                <a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a>
             </div>
             <p>&copy; 2026 Martin Zanker</p>
         </div>

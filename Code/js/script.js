@@ -14,12 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let konzeptAParallaxSpeed = BASE_PARALLAX_SPEED; // Wird dynamisch berechnet
 
-    // =============== SCROLL-TRIGGERED THEME TOGGLE ===============
-    // Scroll-Positionen, an denen sich die Parallax-Schriften treffen
-    // Light → Dark → Light → Dark → Light
-    let sMeetThresholds = [];      // [{scrollPos, section}, ...] sortiert
-    let scrollThemeEnabled = true; // false = manueller Toggle hat übernommen
-
     // Hilfsfunktion: Dokumentposition ohne Transforms ermitteln
     function getDocumentTop(element) {
         let top = 0;
@@ -57,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const aspectRatio = window.innerHeight / window.innerWidth;
         // Portrait-Modus: fester Treffpunkt (siehe Kommentarblock oben)
         if (aspectRatio > 1.2) {
+            if (window.innerWidth < BREAKPOINT_MOBILE) {
+                return Math.max(0, 0.13 - 100 / window.innerHeight); // Original Smartphone-Wert
+            }
             return 0.13; // Fester Wert für Portrait (~160px höher als 0.29)
         }
         // Originale Logik für breitere Bildschirme (Landscape)
@@ -161,6 +158,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.innerHeight / window.innerWidth > 1.2) {
             minGap += 350;
         }
+        // Mobile: MYTHUS-Block 68px tiefer
+        if (window.innerWidth < BREAKPOINT_MOBILE) {
+            minGap += 68;
+        }
 
         const box2LogicalTop = getBox2LogicalTop();
         const box2Height = box2.offsetHeight;
@@ -189,18 +190,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!mythusFilled || !mythusBox || !mythusAnchor) return;
 
         const meetingRatio = getMeetingRatio();
-        const meetY = window.innerHeight * meetingRatio;
+        let meetY = window.innerHeight * meetingRatio;
+        if (window.innerWidth < BREAKPOINT_MOBILE) {
+            meetY = window.innerHeight * 0.80 - 200;
+        }
 
         const aStart = getDocumentTop(mythusFilled);
+        const schriftenMeetY = window.innerWidth < BREAKPOINT_MOBILE ? meetY - 10 : meetY;
 
         const mythusBoxStart = getMythusBoxLogicalTop();
         const anchorHeight = mythusAnchor.offsetHeight;
         const anchorGap = getKonzeptAnchorGap();
-        const anchorStart = mythusBoxStart - anchorGap - anchorHeight;
+        const mobileAnchorOffset = window.innerWidth < BREAKPOINT_MOBILE ? 33 : 0;
+        const anchorStart = mythusBoxStart - anchorGap - anchorHeight + mobileAnchorOffset;
 
         const anchorEffectiveSpeed = BASE_PARALLAX_SPEED;
 
-        const numerator = (aStart - meetY) * (1 - anchorEffectiveSpeed);
+        const numerator = (aStart - schriftenMeetY) * (1 - anchorEffectiveSpeed);
         const denominator = anchorStart - meetY;
 
         if (Math.abs(denominator) < 10) {
@@ -210,6 +216,52 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         mythusAParallaxSpeed = Math.min(1, mythusAParallaxSpeed);
+    }
+
+    function capTextRightBoundary() {
+        const rightLimit = window.innerWidth - 40; // rechter Rahmen (20px) + Puffer (20px)
+        document.querySelectorAll('.content-box p, .content-box-2 p').forEach(p => {
+            const left = p.getBoundingClientRect().left;
+            const available = rightLimit - left;
+            const computed = parseFloat(getComputedStyle(p).maxWidth);
+            if (isNaN(computed) || computed > available) {
+                p.style.maxWidth = Math.max(50, available) + 'px';
+            }
+        });
+    }
+
+    function positionMythusBoxText() {
+        const mythusBox = document.getElementById('mythus-box');
+        const danielEl = document.getElementById('mythus-daniel-image-with-info');
+        if (!mythusBox || !danielEl) return;
+
+        // Portrait: CSS übernimmt, JS-Werte zurücksetzen
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            mythusBox.style.paddingLeft = '';
+            const p = mythusBox.querySelector('p');
+            if (p) p.style.maxWidth = '';
+            return;
+        }
+
+        // CSS-Baseline wiederherstellen vor der Messung
+        mythusBox.style.paddingLeft = '';
+        const p = mythusBox.querySelector('p');
+        if (p) p.style.maxWidth = '';
+
+        const danielRight = danielEl.getBoundingClientRect().right;
+        const basePadding = parseFloat(getComputedStyle(mythusBox).paddingLeft);
+        const textLeft = mythusBox.getBoundingClientRect().left + basePadding;
+        const gap = 20;
+        const shift = danielRight - textLeft + gap;
+
+        if (shift > 0) {
+            mythusBox.style.paddingLeft = (basePadding + shift) + 'px';
+            if (p) {
+                // max-width = verfügbarer Platz von Daniels rechter Kante bis zum rechten Rahmen
+                const availableWidth = window.innerWidth - 40 - danielRight - gap;
+                p.style.maxWidth = Math.max(100, availableWidth) + 'px';
+            }
+        }
     }
 
     function positionMythusDaniel() {
@@ -227,26 +279,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const mythusBoxHeight = mythusBox.offsetHeight;
         const danielNaturalTop = getDocumentTop(mythusDaniel);
 
+        // Mobile: Daniel statisch 45px unter Logo-Unterkante
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            const mythusBoxLogicalBottom = mythusBoxLogicalTop + mythusBoxHeight;
-            // MYTHUS ist Block 3, folgt nach Box 2
-            const box2 = document.querySelector('.content-box-2');
-            if (!box2) return;
-            const box2LogicalTop = getBox2LogicalTop();
-            const box2LogicalBottom = box2LogicalTop + box2.offsetHeight;
-            const minGap = getBoxGap();
-            const mythusLogicalTop = box2LogicalBottom + minGap;
-            const danielContainerElement = document.getElementById('mythus-daniel-container');
-            const danielContainerRelativeTop = getDocumentTop(danielContainerElement) - getDocumentTop(mythusContainer);
-            const danielContainerLogicalTop = mythusLogicalTop + danielContainerRelativeTop;
-
-            const targetDanielTop = mythusBoxLogicalBottom + UNTERPUNKT_BOX_GAP;
-            let offset = targetDanielTop - danielContainerLogicalTop + 100;
-            // Portrait-Modus: Daniel 370px höher
-            if (window.innerHeight / window.innerWidth > 1.2) {
-                offset -= 370;
-            }
-            mythusDaniel.style.top = `${offset}px`;
+            const headerEl = document.querySelector('header');
+            const topPos = headerEl ? headerEl.offsetHeight + 45 : 80;
+            mythusDaniel.style.top = `${topPos}px`;
             return;
         }
 
@@ -274,6 +311,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Portrait-Modus: Daniel 125px höher
         if (window.innerHeight / window.innerWidth > 1.2) {
             finalOffset -= 125;
+            // 11" iPad (< 900px): zusätzlich 150px höher
+            if (window.innerWidth < 900) {
+                finalOffset -= 40;
+            }
         }
 
         mythusDaniel.style.top = `${finalOffset}px`;
@@ -308,20 +349,26 @@ document.addEventListener('DOMContentLoaded', function() {
         // Treffpunkt dynamisch berechnen (gleich wie KONZEPT, 75px höher)
         const meetingRatio = getMeetingRatio();
         let meetY = window.innerHeight * meetingRatio - 75;
-        // Portrait-Modus: Treffpunkt 60px tiefer
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        if (window.innerWidth < BREAKPOINT_MOBILE) {
+            // Smartphone: RIVUS-Treffpunkt bei 80% der Bildschirmhöhe
+            meetY = window.innerHeight * 0.80 - 170;
+        } else if (window.innerHeight / window.innerWidth > 1.2) {
+            // Portrait-Modus: Treffpunkt 60px tiefer
             meetY += 60;
+        } else {
+            // Landscape: Treffpunkt 8px höher
+            meetY -= 8;
         }
 
         // A's Startposition: Dokumentposition ohne Transforms
         const aStart = getDocumentTop(gesichtenFilled);
 
         // Anchor's Startposition berechnen aus der Beziehung zu Box2
-        // Anchor = Box2.top - anchorGap - Anchor.height
+        // Anchor = Box2.top + 15 - anchorGap - Anchor.height (+ 15 wie in applyParallaxEffect)
         const box2Start = getDocumentTop(contentBox2);
         const anchorHeight = gesichtenAnchor.offsetHeight;
         const anchorGap = getGesichtenAnchorGap();
-        const anchorStart = box2Start - anchorGap - anchorHeight;
+        const anchorStart = box2Start + 15 - anchorGap - anchorHeight;
 
         // Anchor's effektive Geschwindigkeit (wie Box)
         const anchorEffectiveSpeed = BASE_PARALLAX_SPEED; // 0.35
@@ -367,14 +414,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!rivusFilled || !rivusContentBox || !rivusAnchor) return;
 
         const meetingRatio = getMeetingRatio();
-        const meetY = window.innerHeight * meetingRatio;
+        let meetY = window.innerHeight * meetingRatio;
+        if (window.innerHeight / window.innerWidth <= 1.2) meetY -= 60; // Landscape: Treffpunkt 60px höher
 
         const aStart = getDocumentTop(rivusFilled);
 
-        const box3Start = getBox3LogicalTop();
+        const box3Start = getDocumentTop(document.getElementById('rivus-content-box-wrapper'));
         const anchorHeight = rivusAnchor.offsetHeight;
         const anchorGap = getGesichtenAnchorGap(); // We can reuse this
-        const anchorStart = box3Start - anchorGap - anchorHeight;
+        const anchorStart = box3Start + 12 - anchorGap - anchorHeight;
 
         const anchorEffectiveSpeed = BASE_PARALLAX_SPEED;
 
@@ -391,101 +439,130 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // positionRivusAnchor() entfällt — Anchor wird in positionAnchors() via transform positioniert.
 
-    // =============== S_MEET BERECHNUNG (Scroll-Treffpunkte) ===============
-    // Berechnet die Scroll-Positionen, an denen sich die Parallax-Schriften treffen.
-    // Wird nach allen Positionierungsfunktionen aufgerufen (load + resize).
+    // =============== MAGNET SNAP ===============
+    // Berechnet die Scroll-Positionen, an denen Anchor und Parallaxschrift exakt übereinanderliegen.
+    // Wird nach dem Positionieren aufgerufen (load + resize).
+    let meetingPoints = [];
+    let isSnapping = false;
+    let scrollEndTimer;
+    let magnetAnimFrame = null;
 
-    function calculateAllSMeetValues() {
-        const results = [];
+    function calculateMeetingPoints() {
+        meetingPoints = [];
 
-        // KONZEPT S_meet
+        // KONZEPT
         const konzeptAnchorEl = document.querySelector('.konzept-heading-anchor');
-        const alexImage = document.querySelector('.main-heading-image');
-        if (konzeptAnchorEl && alexImage) {
+        const alexImg = document.querySelector('.main-heading-image');
+        if (konzeptAnchorEl && alexImg) {
             const meetingRatio = getMeetingRatio();
             let meetY = window.innerHeight * meetingRatio;
             if (window.innerHeight / window.innerWidth > 1.2) meetY += 80;
-
-            const alexStart = getDocumentTop(alexImage);
-            const alexHeight = alexImage.offsetHeight;
             const anchorHeight = konzeptAnchorEl.offsetHeight;
             const anchorGap = getKonzeptAnchorGap();
-            const anchorStart = alexStart + alexHeight + getBoxAlexGap() - anchorGap - anchorHeight;
-
+            const anchorStart = getDocumentTop(alexImg) + alexImg.offsetHeight + getBoxAlexGap() - anchorGap - anchorHeight;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 0) results.push({ scrollPos: sMeet, section: 'KONZEPT' });
+            if (sMeet > 100) meetingPoints.push(sMeet);
         }
 
-        // RIVUS S_meet
-        const contentBox2 = document.querySelector('.content-box-2');
+        // RIVUS
+        const contentBoxWrapper2El = document.querySelector('.content-box-wrapper-2');
         const gesichtenAnchorEl = document.querySelector('.gesichten-anchor-gray');
-        if (contentBox2 && gesichtenAnchorEl) {
+        if (contentBoxWrapper2El && gesichtenAnchorEl) {
             const meetingRatio = getMeetingRatio();
             let meetY = window.innerHeight * meetingRatio - 75;
-            if (window.innerHeight / window.innerWidth > 1.2) meetY += 60;
-
-            const box2Start = getDocumentTop(contentBox2);
+            if (window.innerWidth < BREAKPOINT_MOBILE) {
+                meetY = window.innerHeight * 0.80 - 170;
+            } else if (window.innerHeight / window.innerWidth > 1.2) {
+                meetY += 60;
+            } else {
+                meetY -= 8;
+            }
             const anchorHeight = gesichtenAnchorEl.offsetHeight;
             const anchorGap = getGesichtenAnchorGap();
-            const anchorStart = box2Start - anchorGap - anchorHeight;
-
-            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED) - 70;
-            if (sMeet > 0) results.push({ scrollPos: sMeet, section: 'RIVUS' });
+            const anchorStart = getDocumentTop(contentBoxWrapper2El) + 15 - anchorGap - anchorHeight;
+            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
+            if (sMeet > 100) meetingPoints.push(sMeet);
         }
 
-        // MYTHUS S_meet
-        const mythusBox = document.getElementById('mythus-box');
+        // MYTHUS
         const mythusAnchorEl = document.getElementById('mythus-anchor');
-        if (mythusBox && mythusAnchorEl) {
+        if (mythusAnchorEl) {
             const meetingRatio = getMeetingRatio();
-            const meetY = window.innerHeight * meetingRatio;
-
-            const mythusBoxStart = getMythusBoxLogicalTop();
+            let meetY = window.innerHeight * meetingRatio;
+            if (window.innerWidth < BREAKPOINT_MOBILE) {
+                meetY = window.innerHeight * 0.80 - 200;
+            }
             const anchorHeight = mythusAnchorEl.offsetHeight;
             const anchorGap = getKonzeptAnchorGap();
-            const anchorStart = mythusBoxStart - anchorGap - anchorHeight;
-
+            const mobileAnchorOffset = window.innerWidth < BREAKPOINT_MOBILE ? 33 : 0;
+            const anchorStart = getDocumentTop(document.getElementById('mythus-box-wrapper')) - anchorGap - anchorHeight + mobileAnchorOffset;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 0) results.push({ scrollPos: sMeet, section: 'MYTHUS' });
+            if (sMeet > 100) meetingPoints.push(sMeet);
         }
 
-        // GESICHTEN S_meet
-        const rivusContentBox = document.getElementById('rivus-content-box');
+        // GESICHTEN
         const rivusAnchorEl = document.getElementById('rivus-anchor-gray');
-        if (rivusContentBox && rivusAnchorEl) {
+        if (rivusAnchorEl) {
             const meetingRatio = getMeetingRatio();
-            const meetY = window.innerHeight * meetingRatio;
-
-            const box3Start = getBox3LogicalTop();
+            let meetY = window.innerHeight * meetingRatio;
+            if (window.innerHeight / window.innerWidth <= 1.2) meetY -= 60; // Landscape: Treffpunkt 60px höher
             const anchorHeight = rivusAnchorEl.offsetHeight;
             const anchorGap = getGesichtenAnchorGap();
-            const anchorStart = box3Start - anchorGap - anchorHeight;
-
-            let sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            // Portrait-Modus: Schwelle früher auslösen
-            if (window.innerHeight / window.innerWidth > 1.2) {
-                sMeet -= 80;
-            }
-            if (sMeet > 0) results.push({ scrollPos: sMeet, section: 'GESICHTEN' });
+            const anchorStart = getDocumentTop(document.getElementById('rivus-content-box-wrapper')) + 12 - anchorGap - anchorHeight;
+            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
+            if (sMeet > 100) meetingPoints.push(sMeet);
         }
 
-        results.sort((a, b) => a.scrollPos - b.scrollPos);
-        sMeetThresholds = results;
+        meetingPoints.sort((a, b) => a - b);
+
+        // Spacer-Höhe dynamisch setzen: letzter Snap-Punkt muss erreichbar sein
+        const spacer = document.getElementById('scroll-spacer');
+        if (spacer && meetingPoints.length > 0) {
+            const lastPoint = meetingPoints[meetingPoints.length - 1];
+            const needed = lastPoint;
+            const contentHeight = document.body.scrollHeight - spacer.offsetHeight;
+            spacer.style.height = Math.max(0, needed - contentHeight + window.innerHeight) + 'px';
+        }
     }
 
-    // Bestimmt ob Dark Mode aktiv sein soll basierend auf Scroll-Position
-    // Start = Light, jede Schwelle togglet: Light → Dark → Light → Dark → Light
-    function getScrollThemeDark(scrollY) {
-        let crossedCount = 0;
-        for (let i = 0; i < sMeetThresholds.length; i++) {
-            if (scrollY >= sMeetThresholds[i].scrollPos) {
-                crossedCount++;
+    function slowScrollTo(target) {
+        // Momentum-Scroll einfrieren, damit er nicht mit der Animation kämpft
+        window.scrollTo({ top: window.scrollY, behavior: 'instant' });
+        const start = window.scrollY;
+        const distance = target - start;
+        // Dauer skaliert mit Distanz: 350ms (nah) bis 650ms (weit)
+        const duration = Math.min(650, Math.max(350, Math.abs(distance) * 0.5));
+        let startTime = null;
+
+        // Cubic Ease-In-Out: sanfter Start, Beschleunigung, weiches Ankommen
+        function magnetEase(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = Math.min((timestamp - startTime) / duration, 1);
+            window.scrollTo(0, start + distance * magnetEase(progress));
+            if (progress < 1) {
+                magnetAnimFrame = requestAnimationFrame(step);
             } else {
-                break;
+                window.scrollTo(0, target);
+                isSnapping = false;
+                magnetAnimFrame = null;
             }
         }
-        // Start = Dark, jede Schwelle togglet: Dark → Light → Dark → ...
-        return crossedCount % 2 === 0;
+
+        if (magnetAnimFrame) cancelAnimationFrame(magnetAnimFrame);
+        isSnapping = true;
+        magnetAnimFrame = requestAnimationFrame(step);
+    }
+
+    function cancelMagnetSnap() {
+        if (magnetAnimFrame) {
+            cancelAnimationFrame(magnetAnimFrame);
+            magnetAnimFrame = null;
+            isSnapping = false;
+        }
     }
 
     // =============== CONTENT BOX POSITIONIERUNG ===============
@@ -497,6 +574,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Portrait-Modus: zusätzlicher Abstand Alex→KONZEPT-Box (siehe Portrait-Kommentarblock bei getMeetingRatio())
     const PORTRAIT_BOX_OFFSET = 70;
+    // Smartphone: zusätzlicher Abstand Alex→KONZEPT-Box
+    const MOBILE_BOX_OFFSET = 150;
 
     function getBoxAlexGap() {
         const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
@@ -504,6 +583,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Portrait-Modus: KONZEPT-Block weiter von Alex entfernt (aspectRatio > 1.2)
         if (window.innerHeight / window.innerWidth > 1.2) {
             gap += PORTRAIT_BOX_OFFSET;
+        }
+        // Smartphone: extra Abstand
+        if (window.innerWidth < BREAKPOINT_MOBILE) {
+            gap += MOBILE_BOX_OFFSET;
         }
         return gap;
     }
@@ -524,7 +607,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getBoxGap() {
         const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
-        return BOX_GAP_NARROW + widthFactor * (BOX_GAP_WIDE - BOX_GAP_NARROW);
+        let gap = BOX_GAP_NARROW + widthFactor * (BOX_GAP_WIDE - BOX_GAP_NARROW);
+        // Smartphone: alles ab RIVUS 300px tiefer
+        if (window.innerWidth < BREAKPOINT_MOBILE) {
+            gap += 300;
+        }
+        return gap;
     }
 
     function positionGesichtenAndBox2() {
@@ -537,21 +625,30 @@ document.addEventListener('DOMContentLoaded', function() {
         // WICHTIG: Zuerst marginTop zurücksetzen, um die natürliche Position zu messen
         gesichtenContainer.style.marginTop = '0px';
 
+        const alexBaseTop = getDocumentTop(alexImage);
+        const alexHeight = alexImage.offsetHeight;
+        const box1LogicalTop = alexBaseTop + alexHeight + getBoxAlexGap();
+        const box1Height = box1.offsetHeight;
+        const box1LogicalBottom = box1LogicalTop + box1Height;
+        const gesichtenBaseTop = getDocumentTop(gesichtenContainer);
+
+        // Smartphone: RIVUS nach Ben positionieren
+        // Ben ist position:fixed, daher Höhe aus CSS (80vh) manuell berechnen
+        if (window.innerWidth < BREAKPOINT_MOBILE) {
+            const benHeight = window.innerHeight * 0.80;
+            const benBottom = box1LogicalBottom + UNTERPUNKT_BOX_GAP + benHeight;
+            const targetTop = benBottom + 40 - 200; // 200px höher
+            const offset = targetTop - gesichtenBaseTop;
+            gesichtenContainer.style.marginTop = `${offset}px`;
+            return;
+        }
+
         // Dynamischer Mindestabstand (- 150px: alle Blöcke ab Block 2 höher)
         let minGap = getBoxGap() - 165;
         // Portrait-Modus: RIVUS-Anchor + Textbox 230px tiefer (80 + 150)
         if (window.innerHeight / window.innerWidth > 1.2) {
             minGap += 230;
         }
-
-        // Box 1 als Referenz (RIVUS ist jetzt direkt nach Box 1)
-        const alexBaseTop = getDocumentTop(alexImage);
-        const alexHeight = alexImage.offsetHeight;
-        const box1LogicalTop = alexBaseTop + alexHeight + getBoxAlexGap();
-        const box1Height = box1.offsetHeight;
-        const box1LogicalBottom = box1LogicalTop + box1Height;
-
-        const gesichtenBaseTop = getDocumentTop(gesichtenContainer);
 
         const naturalGap = gesichtenBaseTop - box1LogicalBottom;
         const offset = minGap - naturalGap;
@@ -611,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Box2's Startposition (Ben soll unter Box2 erscheinen)
         const box2Start = getDocumentTop(contentBox2);
         const box2Height = contentBox2.offsetHeight;
-        const targetBenPos = box2Start + box2Height + UNTERPUNKT_BOX_GAP;
+        const targetBenPos = box2Start + box2Height + UNTERPUNKT_BOX_GAP - 900; // Mobile: 900px höher
 
         // Box2's effektive Geschwindigkeit
         const box2EffectiveSpeed = BASE_PARALLAX_SPEED;
@@ -702,26 +799,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const box2Height = contentBox2.offsetHeight;
         const benNaturalTop = getDocumentTop(benContainer);
 
-        // Bei schmalen Bildschirmen (Mobile): Stelle die ursprüngliche, komplexere Logik wieder her.
+        // Mobile: Ben statisch 15px unter Logo-Unterkante
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            const box2LogicalBottom = box2LogicalTop + box2Height;
-
-            // Logische Position über Box 1-Kette berechnen (RIVUS folgt direkt nach Box 1)
-            const box1 = document.querySelector('.content-box');
-            const alexImage = document.querySelector('.main-heading-image');
-            if (!box1 || !alexImage) return;
-            const alexBaseTop = getDocumentTop(alexImage);
-            const alexHeight = alexImage.offsetHeight;
-            const box1LogicalBottom = alexBaseTop + alexHeight + getBoxAlexGap() + box1.offsetHeight;
-            const minGap = getBoxGap() - 165;
-            const gesichtenLogicalTop = box1LogicalBottom + minGap;
-            const benContainerRelativeTop = getDocumentTop(unterpunktContainer) - getDocumentTop(gesichtenContainer);
-            const benContainerLogicalTop = gesichtenLogicalTop + benContainerRelativeTop;
-
-            // Ben soll UNTERPUNKT_BOX_GAP unter Box2-Unterkante liegen
-            const targetBenTop = box2LogicalBottom + UNTERPUNKT_BOX_GAP;
-            const offset = targetBenTop - benContainerLogicalTop;
-            benContainer.style.top = `${offset}px`;
+            const headerEl = document.querySelector('header');
+            const topPos = headerEl ? headerEl.offsetHeight + 15 : 50;
+            benContainer.style.top = `${topPos}px`;
             return;
         }
 
@@ -819,15 +901,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const box3Height = rivusContentBox.offsetHeight;
         const michaelNaturalTop = getDocumentTop(michaelContainer);
 
+        // Mobile: Michael + Marcus statisch 15px unter Logo-Unterkante
         if (window.innerWidth < 600) {
-            // Mobile logic for Michael
-            const box3LogicalBottom = box3LogicalTop + box3Height;
-            const michaelContainerLogicalTop = getDocumentTop(unterpunktContainerForMichael);
-            const targetMichaelTop = box3LogicalBottom + UNTERPUNKT_BOX_GAP;
-            const offset = targetMichaelTop - michaelContainerLogicalTop;
-            michaelContainer.style.top = `${offset}px`;
+            const headerEl = document.querySelector('header');
+            const topPos = headerEl ? headerEl.offsetHeight + 15 : 50;
+            michaelContainer.style.top = `${topPos}px`;
             if (marcusContainer) {
-                marcusContainer.style.top = `${offset}px`;
+                marcusContainer.style.top = `${topPos}px`;
             }
             return;
         }
@@ -948,12 +1028,14 @@ document.addEventListener('DOMContentLoaded', function() {
         positionMythusBlock();
         calculateMythusAParallaxSpeed();
         positionMythusDaniel();
+        positionMythusBoxText();
         positionRivusAndBox3();
         calculateRivusAParallaxSpeed();
         positionMichaelAndMarcus();
         calculateMichaelMobileParallaxSpeed();
         positionAnchors();
-        calculateAllSMeetValues();
+        capTextRightBoundary();
+        calculateMeetingPoints();
 
         // Sanfte Theme-Transitions erst nach initialem Rendern aktivieren
         requestAnimationFrame(() => {
@@ -961,6 +1043,65 @@ document.addEventListener('DOMContentLoaded', function() {
             document.documentElement.classList.add('theme-transitioning');
         });
     });
+
+    // Touch-Toggle für Bild-Info (Mobile)
+    document.querySelectorAll('#ben-image-with-info, #mythus-daniel-image-with-info, #michael-image-with-info, #marcus-image-with-info').forEach(container => {
+        container.addEventListener('click', function(e) {
+            const isActive = this.classList.contains('info-active');
+            document.querySelectorAll('.info-active').forEach(el => {
+                el.classList.remove('info-active');
+                el.style.zIndex = '';
+            });
+            if (!isActive) {
+                this.classList.add('info-active');
+                this.style.zIndex = '20';
+            }
+            e.stopPropagation();
+        });
+    });
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.info-active').forEach(el => {
+            el.classList.remove('info-active');
+            el.style.zIndex = '';
+        });
+    });
+
+    // Locale-Toggle (DE/EN)
+    const localeBtns = document.querySelectorAll('.locale-switch__btn');
+
+    function setLocale(locale) {
+        localeBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.locale === locale));
+        document.querySelectorAll('.locale-de, .locale-en, .locale-es').forEach(el => {
+            el.classList.toggle('active', el.classList.contains('locale-' + locale));
+        });
+        document.querySelectorAll('[data-de]').forEach(el => {
+            if (locale === 'en') el.textContent = el.dataset.en || el.dataset.de;
+            else if (locale === 'es') el.textContent = el.dataset.es || el.dataset.de;
+            else el.textContent = el.dataset.de;
+        });
+        localStorage.setItem('locale', locale);
+    }
+
+    localeBtns.forEach(btn => btn.addEventListener('click', () => setLocale(btn.dataset.locale)));
+    setLocale(localStorage.getItem('locale') || 'de');
+
+    // Sprachniveau-Toggle
+    const langBtns = document.querySelectorAll('.lang-switch__btn');
+
+    function setLanguage(lang) {
+        langBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+        document.querySelectorAll('.lang-text').forEach(el => {
+            el.classList.toggle('active', el.classList.contains('lang-' + lang));
+        });
+        localStorage.setItem('lang-level', lang);
+    }
+
+    langBtns.forEach(btn => {
+        btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+    });
+
+    // Gespeicherte Präferenz wiederherstellen (Standard: expert)
+    setLanguage(localStorage.getItem('lang-level') || 'expert');
 
     // Mobile Navigation Toggle
     const navToggle = document.querySelector('.nav-toggle');
@@ -1072,7 +1213,31 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             ticking = true;
         }
+
+        // Magnet Snap: Timer nur starten wenn User nicht aktiv scrollt
+        if (!isSnapping && !isTouching && !isScrollbarHeld) {
+            scheduleSnapCheck();
+        }
     });
+
+    function scheduleSnapCheck() {
+        clearTimeout(scrollEndTimer);
+        scrollEndTimer = setTimeout(() => {
+            if (isSnapping || isTouching || isScrollbarHeld) return;
+            const s = window.scrollY;
+            let target = null;
+            let minDist = Infinity;
+            for (let i = 0; i < meetingPoints.length; i++) {
+                const point = meetingPoints[i];
+                const dist = Math.abs(s - point);
+                const distPrev = i > 0 ? point - meetingPoints[i - 1] : point;
+                const distNext = i < meetingPoints.length - 1 ? meetingPoints[i + 1] - point : Infinity;
+                const zone = Math.min(distPrev, distNext) * 0.24;
+                if (dist <= zone && dist < minDist) { minDist = dist; target = point; }
+            }
+            if (target !== null) slowScrollTo(target);
+        }, 200);
+    }
 
     function updateScene() {
         // Phase 1: Alle Transforms schreiben (WRITE, kein Layout-Reflow)
@@ -1080,6 +1245,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Phase 2: Alle Layout-Reads gebatcht (ein einziger Reflow)
         const fadeThreshold = window.innerHeight * 0.07;
+        const fadeThresholdEarly = window.innerHeight * 0.23; // RIVUS/MYTHUS/GESICHTEN früher ausblenden (nur Mobile)
         const visRects = [];
         for (let i = 0; i < _visHeadings.length; i++) {
             visRects.push(_visHeadings[i] ? _visHeadings[i].getBoundingClientRect().top : Infinity);
@@ -1088,9 +1254,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Phase 3: Alle Layout-Writes (kein Read mehr → kein Reflow)
 
         // Heading-Sichtbarkeit
+        // _visHeadings: [main-filled, konzeptFilled, unterpunktFilled, gesichtenFilled, rivusAnchorFilled, mythusFilled]
+        // Index 3 (gesichtenFilled = RIVUS filled), 4 (rivusAnchorFilled = GESICHTEN filled), 5 (mythusFilled)
+        const isMobileForFade = window.innerWidth < BREAKPOINT_MOBILE;
         for (let i = 0; i < _visHeadings.length; i++) {
             if (_visHeadings[i]) {
-                if (visRects[i] < fadeThreshold) {
+                const threshold = (isMobileForFade && i >= 3) ? fadeThresholdEarly : fadeThreshold;
+                if (visRects[i] < threshold) {
                     _visHeadings[i].classList.add('faded-out');
                 } else {
                     _visHeadings[i].classList.remove('faded-out');
@@ -1112,14 +1282,6 @@ document.addEventListener('DOMContentLoaded', function() {
             updateHeaderSize(latestScroll);
         }
 
-        // Phase 4: Scroll-triggered Theme Toggle
-        if (scrollThemeEnabled && sMeetThresholds.length > 0) {
-            const shouldBeDark = getScrollThemeDark(latestScroll);
-            const isDark = document.body.classList.contains('dark-mode');
-            if (shouldBeDark !== isDark) {
-                setTheme(shouldBeDark);
-            }
-        }
     }
 
     // Header shrinking animation (only on landing page)
@@ -1137,6 +1299,18 @@ document.addEventListener('DOMContentLoaded', function() {
             navHeight = 25;
             startTextSize = 34; // 20% smaller than 42px (42 × 0.8 = 33.6)
             endTextSize = 34;
+
+            // Intro-Animation: Logo startet 200px tiefer, bewegt sich beim Scrollen hoch
+            const INTRO_OFFSET = 100;
+            const introOffset = Math.max(0, INTRO_OFFSET - scrollY);
+            const clampedScroll = Math.max(scrollY, 0);
+            const progress = Math.min(clampedScroll / maxScroll, 1);
+            const newHeight = startHeight;
+            const header = document.querySelector('header');
+            if (header) header.style.top = `${navHeight + introOffset}px`;
+            if (_heroSection) _heroSection.style.marginTop = `${navHeight + newHeight + introOffset}px`;
+            if (_headerBackdrop) _headerBackdrop.style.height = `${navHeight + newHeight}px`;
+            return;
         } else if (windowWidth <= 768) {
             // Tablet/mobile
             startHeight = 83;
@@ -1229,6 +1403,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // =============== MOBILE IMAGE VISIBILITY ===============
+    // Bilder liegen statisch hinter Textblöcken. Sichtbarkeit wird über opacity gesteuert:
+    // Ben → sichtbar wenn KONZEPT-Box oben vorbeirollt, bis RIVUS-Box beginnt Ben zu verdecken
+    // Daniel → wenn RIVUS Ben verdeckt, bis MYTHUS Daniel verdeckt
+    // Michael → wenn MYTHUS Daniel verdeckt, bis GESICHTEN Michael verdeckt
+    // Marcus → nach GESICHTEN (bleibt stehen)
+    function updateMobileImageVisibility() {
+        if (window.innerWidth >= BREAKPOINT_MOBILE) return;
+
+        const headerEl = document.querySelector('header');
+        const imageFixedTop = (headerEl ? headerEl.offsetHeight : 50) + 15;
+
+        const konzeptTop = _contentBoxWrapper ? _contentBoxWrapper.getBoundingClientRect().top : Infinity;
+        const rivusTop   = _contentBoxWrapper2 ? _contentBoxWrapper2.getBoundingClientRect().top : Infinity;
+        const mythusTop  = _mythusBoxWrapper ? _mythusBoxWrapper.getBoundingClientRect().top : Infinity;
+        const gesichtenTop = _rivusContentBoxWrapper ? _rivusContentBoxWrapper.getBoundingClientRect().top : Infinity;
+
+        const show = el => { if (el) el.style.opacity = '1'; };
+        const hide = el => { if (el) el.style.opacity = '0'; };
+
+        if (gesichtenTop < imageFixedTop) {
+            hide(_benImage); hide(_mythusDaniel); hide(_michaelImage); show(_marcusImage);
+        } else if (mythusTop < imageFixedTop) {
+            hide(_benImage); hide(_mythusDaniel); show(_michaelImage); hide(_marcusImage);
+        } else if (_benImage && rivusTop < _benImage.getBoundingClientRect().top) {
+            hide(_benImage); show(_mythusDaniel); hide(_michaelImage); hide(_marcusImage);
+        } else if (konzeptTop < imageFixedTop) {
+            show(_benImage); hide(_mythusDaniel); hide(_michaelImage); hide(_marcusImage);
+        } else {
+            hide(_benImage); hide(_mythusDaniel); hide(_michaelImage); hide(_marcusImage);
+        }
+    }
+
     // Parallax effect (optimiert: gecachte DOM-Referenzen)
     function applyParallaxEffect(scrollY) {
         const textSpeed = scrollY * 0.25;
@@ -1240,29 +1447,23 @@ document.addEventListener('DOMContentLoaded', function() {
             _mainImageContainer.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED}px, 0)`;
         }
 
-        // Ben bei RIVUS
-        if (_benImage) {
-            const speed = isMobile ? benMobileParallaxSpeed : BASE_UNTERPUNKT_SPEED;
-            const xOffset = isMobile ? '-50%' : '0';
-            _benImage.style.transform = `translate3d(${xOffset}, ${scrollY * speed}px, 0)`;
-        }
-
-        // MYTHUS Daniel
-        if (_mythusDaniel) {
-            const xOffset = isMobile ? '-50%' : '0';
-            _mythusDaniel.style.transform = `translate3d(${xOffset}, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
-        }
-
-        // Michael
-        if (_michaelImage) {
-            const speed = isMobile ? michaelMobileParallaxSpeed : BASE_UNTERPUNKT_SPEED;
-            _michaelImage.style.transform = `translate3d(0, ${scrollY * speed}px, 0)`;
-        }
-
-        // Marcus
-        if (_marcusImage) {
-            const speed = isMobile ? michaelMobileParallaxSpeed : BASE_UNTERPUNKT_SPEED;
-            _marcusImage.style.transform = `translate3d(0, ${scrollY * speed}px, 0)`;
+        // Mobile: Sichtbarkeit der Bilder per Scroll steuern (statisch, kein transform)
+        if (isMobile) {
+            updateMobileImageVisibility();
+        } else {
+            // Desktop: normale Parallax-Transforms
+            if (_benImage) {
+                _benImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
+            }
+            if (_mythusDaniel) {
+                _mythusDaniel.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
+            }
+            if (_michaelImage) {
+                _michaelImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
+            }
+            if (_marcusImage) {
+                _marcusImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
+            }
         }
 
         // Content box 1 - horizontaler Offset auf Box, Vertikalposition via transform auf Wrapper
@@ -1293,7 +1494,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // MYTHUS Anchor – folgt MYTHUS Box Wrapper
             if (_mythusAnchor) {
                 const wrapperVisualTop = _mythusWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
-                const anchorTop = wrapperVisualTop - _mythusAnchorHeight2 - _mythusAnchorGap2;
+                const mobileOffset = window.innerWidth < BREAKPOINT_MOBILE ? 38 : 0;
+                const anchorTop = wrapperVisualTop - _mythusAnchorHeight2 - _mythusAnchorGap2 + mobileOffset;
                 _mythusAnchor.style.transform = `translate3d(${_mythusAnchorLeft}px, ${anchorTop}px, 0)`;
             }
 
@@ -1310,7 +1512,9 @@ document.addEventListener('DOMContentLoaded', function() {
             _mythusBoxWrapper.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED}px, 0)`;
         }
         if (_mythusBox) {
-            _mythusBox.style.transform = 'translate3d(20%, 0, 0)';
+            const mythusShift = window.innerWidth < BREAKPOINT_MOBILE ? '0%' : '20%';
+            const mythusBoxOffsetY = window.innerWidth < BREAKPOINT_MOBILE ? 12 : 0;
+            _mythusBox.style.transform = `translate3d(${mythusShift}, ${mythusBoxOffsetY}px, 0)`;
         }
 
         // KONZEPT filled & outline
@@ -1408,6 +1612,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Alle Positionen werden bei jedem Resize neu berechnet
     // Die Berechnungen sind idempotent (OFFSET-basiert, ohne Transform/Scroll-Einfluss)
     let resizeTimer;
+    // =============== AKTIVES-SCROLLEN ERKENNUNG ===============
+    let isTouching = false;
+    let isScrollbarHeld = false;
+
+    window.addEventListener('touchstart', () => {
+        isTouching = true;
+        cancelMagnetSnap();
+    }, { passive: true });
+    window.addEventListener('touchend', () => {
+        isTouching = false;
+        scheduleSnapCheck();
+    }, { passive: true });
+    window.addEventListener('touchcancel', () => { isTouching = false; }, { passive: true });
+
+    window.addEventListener('pointerdown', (e) => {
+        if (e.clientX > document.documentElement.clientWidth) {
+            isScrollbarHeld = true;
+            cancelMagnetSnap();
+        }
+    });
+    window.addEventListener('pointerup', () => {
+        if (isScrollbarHeld) {
+            isScrollbarHeld = false;
+            scheduleSnapCheck();
+        }
+    });
+
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
@@ -1421,12 +1652,14 @@ document.addEventListener('DOMContentLoaded', function() {
             positionMythusBlock();
             calculateMythusAParallaxSpeed();
             positionMythusDaniel();
+            positionMythusBoxText();
             positionRivusAndBox3();
             calculateRivusAParallaxSpeed();
             positionMichaelAndMarcus();
             calculateMichaelMobileParallaxSpeed();
             positionAnchors();
-            calculateAllSMeetValues();
+            capTextRightBoundary();
+            calculateMeetingPoints();
         }, 250);
     });
 
@@ -1449,21 +1682,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Seite startet immer im Dark-Mode (Scroll-Steuerung übernimmt)
-    setTheme(true);
+    // Theme aus localStorage oder OS-Präferenz laden
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        setTheme(savedTheme === 'dark');
+    } else {
+        setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
 
     if (themeSwitch) {
-        // Manueller Toggle deaktiviert Scroll-Steuerung
         themeSwitch.addEventListener('change', () => {
             const isDark = themeSwitch.checked;
-            scrollThemeEnabled = false;
             setTheme(isDark);
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
 
         // OS-Preference nur wenn kein manuelles Theme gesetzt
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!localStorage.getItem('theme') && !scrollThemeEnabled) {
+            if (!localStorage.getItem('theme')) {
                 setTheme(e.matches);
             }
         });
