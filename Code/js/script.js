@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let mythusAParallaxSpeed = BASE_PARALLAX_SPEED;
 
     function positionMythusBlock() {
-        const box2 = document.querySelector('.content-box-2');
+        const box2 = document.getElementById('rivus-content-box');
         const mythusContainer = document.getElementById('mythus-anchor-container');
 
         if (!box2 || !mythusContainer) return;
@@ -161,6 +161,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mobile: MYTHUS-Block 68px tiefer
         if (window.innerWidth < BREAKPOINT_MOBILE) {
             minGap += 68;
+        }
+        // Desktop (Landscape): MYTHUS-Position angepasst (verhindert Doppel-Snap mit RIVUS)
+        const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+        if (!isPortrait && window.innerWidth >= 1025) {
+            minGap -= 100;
         }
 
         const box2LogicalTop = getBox2LogicalTop();
@@ -193,6 +198,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let meetY = window.innerHeight * meetingRatio;
         if (window.innerWidth < BREAKPOINT_MOBILE) {
             meetY = window.innerHeight * 0.80 - 200;
+        } else if (window.innerHeight / window.innerWidth > 1.2) {
+            meetY += 80;
         }
 
         const aStart = getDocumentTop(mythusFilled);
@@ -220,14 +227,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function capTextRightBoundary() {
         const rightLimit = window.innerWidth - 40; // rechter Rahmen (20px) + Puffer (20px)
-        document.querySelectorAll('.content-box p, .content-box-2 p').forEach(p => {
+        const rivusBox = document.getElementById('gesichten-content-box');
+        const rivusTextBox = document.getElementById('rivus-content-box'); // RIVUS-Textbox
+        const paragraphs = document.querySelectorAll('.content-box p, .content-box-2 p');
+
+        // Ben-Bild: horizontale Position als rechte Grenze für RIVUS-Text
+        const benEl = document.getElementById('ben-image-with-info');
+        const benRect = (benEl && window.innerWidth >= 601) ? benEl.getBoundingClientRect() : null;
+        const rivusTextRightLimit = benRect ? benRect.left - 40 : rightLimit; // 40px Gutter
+
+        // Inline-Stile zuerst zurücksetzen, damit CSS-Werte bei Orientierungswechsel wieder greifen
+        paragraphs.forEach(p => {
+            if (rivusBox && rivusBox.contains(p)) return;
+            p.style.maxWidth = '';
+        });
+
+        // Neu berechnen basierend auf aktuellem Layout
+        paragraphs.forEach(p => {
+            // GESICHTEN-Box: Breite separat gesetzt, hier überspringen
+            if (rivusBox && rivusBox.contains(p)) return;
             const left = p.getBoundingClientRect().left;
-            const available = rightLimit - left;
+            // RIVUS-Textbox: Grenze an Bens linker Kante (Grid-Gutter)
+            const limit = (rivusTextBox && rivusTextBox.contains(p)) ? rivusTextRightLimit : rightLimit;
+            const available = limit - left;
             const computed = parseFloat(getComputedStyle(p).maxWidth);
             if (isNaN(computed) || computed > available) {
                 p.style.maxWidth = Math.max(50, available) + 'px';
             }
         });
+
+        // GESICHTEN-Box: Breite immer explizit per JS setzen
+        if (rivusBox) {
+            const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+            const padding = parseFloat(getComputedStyle(rivusBox).paddingLeft) || 24;
+            const targetWidth = isPortrait
+                ? window.innerWidth - padding * 2          // Portrait: Rand zu Rand
+                : Math.round(window.innerWidth * 0.9);     // Landscape/Desktop: 90vw
+            // Box startet bei x=0 im Viewport (margin-left:-20vw + transform:+20vw).
+            // Damit der Text im Viewport zentriert ist, margin-left = (viewport - textWidth)/2 - boxPadding
+            const marginLeft = isPortrait ? 0 : Math.max(0, (window.innerWidth - targetWidth) / 2 - padding);
+            rivusBox.querySelectorAll('p').forEach(p => {
+                p.style.setProperty('max-width', targetWidth + 'px', 'important');
+                p.style.setProperty('margin-left', marginLeft + 'px', 'important');
+                p.style.setProperty('margin-right', 'auto', 'important');
+            });
+        }
     }
 
     function positionMythusBoxText() {
@@ -251,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const danielRight = danielEl.getBoundingClientRect().right;
         const basePadding = parseFloat(getComputedStyle(mythusBox).paddingLeft);
         const textLeft = mythusBox.getBoundingClientRect().left + basePadding;
-        const gap = 20;
+        const gap = 40; // --grid-gutter
         const shift = danielRight - textLeft + gap;
 
         if (shift > 0) {
@@ -298,24 +342,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const anchorHeight = mythusAnchor.offsetHeight;
 
         const meetingRatio = getMeetingRatio();
-        const meetY = window.innerHeight * meetingRatio;
+        let meetY = window.innerHeight * meetingRatio - 75;
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            meetY += 60;
+        } else {
+            meetY -= 8;
+            meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
+        }
 
         const S_meet_numerator = naturalTop_Box - anchorGap - anchorHeight - meetY;
         const S_meet_denominator = (1 - speed_Box);
         if (Math.abs(S_meet_denominator) < 0.001) return;
         const S_meet = S_meet_numerator / S_meet_denominator;
+        _sMeetDaniel = S_meet;
 
-        const alignmentOffset = (naturalTop_Box - naturalTop_Daniel) + (boxHeight - danielHeight) / 2;
-        const parallaxCorrection = S_meet * (speed_Box - speed_Daniel);
-        let finalOffset = alignmentOffset + parallaxCorrection + 100;
-        // Portrait-Modus: Daniel 125px höher
-        if (window.innerHeight / window.innerWidth > 1.2) {
-            finalOffset -= 125;
-            // 11" iPad (< 900px): zusätzlich 150px höher
-            if (window.innerWidth < 900) {
-                finalOffset -= 40;
-            }
-        }
+        // Oberkante des aktiven Textes messen (für Top-Top-Ausrichtung bei S_meet)
+        const _activeTextDaniel = mythusBox.querySelector('.lang-text.active') || mythusBox;
+        const _firstElDaniel = _activeTextDaniel.querySelector('h2, p');
+        const textTopOffsetDaniel = _firstElDaniel
+            ? _firstElDaniel.offsetTop
+            : (parseFloat(getComputedStyle(mythusBox).paddingTop) || 0);
+        const alignmentOffset_Daniel = (naturalTop_Box - naturalTop_Daniel) + textTopOffsetDaniel;
+        const parallaxCorrection_Daniel = S_meet * (speed_Box - speed_Daniel);
+        let finalOffset = alignmentOffset_Daniel + parallaxCorrection_Daniel;
+
+        const isPortraitDaniel = window.innerHeight / window.innerWidth > 1.2;
+        if (window.innerWidth >= 1025 && !isPortraitDaniel) finalOffset += 55;
 
         mythusDaniel.style.top = `${finalOffset}px`;
     }
@@ -340,9 +392,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculateGesichtenAParallaxSpeed() {
-        const gesichtenFilled = document.querySelector('.gesichten-anchor-filled');
-        const contentBox2 = document.querySelector('.content-box-2');
-        const gesichtenAnchor = document.querySelector('.gesichten-anchor-gray');
+        const gesichtenFilled = document.querySelector('.rivus-anchor-filled');
+        const contentBox2 = document.getElementById('rivus-content-box');
+        const gesichtenAnchor = document.querySelector('.rivus-anchor-gray');
 
         if (!gesichtenFilled || !contentBox2 || !gesichtenAnchor) return;
 
@@ -358,14 +410,20 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // Landscape: Treffpunkt 8px höher
             meetY -= 8;
+            // Sicherstellen, dass Snap erst passiert wenn RIVUS-Filled noch sichtbar ist
+            // fadeThreshold = 0.07 * vh → meetY muss deutlich darüber liegen
+            meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
         }
 
         // A's Startposition: Dokumentposition ohne Transforms
         const aStart = getDocumentTop(gesichtenFilled);
 
         // Anchor's Startposition berechnen aus der Beziehung zu Box2
-        // Anchor = Box2.top + 15 - anchorGap - Anchor.height (+ 15 wie in applyParallaxEffect)
-        const box2Start = getDocumentTop(contentBox2);
+        // Wenn Wrapper fixed: getDocumentTop(contentBox2) liefert 0 → _box2WrapperDocTop nutzen
+        const box2Wrapper = document.getElementById('rivus-content-box-wrapper');
+        const box2Start = (box2Wrapper && box2Wrapper.style.position === 'fixed')
+            ? _box2WrapperDocTop
+            : getDocumentTop(contentBox2);
         const anchorHeight = gesichtenAnchor.offsetHeight;
         const anchorGap = getGesichtenAnchorGap();
         const anchorStart = box2Start + 15 - anchorGap - anchorHeight;
@@ -384,21 +442,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         gesichtenAParallaxSpeed = Math.min(1, gesichtenAParallaxSpeed);
-
-        console.log('--- RIVUS CALCULATION ---');
-        console.log({
-            meetingRatio,
-            meetY,
-            aStart,
-            anchorStart,
-            box2Start,
-            anchorGap,
-            anchorHeight,
-            numerator,
-            denominator,
-            calculatedSpeed: 1 - numerator / denominator,
-            finalSpeed: gesichtenAParallaxSpeed
-        });
     }
 
     // positionGesichtenAnchor() entfällt — Anchor wird in positionAnchors() via transform positioniert.
@@ -407,22 +450,26 @@ document.addEventListener('DOMContentLoaded', function() {
     let rivusAParallaxSpeed = BASE_PARALLAX_SPEED;
 
     function calculateRivusAParallaxSpeed() {
-        const rivusFilled = document.getElementById('rivus-anchor-filled');
-        const rivusContentBox = document.getElementById('rivus-content-box');
-        const rivusAnchor = document.getElementById('rivus-anchor-gray');
+        const rivusFilled = document.getElementById('gesichten-anchor-filled');
+        const rivusContentBox = document.getElementById('gesichten-content-box');
+        const rivusAnchor = document.getElementById('gesichten-anchor-gray');
 
         if (!rivusFilled || !rivusContentBox || !rivusAnchor) return;
 
         const meetingRatio = getMeetingRatio();
         let meetY = window.innerHeight * meetingRatio;
-        if (window.innerHeight / window.innerWidth <= 1.2) meetY -= 60; // Landscape: Treffpunkt 60px höher
+        if (window.innerHeight / window.innerWidth > 1.2 && window.innerWidth >= BREAKPOINT_MOBILE) {
+            meetY += 80; // Portrait (Tablet): Treffpunkt 80px tiefer
+        } else {
+            meetY += 70; // Landscape/Desktop: +70 kompensiert den +70-Anchor-Offset
+        }
 
         const aStart = getDocumentTop(rivusFilled);
 
-        const box3Start = getDocumentTop(document.getElementById('rivus-content-box-wrapper'));
+        const box3Start = getDocumentTop(document.getElementById('gesichten-content-box-wrapper'));
         const anchorHeight = rivusAnchor.offsetHeight;
         const anchorGap = getGesichtenAnchorGap(); // We can reuse this
-        const anchorStart = box3Start + 12 - anchorGap - anchorHeight;
+        const anchorStart = box3Start + 70 - anchorGap - anchorHeight;
 
         const anchorEffectiveSpeed = BASE_PARALLAX_SPEED;
 
@@ -443,12 +490,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Berechnet die Scroll-Positionen, an denen Anchor und Parallaxschrift exakt übereinanderliegen.
     // Wird nach dem Positionieren aufgerufen (load + resize).
     let meetingPoints = [];
+    let meetingPointZoneOverrides = new Map();
     let isSnapping = false;
     let scrollEndTimer;
     let magnetAnimFrame = null;
 
     function calculateMeetingPoints() {
         meetingPoints = [];
+        meetingPointZoneOverrides = new Map();
 
         // KONZEPT
         const konzeptAnchorEl = document.querySelector('.konzept-heading-anchor');
@@ -465,8 +514,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // RIVUS
-        const contentBoxWrapper2El = document.querySelector('.content-box-wrapper-2');
-        const gesichtenAnchorEl = document.querySelector('.gesichten-anchor-gray');
+        const contentBoxWrapper2El = document.getElementById('rivus-content-box-wrapper');
+        const gesichtenAnchorEl = document.querySelector('.rivus-anchor-gray');
         if (contentBoxWrapper2El && gesichtenAnchorEl) {
             const meetingRatio = getMeetingRatio();
             let meetY = window.innerHeight * meetingRatio - 75;
@@ -476,10 +525,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetY += 60;
             } else {
                 meetY -= 8;
+                // Sicherstellen, dass Snap erst passiert wenn RIVUS-Filled noch sichtbar ist
+                meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
             }
             const anchorHeight = gesichtenAnchorEl.offsetHeight;
             const anchorGap = getGesichtenAnchorGap();
-            const anchorStart = getDocumentTop(contentBoxWrapper2El) + 15 - anchorGap - anchorHeight;
+            // _box2WrapperDocTop nutzen: fixed Wrapper → getDocumentTop() liefert 0
+            const anchorStart = _box2WrapperDocTop + 15 - anchorGap - anchorHeight;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
             if (sMeet > 100) meetingPoints.push(sMeet);
         }
@@ -488,32 +540,62 @@ document.addEventListener('DOMContentLoaded', function() {
         const mythusAnchorEl = document.getElementById('mythus-anchor');
         if (mythusAnchorEl) {
             const meetingRatio = getMeetingRatio();
-            let meetY = window.innerHeight * meetingRatio;
+            let meetY = window.innerHeight * meetingRatio - 75;
             if (window.innerWidth < BREAKPOINT_MOBILE) {
                 meetY = window.innerHeight * 0.80 - 200;
+            } else if (window.innerHeight / window.innerWidth > 1.2) {
+                meetY += 60;
+            } else {
+                meetY -= 8;
+                meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
             }
             const anchorHeight = mythusAnchorEl.offsetHeight;
             const anchorGap = getKonzeptAnchorGap();
             const mobileAnchorOffset = window.innerWidth < BREAKPOINT_MOBILE ? 33 : 0;
             const anchorStart = getDocumentTop(document.getElementById('mythus-box-wrapper')) - anchorGap - anchorHeight + mobileAnchorOffset;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 100) meetingPoints.push(sMeet);
+            if (sMeet > 100) {
+                meetingPoints.push(sMeet);
+                meetingPointZoneOverrides.set(sMeet, { before: 500, after: 180 });
+            }
         }
 
         // GESICHTEN
-        const rivusAnchorEl = document.getElementById('rivus-anchor-gray');
+        const rivusAnchorEl = document.getElementById('gesichten-anchor-gray');
         if (rivusAnchorEl) {
             const meetingRatio = getMeetingRatio();
             let meetY = window.innerHeight * meetingRatio;
-            if (window.innerHeight / window.innerWidth <= 1.2) meetY -= 60; // Landscape: Treffpunkt 60px höher
+            if (window.innerHeight / window.innerWidth > 1.2 && window.innerWidth >= BREAKPOINT_MOBILE) {
+                meetY += 80; // Portrait (Tablet): Treffpunkt 80px tiefer
+            }
             const anchorHeight = rivusAnchorEl.offsetHeight;
             const anchorGap = getGesichtenAnchorGap();
-            const anchorStart = getDocumentTop(document.getElementById('rivus-content-box-wrapper')) + 12 - anchorGap - anchorHeight;
+            const anchorStart = getDocumentTop(document.getElementById('gesichten-content-box-wrapper')) + 70 - anchorGap - anchorHeight;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
             if (sMeet > 100) meetingPoints.push(sMeet);
         }
 
+        // MICHAEL (Non-Mobile): Snap so dass Bildmitte = Viewport-Mitte
+        if (window.innerWidth >= 601) {
+            const michaelEl = document.getElementById('michael-image-with-info');
+            if (michaelEl) {
+                // position:relative → getDocumentTop gibt natural flow-Top ohne style.top
+                // Visueller Offset durch JS-positionierung (style.top) muss addiert werden
+                const naturalTop = getDocumentTop(michaelEl);
+                const styleTop = parseFloat(michaelEl.style.top || '0');
+                const michaelVisualDocTop = naturalTop + styleTop;
+                const michaelHeight = michaelEl.offsetHeight;
+                const sMichael = (michaelVisualDocTop + michaelHeight / 2 - window.innerHeight / 2) / (1 - BASE_UNTERPUNKT_SPEED);
+                if (sMichael > 100) {
+                    meetingPoints.push(sMichael);
+                    const isDesktop = window.innerWidth >= 1025 && window.innerHeight / window.innerWidth <= 1.2;
+                    if (isDesktop) meetingPointZoneOverrides.set(sMichael, 600);
+                }
+            }
+        }
+
         meetingPoints.sort((a, b) => a - b);
+        console.log('snapPoints:', meetingPoints.map(p => Math.round(p)));
 
         // Spacer-Höhe dynamisch setzen: letzter Snap-Punkt muss erreichbar sein
         const spacer = document.getElementById('scroll-spacer');
@@ -618,7 +700,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function positionGesichtenAndBox2() {
         const box1 = document.querySelector('.content-box');
         const alexImage = document.querySelector('.main-heading-image');
-        const gesichtenContainer = document.querySelector('.gesichten-anchor-container');
+        const gesichtenContainer = document.querySelector('.rivus-anchor-container');
 
         if (!box1 || !alexImage || !gesichtenContainer) return;
 
@@ -657,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function positionRivusAndBox3() {
         const mythusBox = document.getElementById('mythus-box');
-        const rivusContainer = document.getElementById('rivus-anchor-container');
+        const rivusContainer = document.getElementById('gesichten-anchor-container');
 
         if (!mythusBox || !rivusContainer) return;
 
@@ -676,7 +758,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const rivusBaseTop = getDocumentTop(rivusContainer);
 
         const naturalGap = rivusBaseTop - mythusBoxLogicalBottom;
-        const offset = minGap - naturalGap - 20;
+        let offset = minGap - naturalGap - 20;
+        const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+        const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
+        if (!isPortrait && !isMobile) offset -= 300;
         rivusContainer.style.marginTop = `${offset}px`;
     }
 
@@ -694,7 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.innerWidth >= 600) return; // Nur für schmale Fenster
 
         const benContainer = document.getElementById('ben-image-with-info');
-        const contentBox2 = document.querySelector('.content-box-2');
+        const contentBox2 = document.getElementById('rivus-content-box');
 
         if (!benContainer || !contentBox2) return;
 
@@ -736,8 +821,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getBox3LogicalTop() {
         const mythusBox = document.getElementById('mythus-box');
-        const rivusContainer = document.getElementById('rivus-anchor-container');
-        const rivusBoxWrapper = document.getElementById('rivus-content-box-wrapper');
+        const rivusContainer = document.getElementById('gesichten-anchor-container');
+        const rivusBoxWrapper = document.getElementById('gesichten-content-box-wrapper');
 
         if(!mythusBox || !rivusContainer || !rivusBoxWrapper) return 0;
 
@@ -758,8 +843,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function getBox2LogicalTop() {
         const box1 = document.querySelector('.content-box');
         const alexImage = document.querySelector('.main-heading-image');
-        const gesichtenContainer = document.querySelector('.gesichten-anchor-container');
-        const box2Wrapper = document.querySelector('.content-box-wrapper-2');
+        const gesichtenContainer = document.querySelector('.rivus-anchor-container');
+        const box2Wrapper = document.getElementById('rivus-content-box-wrapper');
 
         if (!box1 || !alexImage || !gesichtenContainer || !box2Wrapper) return 0;
 
@@ -771,23 +856,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const box1LogicalBottom = box1LogicalTop + box1Height;
 
         // RIVUS-Container startet nach dem dynamischen Gap (- 150px: alle Blöcke ab Block 2 höher)
-        const minGap = getBoxGap() - 165;
+        let minGap = getBoxGap() - 165;
+        // Portrait-Modus: gleicher +230px-Offset wie in positionGesichtenAndBox2()
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            minGap += 230;
+        }
         const gesichtenLogicalTop = box1LogicalBottom + minGap;
 
-        // Box 2 ist innerhalb von gesichtenContainer
-        // Ihre relative Position zu gesichtenContainer bleibt konstant
-        const box2RelativeTop = getDocumentTop(box2Wrapper) - getDocumentTop(gesichtenContainer);
+        // Wenn Wrapper fixed: getDocumentTop() liefert 0 (falsch).
+        // _box2WrapperDocTop nutzen – wird in recalculateLayout() nach positionGesichtenAndBox2()
+        // über den Anchor-Container aktuell berechnet.
+        if (box2Wrapper.style.position === 'fixed') {
+            return _box2WrapperDocTop;
+        }
 
+        // Wrapper im Fluss: relativen Abstand aus DOM messen
+        const box2RelativeTop = getDocumentTop(box2Wrapper) - getDocumentTop(gesichtenContainer);
         return gesichtenLogicalTop + box2RelativeTop;
     }
 
     function positionBen() {
         const benContainer = document.getElementById('ben-image-with-info');
         const benImage = benContainer ? benContainer.querySelector('.unterpunkt-heading-image') : null;
-        const contentBox2 = document.querySelector('.content-box-2');
+        const contentBox2 = document.getElementById('rivus-content-box');
         const unterpunktContainer = document.getElementById('ben-container');
-        const gesichtenContainer = document.querySelector('.gesichten-anchor-container');
-        const gesichtenAnchor = document.querySelector('.gesichten-anchor-gray');
+        const gesichtenContainer = document.querySelector('.rivus-anchor-container');
+        const gesichtenAnchor = document.querySelector('.rivus-anchor-gray');
 
         if (!benContainer || !benImage || !contentBox2 || !unterpunktContainer || !gesichtenContainer || !gesichtenAnchor) return;
 
@@ -795,7 +889,8 @@ document.addEventListener('DOMContentLoaded', function() {
         benContainer.style.top = '0px';
 
         // Logische/natürliche Positionen der Elemente ermitteln
-        const box2LogicalTop = getBox2LogicalTop();
+        // _box2WrapperDocTop: direkter DOM-Wert, konsistent mit Parallax-Engine
+        const box2LogicalTop = _box2WrapperDocTop;
         const box2Height = contentBox2.offsetHeight;
         const benNaturalTop = getDocumentTop(benContainer);
 
@@ -821,25 +916,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const anchorGap = getGesichtenAnchorGap();
         const anchorHeight = gesichtenAnchor.offsetHeight;
 
-        // 2. Treffpunkt 'meetY' berechnen (wo die anvisierten Texte sich treffen sollen)
+        // 2. Treffpunkt 'meetY' berechnen — identische Formel wie positionMythusDaniel + calculateMeetingPoints (RIVUS)
         const meetingRatio = getMeetingRatio();
-        const meetY = window.innerHeight * meetingRatio;
+        let meetY = window.innerHeight * meetingRatio - 75;
+        if (window.innerHeight / window.innerWidth > 1.2) {
+            meetY += 60;
+        } else {
+            meetY -= 8;
+            meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
+        }
 
         // 3. Den Scroll-Punkt 'S_meet' berechnen, an dem der Anchor den Treffpunkt erreicht
         const S_meet_numerator = naturalTop_Box - anchorGap - anchorHeight - meetY;
         const S_meet_denominator = (1 - speed_Box);
         if (Math.abs(S_meet_denominator) < 0.001) return; // Division durch Null vermeiden
         const S_meet = S_meet_numerator / S_meet_denominator;
+        _sMeetBen = S_meet;
 
-        // 4. Den finalen Offset für Ben berechnen, um die Zentrierung bei 'S_meet' zu erreichen
-        const alignmentOffset = (naturalTop_Box - naturalTop_Ben) + (boxHeight - benImageHeight) / 2;
-        const parallaxCorrection = S_meet * (speed_Box - speed_Ben);
-        let finalOffset = alignmentOffset + parallaxCorrection;
-        // Portrait-Modus: Ben 90px tiefer
-        if (window.innerHeight / window.innerWidth > 1.2) {
-            finalOffset += 90;
-        }
-
+        // 4. Oberkante des aktiven Textes messen (für Top-Top-Ausrichtung bei S_meet)
+        const _activeTextBen = contentBox2.querySelector('.lang-text.active') || contentBox2;
+        const _firstElBen = _activeTextBen.querySelector('h2, p');
+        const textTopOffsetBen = _firstElBen
+            ? _firstElBen.offsetTop
+            : (parseFloat(getComputedStyle(contentBox2).paddingTop) || 0);
+        const alignmentOffset_Ben = (naturalTop_Box - naturalTop_Ben) + textTopOffsetBen;
+        const parallaxCorrection_Ben = S_meet * (speed_Box - speed_Ben);
+        const finalOffset = alignmentOffset_Ben + parallaxCorrection_Ben;
         benContainer.style.top = `${finalOffset}px`;
     }
 
@@ -849,7 +951,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.innerWidth >= 600) return;
 
         const michaelContainer = document.getElementById('michael-image-with-info');
-        const rivusContentBox = document.getElementById('rivus-content-box');
+        const rivusContentBox = document.getElementById('gesichten-content-box');
 
         if (!michaelContainer || !rivusContentBox) return;
 
@@ -881,10 +983,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const michaelContainer = document.getElementById('michael-image-with-info');
         if (!michaelContainer) return; // Guard clause
         const michaelImage = michaelContainer.querySelector('.unterpunkt-heading-image');
-        const rivusContentBox = document.getElementById('rivus-content-box');
+        const rivusContentBox = document.getElementById('gesichten-content-box');
         const unterpunktContainerForMichael = michaelContainer.closest('.unterpunkt-heading-container'); 
-        const rivusContainer = document.getElementById('rivus-anchor-container');
-        const rivusAnchor = document.getElementById('rivus-anchor-gray');
+        const rivusContainer = document.getElementById('gesichten-anchor-container');
+        const rivusAnchor = document.getElementById('gesichten-anchor-gray');
 
         // Also get Marcus container
         const marcusContainer = document.getElementById('marcus-image-with-info');
@@ -930,19 +1032,25 @@ document.addEventListener('DOMContentLoaded', function() {
         if (Math.abs(S_meet_denominator) < 0.001) return;
         const S_meet = S_meet_numerator / S_meet_denominator;
 
-        const alignmentOffset = (naturalTop_Box - naturalTop_Michael) + (boxHeight - michaelHeight) / 2;
-        const parallaxCorrection = S_meet * (speed_Box - speed_Michael);
-        let finalOffset = alignmentOffset + parallaxCorrection;
-        // Portrait-Modus: Michael + Marcus 150px tiefer
-        if (window.innerHeight / window.innerWidth > 1.2) {
-            finalOffset += 150;
-        }
+        // Non-Mobile: Michael direkt unterhalb der GESICHTEN-Box (so groß wie möglich)
+        // Formel: Michaels Oberkante trifft Box-Unterkante beim Snap-Punkt S_meet
+        const alignmentOffset_Michael = (naturalTop_Box - naturalTop_Michael) + _cachedRivusBoxHeight;
+        const parallaxCorrection_Michael = S_meet * (speed_Box - speed_Michael);
+        const finalOffset = alignmentOffset_Michael + parallaxCorrection_Michael;
 
-        const finalTop = `${finalOffset + 200}px`;
-        michaelContainer.style.top = finalTop;
-        if (marcusContainer) {
-            marcusContainer.style.top = finalTop;
+        const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+        const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
+        const desktopOffset = (!isPortrait && !isMobile) ? -120 : 0;
+        const imageTop = finalOffset + desktopOffset;
+        michaelContainer.style.top = `${imageTop}px`;
+
+        // Container-Mindesthöhe: sicherstellen, dass Michael vollständig sichtbar ist
+        const outerContainer = document.getElementById('michael-marcus-container');
+        if (outerContainer && michaelImage) {
+            const required = imageTop + michaelImage.offsetHeight + 120; // 120px Abstand am Ende
+            outerContainer.style.minHeight = `${Math.max(required, window.innerHeight)}px`;
         }
+        // Marcus wird per CSS auf Non-Mobile versteckt
     }
     
     // =============== ANCHOR-POSITIONIERUNG (transform-basiert) ===============
@@ -971,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Alle Anchors auf position:fixed setzen
-        const anchors = [_konzeptAnchor, _gesichtenAnchor, _mythusAnchor, _rivusAnchorGray];
+        const anchors = [_konzeptAnchor, _rivusAnchor, _mythusAnchor, _gesichtenAnchorGray];
         for (const el of anchors) {
             if (el) {
                 el.style.position = 'fixed';
@@ -987,12 +1095,24 @@ document.addEventListener('DOMContentLoaded', function() {
             _konzeptAnchorLeft = _konzeptFilled.getBoundingClientRect().left;
         }
 
-        // RIVUS Anchor
-        if (_gesichtenAnchor && _gesichtenFilled && _contentBoxWrapper2) {
-            _rivusAnchorHeight2 = _gesichtenAnchor.offsetHeight;
+        // RIVUS Anchor + Content Box Wrapper auf position:fixed (wie KONZEPT)
+        if (_rivusAnchor && _rivusFilled && _rivusContentBoxWrapper2) {
+            _rivusAnchorHeight2 = _rivusAnchor.offsetHeight;
             _rivusAnchorGap2 = getGesichtenAnchorGap();
-            _box2WrapperDocTop = getDocumentTop(_contentBoxWrapper2);
-            _rivusAnchorLeft = _gesichtenFilled.getBoundingClientRect().left;
+            // Nur aus DOM messen wenn Wrapper zurückgesetzt (nach recalculateLayout-Reset).
+            // Bei afterSwitch()-Aufruf ist Wrapper fixed → getDocumentTop()=0 → vorherigen Wert behalten.
+            if (_rivusContentBoxWrapper2.style.position !== 'fixed') {
+                _box2WrapperDocTop = getDocumentTop(_rivusContentBoxWrapper2);
+            }
+            _rivusContentBoxWrapper2.style.position = 'fixed';
+            _rivusContentBoxWrapper2.style.top = '0';
+            _rivusContentBoxWrapper2.style.left = '0';
+            _rivusContentBoxWrapper2.style.width = '100%';
+            _rivusContentBoxWrapper2.style.marginTop = '0';
+            // Sofortiger Transform wie bei KONZEPT (verhindert Sprung auf Top:0)
+            const scrollY0 = window.scrollY;
+            _rivusContentBoxWrapper2.style.transform = `translate3d(0, ${_box2WrapperDocTop - scrollY0 * (1 - BASE_PARALLAX_SPEED)}px, 0)`;
+            _rivusAnchorLeft = _rivusFilled.getBoundingClientRect().left;
         }
 
         // MYTHUS Anchor
@@ -1004,11 +1124,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // GESICHTEN Anchor
-        if (_rivusAnchorGray && _rivusAnchorFilled && _rivusContentBoxWrapper) {
-            _gesichtenAnchorHeight2 = _rivusAnchorGray.offsetHeight;
+        if (_gesichtenAnchorGray && _gesichtenAnchorFilled && _gesichtenContentBoxWrapper) {
+            _gesichtenAnchorHeight2 = _gesichtenAnchorGray.offsetHeight;
             _gesichtenAnchorGap2 = getGesichtenAnchorGap();
-            _gesichtenWrapperDocTop = getDocumentTop(_rivusContentBoxWrapper);
-            _gesichtenAnchorLeft = _rivusAnchorFilled.getBoundingClientRect().left;
+            _gesichtenWrapperDocTop = getDocumentTop(_gesichtenContentBoxWrapper);
+            _gesichtenAnchorLeft = _gesichtenAnchorFilled.getBoundingClientRect().left;
         }
 
         _anchorsReady = true;
@@ -1020,22 +1140,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial positionieren nach Laden aller Bilder
     // Reihenfolge: Box 1 → RIVUS (Block 2) → Ben → MYTHUS (Block 3) → Daniel → GESICHTEN (Block 4) → Michael/Marcus
     window.addEventListener('load', () => {
-        calculateKonzeptAParallaxSpeed();
-        positionGesichtenAndBox2();
-        calculateGesichtenAParallaxSpeed();
-        positionBen();
-        calculateBenMobileParallaxSpeed();
-        positionMythusBlock();
-        calculateMythusAParallaxSpeed();
-        positionMythusDaniel();
-        positionMythusBoxText();
-        positionRivusAndBox3();
-        calculateRivusAParallaxSpeed();
-        positionMichaelAndMarcus();
-        calculateMichaelMobileParallaxSpeed();
-        positionAnchors();
-        capTextRightBoundary();
-        calculateMeetingPoints();
+        // Box-Höhen einmalig einfrieren (vor jedem Sprachenwechsel)
+        const _box2El = document.getElementById('rivus-content-box');
+        const _mythusBoxEl = document.getElementById('mythus-box');
+        const _gesichtenBoxEl = document.getElementById('gesichten-content-box');
+        if (_box2El) _cachedBox2Height = _box2El.offsetHeight;
+        if (_mythusBoxEl) _cachedMythusBoxHeight = _mythusBoxEl.offsetHeight;
+        if (_gesichtenBoxEl) _cachedRivusBoxHeight = _gesichtenBoxEl.offsetHeight;
+
+        recalculateLayout();
 
         // Sanfte Theme-Transitions erst nach initialem Rendern aktivieren
         requestAnimationFrame(() => {
@@ -1044,9 +1157,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Touch-Toggle für Bild-Info (Mobile)
+    // Touch-Toggle für Bild-Info (nur Mobile)
     document.querySelectorAll('#ben-image-with-info, #mythus-daniel-image-with-info, #michael-image-with-info, #marcus-image-with-info').forEach(container => {
         container.addEventListener('click', function(e) {
+            if (window.innerWidth >= BREAKPOINT_MOBILE) return;
             const isActive = this.classList.contains('info-active');
             document.querySelectorAll('.info-active').forEach(el => {
                 el.classList.remove('info-active');
@@ -1060,6 +1174,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     document.addEventListener('click', () => {
+        if (window.innerWidth >= BREAKPOINT_MOBILE) return;
         document.querySelectorAll('.info-active').forEach(el => {
             el.classList.remove('info-active');
             el.style.zIndex = '';
@@ -1082,8 +1197,58 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('locale', locale);
     }
 
-    localeBtns.forEach(btn => btn.addEventListener('click', () => setLocale(btn.dataset.locale)));
+    // Wechselt Sprache/Level ohne Bildpositionen zu verschieben.
+    // Kompensiert parent-Verschiebung durch DOM-Reflow direkt am style.top der Bilder.
+    function applyWithStableImages(switchFn) {
+        const imageIds = [
+            'ben-image-with-info',
+            'mythus-daniel-image-with-info',
+            'michael-image-with-info',
+        ];
+        const snapshots = imageIds.map(id => {
+            const el = document.getElementById(id);
+            const parent = el ? el.offsetParent : null;
+            return { el, beforeTop: parent ? getDocumentTop(parent) : 0 };
+        });
+
+        switchFn();
+        document.body.classList.add('no-image-transition');
+
+        // Bildpositionen kompensieren
+        snapshots.forEach(({ el, beforeTop }) => {
+            if (!el) return;
+            const parent = el.offsetParent;
+            const afterTop = parent ? getDocumentTop(parent) : 0;
+            const delta = afterTop - beforeTop;
+            if (delta !== 0) {
+                el.style.top = (parseFloat(el.style.top || '0') - delta) + 'px';
+            }
+        });
+
+        requestAnimationFrame(() => document.body.classList.remove('no-image-transition'));
+    }
+
+    function afterSwitch() {
+        positionMythusBoxText();
+        positionAnchors();
+        // Bildpositionen neu berechnen: contentSpan ändert sich mit Sprache/Niveau
+        positionBen();
+        positionMythusDaniel();
+        calculateRivusAParallaxSpeed();
+        calculateMeetingPoints();
+        calculateImageFreezeBounds();
+    }
+
+    let currentLocale = null;
+    localeBtns.forEach(btn => btn.addEventListener('click', () => {
+        const locale = btn.dataset.locale;
+        if (locale === currentLocale) return;
+        currentLocale = locale;
+        applyWithStableImages(() => { setLocale(locale); capTextRightBoundary(); });
+        requestAnimationFrame(() => afterSwitch());
+    }));
     setLocale(localStorage.getItem('locale') || 'de');
+    currentLocale = localStorage.getItem('locale') || 'de';
 
     // Sprachniveau-Toggle
     const langBtns = document.querySelectorAll('.lang-switch__btn');
@@ -1096,12 +1261,20 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('lang-level', lang);
     }
 
+    let currentLang = null;
     langBtns.forEach(btn => {
-        btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+        btn.addEventListener('click', () => {
+            const lang = btn.dataset.lang;
+            if (lang === currentLang) return;
+            currentLang = lang;
+            applyWithStableImages(() => { setLanguage(lang); capTextRightBoundary(); });
+            requestAnimationFrame(() => afterSwitch());
+        });
     });
 
     // Gespeicherte Präferenz wiederherstellen (Standard: expert)
     setLanguage(localStorage.getItem('lang-level') || 'expert');
+    currentLang = localStorage.getItem('lang-level') || 'expert';
 
     // Mobile Navigation Toggle
     const navToggle = document.querySelector('.nav-toggle');
@@ -1148,17 +1321,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const header = document.querySelector('header');
     const isShrinkingHeader = header && header.classList.contains('shrinking-header');
 
+    // =============== BOX HEIGHT CACHE ===============
+    // Einmalig beim Laden eingefroren – unabhängig von Textlänge bei Sprachenwechsel
+    let _cachedBox2Height = 0;
+    let _cachedMythusBoxHeight = 0;
+    let _cachedRivusBoxHeight = 0;
+
     // =============== DOM ELEMENT CACHE (Performance) ===============
     // Alle häufig genutzten Elemente einmal cachen statt pro Frame zu suchen
     const _alexImage = document.querySelector('.main-heading-image');
     const _contentBoxWrapper = document.querySelector('.content-box-wrapper');
-    const _contentBoxWrapper2 = document.querySelector('.content-box-wrapper-2');
+    const _rivusContentBoxWrapper2 = document.getElementById('rivus-content-box-wrapper');
     const _mythusBoxWrapper = document.getElementById('mythus-box-wrapper');
-    const _rivusContentBoxWrapper = document.getElementById('rivus-content-box-wrapper');
+    const _gesichtenContentBoxWrapper = document.getElementById('gesichten-content-box-wrapper');
     const _contentBox = document.querySelector('.content-box');
-    const _contentBox2 = document.querySelector('.content-box-2');
+    const _rivusContentBox2 = document.getElementById('rivus-content-box');
     const _mythusBox = document.getElementById('mythus-box');
-    const _rivusContentBox = document.getElementById('rivus-content-box');
+    const _gesichtenContentBox = document.getElementById('gesichten-content-box');
     const _mainImageContainer = document.querySelector('.main-heading-container .image-with-info');
     const _benImage = document.getElementById('ben-image-with-info');
     const _mythusDaniel = document.getElementById('mythus-daniel-image-with-info');
@@ -1170,12 +1349,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const _mythusFilled = document.getElementById('mythus-filled');
     const _mythusOutline = document.getElementById('mythus-outline');
     const _mythusAnchor = document.getElementById('mythus-anchor');
-    const _gesichtenFilled = document.querySelector('.gesichten-anchor-filled');
-    const _gesichtenOutline = document.querySelector('.gesichten-anchor-outline');
-    const _gesichtenAnchor = document.querySelector('.gesichten-anchor-gray');
-    const _rivusAnchorFilled = document.getElementById('rivus-anchor-filled');
-    const _rivusAnchorOutline = document.querySelector('#rivus-anchor-container .gesichten-anchor-outline');
-    const _rivusAnchorGray = document.getElementById('rivus-anchor-gray');
+    const _rivusFilled = document.querySelector('.rivus-anchor-filled');
+    const _rivusOutline = document.querySelector('.rivus-anchor-outline');
+    const _rivusAnchor = document.querySelector('.rivus-anchor-gray');
+    const _gesichtenAnchorFilled = document.getElementById('gesichten-anchor-filled');
+    const _gesichtenAnchorOutline = document.querySelector('#gesichten-anchor-container .gesichten-anchor-outline');
+    const _gesichtenAnchorGray = document.getElementById('gesichten-anchor-gray');
     const _allTextBehinds = document.querySelectorAll('.text-behind');
     const _allTextFronts = document.querySelectorAll('.text-front');
     const _allParallaxImages = document.querySelectorAll('.parallax-image');
@@ -1191,13 +1370,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let _rivusAnchorHeight2 = 0, _rivusAnchorGap2 = 0, _rivusAnchorLeft = 0, _box2WrapperDocTop = 0;
     let _mythusAnchorHeight2 = 0, _mythusAnchorGap2 = 0, _mythusAnchorLeft = 0, _mythusWrapperDocTop = 0;
     let _gesichtenAnchorHeight2 = 0, _gesichtenAnchorGap2 = 0, _gesichtenAnchorLeft = 0, _gesichtenWrapperDocTop = 0;
+    // Image freeze bounds: S_meet = scroll when image top = text top; S_exit = scroll when image bottom = text bottom
+    let _sMeetBen = 0, _sExitBen = 0;
+    let _sMeetDaniel = 0, _sExitDaniel = 0;
     const _heroSection = document.querySelector('.hero-section');
     const _visHeadings = [
         document.querySelector('.main-heading-filled'),
         _konzeptFilled,
         document.querySelector('.unterpunkt-heading-filled'),
-        _gesichtenFilled,
-        _rivusAnchorFilled,
+        _gesichtenAnchorFilled,
+        _rivusFilled,
         _mythusFilled
     ];
 
@@ -1232,7 +1414,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dist = Math.abs(s - point);
                 const distPrev = i > 0 ? point - meetingPoints[i - 1] : point;
                 const distNext = i < meetingPoints.length - 1 ? meetingPoints[i + 1] - point : Infinity;
-                const zone = Math.min(distPrev, distNext) * 0.24;
+                const override = meetingPointZoneOverrides.get(point);
+                const zone = override
+                    ? (typeof override === 'object'
+                        ? (s < point ? override.before : override.after)
+                        : override)
+                    : Math.min(distPrev, distNext) * 0.24;
                 if (dist <= zone && dist < minDist) { minDist = dist; target = point; }
             }
             if (target !== null) slowScrollTo(target);
@@ -1360,8 +1547,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.main-heading-filled'),
             document.querySelector('.konzept-heading-filled'),
             document.querySelector('.unterpunkt-heading-filled'),
-            document.querySelector('.gesichten-anchor-filled'),
-            document.getElementById('rivus-anchor-filled'),
+            document.querySelector('.rivus-anchor-filled'),
+            document.getElementById('gesichten-anchor-filled'),
             document.getElementById('mythus-filled')
         ];
 
@@ -1416,9 +1603,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const imageFixedTop = (headerEl ? headerEl.offsetHeight : 50) + 15;
 
         const konzeptTop = _contentBoxWrapper ? _contentBoxWrapper.getBoundingClientRect().top : Infinity;
-        const rivusTop   = _contentBoxWrapper2 ? _contentBoxWrapper2.getBoundingClientRect().top : Infinity;
+        const rivusTop   = _rivusContentBoxWrapper2 ? _rivusContentBoxWrapper2.getBoundingClientRect().top : Infinity;
         const mythusTop  = _mythusBoxWrapper ? _mythusBoxWrapper.getBoundingClientRect().top : Infinity;
-        const gesichtenTop = _rivusContentBoxWrapper ? _rivusContentBoxWrapper.getBoundingClientRect().top : Infinity;
+        const gesichtenTop = _gesichtenContentBoxWrapper ? _gesichtenContentBoxWrapper.getBoundingClientRect().top : Infinity;
 
         const show = el => { if (el) el.style.opacity = '1'; };
         const hide = el => { if (el) el.style.opacity = '0'; };
@@ -1451,12 +1638,25 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isMobile) {
             updateMobileImageVisibility();
         } else {
-            // Desktop: normale Parallax-Transforms
+            // Berechnet transform-Y mit optionalem Freeze-Fenster [sMeet, sExit].
+            // Phase 1 (vor Snap):  normale Parallax
+            // Phase 2 (Freeze):    Bild steht; transform kompensiert Page-Scroll
+            // Phase 3 (nach Exit): Bild scrollt mit Box-Geschwindigkeit (synchron zum Text)
+            const imgSpeed = BASE_UNTERPUNKT_SPEED;
+            const boxSpeed = BASE_PARALLAX_SPEED;
+            const frozenTransformY = (s, sMeet, sExit) => {
+                if (sMeet <= 0 || sExit <= sMeet) return s * imgSpeed;
+                if (s <= sMeet) return s * imgSpeed;
+                if (s < sExit)  return s - sMeet * (1 - imgSpeed);
+                // Nahtloser Übergang: ab sExit mit boxSpeed wegscrollen (= Textgeschwindigkeit)
+                return (sExit - sMeet * (1 - imgSpeed)) + (s - sExit) * boxSpeed;
+            };
+
             if (_benImage) {
-                _benImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
+                _benImage.style.transform = `translate3d(0, ${frozenTransformY(scrollY, _sMeetBen, _sExitBen)}px, 0)`;
             }
             if (_mythusDaniel) {
-                _mythusDaniel.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
+                _mythusDaniel.style.transform = `translate3d(0, ${frozenTransformY(scrollY, _sMeetDaniel, _sExitDaniel)}px, 0)`;
             }
             if (_michaelImage) {
                 _michaelImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
@@ -1481,14 +1681,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (_konzeptAnchor) {
                 const boxTop = _alexDocTop + _alexHeight - scrollY * (1 - BASE_PARALLAX_SPEED) + _boxAlexGap;
                 const anchorTop = boxTop - _konzeptAnchorHeight - _konzeptAnchorGap;
-                _konzeptAnchor.style.transform = `translate3d(${_konzeptAnchorLeft}px, ${anchorTop}px, 0)`;
+                _konzeptAnchor.style.transform = `translate3d(${_konzeptAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
 
-            // RIVUS Anchor – folgt Box 2 Wrapper (position:relative + parallax)
-            if (_gesichtenAnchor) {
+            // RIVUS Anchor – folgt RIVUS Box 2 Wrapper
+            if (_rivusAnchor) {
                 const wrapperVisualTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
                 const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 15;
-                _gesichtenAnchor.style.transform = `translate3d(${_rivusAnchorLeft}px, ${anchorTop}px, 0)`;
+                _rivusAnchor.style.transform = `translate3d(${_rivusAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
 
             // MYTHUS Anchor – folgt MYTHUS Box Wrapper
@@ -1496,14 +1696,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const wrapperVisualTop = _mythusWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
                 const mobileOffset = window.innerWidth < BREAKPOINT_MOBILE ? 38 : 0;
                 const anchorTop = wrapperVisualTop - _mythusAnchorHeight2 - _mythusAnchorGap2 + mobileOffset;
-                _mythusAnchor.style.transform = `translate3d(${_mythusAnchorLeft}px, ${anchorTop}px, 0)`;
+                _mythusAnchor.style.transform = `translate3d(${_mythusAnchorLeft}px, ${anchorTop}px, 0) rotate(4deg)`;
             }
 
             // GESICHTEN Anchor – folgt GESICHTEN Box Wrapper
-            if (_rivusAnchorGray) {
+            if (_gesichtenAnchorGray) {
                 const wrapperVisualTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
-                const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 12;
-                _rivusAnchorGray.style.transform = `translate3d(${_gesichtenAnchorLeft}px, ${anchorTop}px, 0)`;
+                const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 70;
+                _gesichtenAnchorGray.style.transform = `translate3d(${_gesichtenAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
         }
 
@@ -1519,53 +1719,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // KONZEPT filled & outline
         if (_konzeptFilled) {
-            _konzeptFilled.style.transform = `translate3d(0, ${scrollY * konzeptAParallaxSpeed}px, 0)`;
+            _konzeptFilled.style.transform = `translate3d(0, ${scrollY * konzeptAParallaxSpeed}px, 0) rotate(-2deg)`;
         }
         if (_konzeptOutline) {
-            _konzeptOutline.style.transform = `translate3d(0, ${scrollY * konzeptAParallaxSpeed}px, 0)`;
+            _konzeptOutline.style.transform = `translate3d(0, ${scrollY * konzeptAParallaxSpeed}px, 0) rotate(-2deg)`;
         }
 
         // MYTHUS filled & outline
         if (_mythusFilled) {
-            _mythusFilled.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed}px, 0)`;
+            _mythusFilled.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed}px, 0) rotate(2deg)`;
         }
         if (_mythusOutline) {
-            _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed}px, 0)`;
+            _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed}px, 0) rotate(2deg)`;
         }
 
-        // Content box 2 (links) - vertikal auf Wrapper, horizontal auf Box
-        if (_contentBoxWrapper2) {
-            _contentBoxWrapper2.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED}px, 0)`;
+        // RIVUS content box (links) - position:fixed wie KONZEPT, Transform: docTop - scrollY*(1-speed)
+        if (_anchorsReady && _rivusContentBoxWrapper2) {
+            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
+            _rivusContentBoxWrapper2.style.transform = `translate3d(0, ${rivusTop}px, 0)`;
         }
-        if (_contentBox2) {
+        if (_rivusContentBox2) {
             const rightOffset = getGesichtenRightOffset();
-            const totalXOffset = -window.innerWidth * 0.2 + rightOffset + 45;
-            _contentBox2.style.transform = `translate3d(${totalXOffset}px, 0, 0)`;
+            const totalXOffset = -window.innerWidth * 0.2 + rightOffset + 61;
+            _rivusContentBox2.style.transform = `translate3d(${totalXOffset}px, 0, 0)`;
         }
 
-        // RIVUS content box - vertikal auf Wrapper, horizontal auf Box
-        if (_rivusContentBoxWrapper) {
-            _rivusContentBoxWrapper.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED}px, 0)`;
+        // GESICHTEN content box - vertikal auf Wrapper, horizontal auf Box
+        if (_gesichtenContentBoxWrapper) {
+            _gesichtenContentBoxWrapper.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED}px, 0)`;
         }
-        if (_rivusContentBox) {
+        if (_gesichtenContentBox) {
             const totalXOffset = window.innerWidth * 0.2;
-            _rivusContentBox.style.transform = `translate3d(${totalXOffset}px, 0, 0)`;
+            const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+            const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
+            const yOffset = (!isPortrait && !isMobile) ? 50 : 0;
+            _gesichtenContentBox.style.transform = `translate3d(${totalXOffset}px, ${yOffset}px, 0)`;
         }
 
         // RIVUS filled & outline
-        if (_gesichtenFilled) {
-            _gesichtenFilled.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed}px, 0)`;
+        if (_rivusFilled) {
+            _rivusFilled.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed}px, 0) rotate(-2deg)`;
         }
-        if (_gesichtenOutline) {
-            _gesichtenOutline.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed}px, 0)`;
+        if (_rivusOutline) {
+            _rivusOutline.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed}px, 0) rotate(-2deg)`;
         }
 
         // GESICHTEN filled & outline
-        if (_rivusAnchorFilled) {
-            _rivusAnchorFilled.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed}px, 0)`;
+        if (_gesichtenAnchorFilled) {
+            _gesichtenAnchorFilled.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed}px, 0) rotate(-2deg)`;
         }
-        if (_rivusAnchorOutline) {
-            _rivusAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed}px, 0)`;
+        if (_gesichtenAnchorOutline) {
+            _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed}px, 0) rotate(-2deg)`;
         }
 
         // Text-Layer
@@ -1639,28 +1843,172 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Berechnet S_exit pro Bild: Scroll-Position, bei der Bild-Unterkante = Text-Unterkante.
+    // Freeze-Fenster: [S_meet, S_exit]. Nur auf Desktop (non-Mobile).
+    function calculateImageFreezeBounds() {
+        const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
+        if (isMobile) { _sExitBen = 0; _sExitDaniel = 0; return; }
+
+        const boxSpeed = BASE_PARALLAX_SPEED;
+
+        // Hilfsfunktion: exakter Textbereich = Unterkante letztes Element − Oberkante erstes Element
+        function getTextSpan(box) {
+            // Nur aktive Sprachvariante auswählen, damit display:none-Elemente
+            // (deren offsetTop=0) den lastEl nicht verfälschen.
+            const container = box.querySelector('.lang-text.active') || box;
+            const allEls = container.querySelectorAll('h2, p');
+            if (allEls.length === 0) return box.offsetHeight;
+            const firstEl = allEls[0];
+            const lastEl  = allEls[allEls.length - 1];
+            return lastEl.offsetTop + lastEl.offsetHeight - firstEl.offsetTop;
+        }
+
+        // Einheitliche Exit-Formel für beide Ausrichtungsstrategien:
+        // • imgHeight > contentSpan (Bottom-Bottom-Eintritt): Exit wenn Text-OK = Bild-OK
+        // • contentSpan > imgHeight (Top-Top-Eintritt):       Exit wenn Text-UK = Bild-UK
+        // Freeze-Dauer = |imgHeight - contentSpan| / (1 - boxSpeed)
+        function calcSExit(sMeet, imgHeight, contentSpan) {
+            return sMeet + Math.abs(imgHeight - contentSpan) / (1 - boxSpeed);
+        }
+
+        // Ben / RIVUS-Box
+        const box2 = document.getElementById('rivus-content-box');
+        if (_benImage && box2 && _sMeetBen > 0) {
+            const _benInnerImg = _benImage.querySelector('.unterpunkt-heading-image');
+            const _benH = _benInnerImg ? _benInnerImg.offsetHeight : _benImage.offsetHeight;
+            const _benSpan = getTextSpan(box2);
+            _sExitBen = _benH > _benSpan ? 0 : calcSExit(_sMeetBen, _benH, _benSpan);
+        } else {
+            _sExitBen = 0;
+        }
+
+        // Daniel / MYTHUS-Box
+        const mythusBox = document.getElementById('mythus-box');
+        if (_mythusDaniel && mythusBox && _sMeetDaniel > 0) {
+            const _danielInnerImg = _mythusDaniel.querySelector('.unterpunkt-heading-image');
+            const _danielH = _danielInnerImg ? _danielInnerImg.offsetHeight : _mythusDaniel.offsetHeight;
+            const _danielSpan = getTextSpan(mythusBox);
+            _sExitDaniel = _danielH > _danielSpan ? 0 : calcSExit(_sMeetDaniel, _danielH, _danielSpan);
+        } else {
+            _sExitDaniel = 0;
+        }
+    }
+
+    function recalculateLayout() {
+        _anchorsReady = false; // Zurücksetzen damit updateScene den Fallback nutzt
+
+        // Fixed Wrapper zurücksetzen, bevor DOM-Messungen stattfinden.
+        // Browser rendert nicht zwischen synchronen Anweisungen → kein Flicker.
+        // Ohne Reset liefert getDocumentTop() für Kindelemente fixed-positionierter
+        // Wrapper falsche Werte (z.B. _alexDocTop ≈ 0 statt korrekter Dokumentposition).
+        const _resetFixedWrapper = (el) => {
+            if (!el) return;
+            el.style.position = '';
+            el.style.top = '';
+            el.style.left = '';
+            el.style.width = '';
+            el.style.marginTop = '';
+            el.style.transform = '';
+        };
+        _resetFixedWrapper(_contentBoxWrapper);
+        _resetFixedWrapper(_rivusContentBoxWrapper2);
+
+        // Box-Höhen neu messen (orientierungsabhängig)
+        const _box2El = document.getElementById('rivus-content-box');
+        const _mythusBoxEl = document.getElementById('mythus-box');
+        const _gesichtenBoxEl = document.getElementById('gesichten-content-box');
+        if (_box2El) _cachedBox2Height = _box2El.offsetHeight;
+        if (_mythusBoxEl) _cachedMythusBoxHeight = _mythusBoxEl.offsetHeight;
+        if (_gesichtenBoxEl) _cachedRivusBoxHeight = _gesichtenBoxEl.offsetHeight;
+
+        updateScene();
+        calculateKonzeptAParallaxSpeed();
+        positionGesichtenAndBox2();
+        // _box2WrapperDocTop direkt aus DOM messen (gleicher Wert wie in positionAnchors und Parallax).
+        // Direkte DOM-Messung verhindert Abweichungen durch Formel-Approximation (anchorTop+height+margin).
+        if (_rivusContentBoxWrapper2) {
+            _box2WrapperDocTop = getDocumentTop(_rivusContentBoxWrapper2);
+        }
+        calculateGesichtenAParallaxSpeed();
+        positionAnchors(); // fixiert Wrapper; ab hier ist der DOM im Runtime-Zustand
+        positionBen();     // benNaturalTop jetzt konsistent mit Laufzeit (Wrapper fixed)
+        calculateBenMobileParallaxSpeed();
+        capTextRightBoundary();
+        // Nach RIVUS-Fixierung: Blöcke neu positionieren und DocTops korrekt messen
+        positionMythusBlock();
+        if (_mythusBoxWrapper) _mythusWrapperDocTop = getDocumentTop(_mythusBoxWrapper);
+        calculateMythusAParallaxSpeed();
+        positionMythusDaniel();
+        positionMythusBoxText();
+        positionRivusAndBox3();
+        positionMichaelAndMarcus();
+        calculateMichaelMobileParallaxSpeed();
+        if (_gesichtenContentBoxWrapper) _gesichtenWrapperDocTop = getDocumentTop(_gesichtenContentBoxWrapper);
+        applyParallaxEffect(window.scrollY); // Anchors mit korrekten DocTops aktualisieren
+        calculateRivusAParallaxSpeed();
+        calculateMeetingPoints();
+        calculateImageFreezeBounds();
+    }
+
+    // =============== BEN STAIRCASE: iPad Portrait Split ===============
+    function updateBenStaircase() {
+        const benList = document.querySelector('#ben-container .words-stair');
+        if (!benList) return;
+
+        const isSplit = window.innerWidth <= 600
+                     || (window.innerWidth <= 1024 && window.innerHeight > window.innerWidth);
+
+        const d3    = benList.querySelector('.ben-desktop-3');
+        const d4    = benList.querySelector('.ben-desktop-4');
+        const i3    = benList.querySelector('.ben-ipad-3');
+        const i4    = benList.querySelector('.ben-ipad-4');
+        const i5    = benList.querySelector('.ben-ipad-5');
+        const masse = benList.querySelector('.ben-masse');
+
+        if (!d3 || !d4 || !i3 || !i4 || !i5 || !masse) return;
+
+        if (isSplit) {
+            d3.style.display = 'none';
+            d4.style.display = 'none';
+            i3.style.display = 'list-item';
+            i4.style.display = 'list-item';
+            i5.style.display = 'list-item';
+
+            // Treppenoffsets für 3.–6. sichtbare Position
+            i3.style.left    = '48px';
+            i4.style.left    = '64px';
+            i5.style.left    = '80px';
+            masse.style.left = '96px';
+
+            // Skew: i3=nth-child(5)odd, i4=6even, i5=7odd, masse=8even → alterniert korrekt
+            i3.style.transform    = '';
+            i4.style.transform    = '';
+            i5.style.transform    = '';
+            masse.style.transform = '';
+        } else {
+            d3.style.display = '';
+            d4.style.display = '';
+            i3.style.display = 'none';
+            i4.style.display = 'none';
+            i5.style.display = 'none';
+
+            // masse ist nth-child(8)=even, soll als 5. sichtbare Zeile odd wirken
+            masse.style.left      = '80px';
+            masse.style.transform = 'skew(60deg, -30deg) scaleY(0.66667)';
+        }
+    }
+
+    updateBenStaircase();
+
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
+        // Transition während Resize deaktivieren
+        document.body.classList.add('no-image-transition');
         resizeTimer = setTimeout(() => {
-            _anchorsReady = false; // Zurücksetzen damit updateScene den Fallback nutzt
-            updateScene();
-            calculateKonzeptAParallaxSpeed();
-            positionGesichtenAndBox2();
-            calculateGesichtenAParallaxSpeed();
-            positionBen();
-            calculateBenMobileParallaxSpeed();
-            positionMythusBlock();
-            calculateMythusAParallaxSpeed();
-            positionMythusDaniel();
-            positionMythusBoxText();
-            positionRivusAndBox3();
-            calculateRivusAParallaxSpeed();
-            positionMichaelAndMarcus();
-            calculateMichaelMobileParallaxSpeed();
-            positionAnchors();
-            capTextRightBoundary();
-            calculateMeetingPoints();
-        }, 250);
+            recalculateLayout();
+            updateBenStaircase();
+            requestAnimationFrame(() => document.body.classList.remove('no-image-transition'));
+        }, 150);
     });
 
     // =============== THEME TOGGLE ===============
