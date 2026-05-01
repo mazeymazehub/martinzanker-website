@@ -941,7 +941,9 @@ document.addEventListener('DOMContentLoaded', function() {
             : (parseFloat(getComputedStyle(contentBox2).paddingTop) || 0);
         const alignmentOffset_Ben = (naturalTop_Box - naturalTop_Ben) + textTopOffsetBen;
         const parallaxCorrection_Ben = S_meet * (speed_Box - speed_Ben);
-        const finalOffset = alignmentOffset_Ben + parallaxCorrection_Ben;
+        const isPortraitBen = window.innerHeight / window.innerWidth > 1.2;
+        const desktopOffsetBen = (window.innerWidth >= 1025 && !isPortraitBen) ? 15 : 0;
+        const finalOffset = alignmentOffset_Ben + parallaxCorrection_Ben + desktopOffsetBen;
         benContainer.style.top = `${finalOffset}px`;
     }
 

@@ -3,19 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reden - Martin Zanker</title>
+    <title>Texte - Martin Zanker</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        .speeches-section {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: var(--spacing-section) var(--spacing-container);
+        /* ---- Texte Heading ---- */
+        .reden-heading-section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 73px;
+            padding-bottom: 0;
+            overflow: visible;
+            position: relative;
+        }
+
+        .reden-heading-container {
+            position: relative;
+            left: 260px;
+            display: grid;
+            place-items: center;
+        }
+
+        .reden-heading {
+            font-family: 'Inter', sans-serif;
+            font-size: var(--font-size-heading-large);
+            font-weight: 850;
+            letter-spacing: -0.08em;
+            text-transform: uppercase;
+            margin: 0;
+            grid-column: 1;
+            grid-row: 1;
+            white-space: nowrap;
+            position: relative;
+            transform: rotate(2deg);
+        }
+
+        .reden-heading-anchor {
+            color: var(--color-gray);
+            transform: rotate(2deg) translate(5px, 5px);
+            z-index: 0;
+        }
+
+        .reden-heading-filled {
+            color: #333333;
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .reden-heading-outline {
+            color: transparent;
+            -webkit-text-stroke: 2px #333333;
+            text-stroke: 2px #333333;
+            z-index: 4;
+        }
+
+        /* ---- Gray Content Box ---- */
+        .reden-box-section {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            padding: 0 var(--spacing-container) clamp(60px, 10vh, 120px);
+            margin-top: -365px;
+            z-index: 3;
+        }
+
+        .reden-content-box {
+            background-color: var(--color-gray);
+            padding: var(--spacing-box-padding);
+            width: 100%;
+            max-width: 820px;
+            position: relative;
+        }
+
+        /* ---- Speech List ---- */
+        .speeches-note {
+            font-family: 'Inter', sans-serif;
+            font-size: var(--font-size-body);
+            color: #333333;
+            font-style: italic;
+            margin-bottom: 24px;
+            opacity: 0.7;
         }
 
         .speech-list {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 0;
         }
 
         .speech-item {
@@ -24,11 +97,11 @@
             justify-content: space-between;
             gap: 24px;
             padding: 20px 0;
-            border-bottom: 1px solid var(--color-gray);
+            border-bottom: 1px solid rgba(51, 51, 51, 0.3);
         }
 
         .speech-item:first-child {
-            border-top: 1px solid var(--color-gray);
+            border-top: 1px solid rgba(51, 51, 51, 0.3);
         }
 
         .speech-info {
@@ -36,21 +109,26 @@
         }
 
         .speech-date {
+            font-family: 'Inter', sans-serif;
             font-size: var(--font-size-body);
-            color: var(--color-gray-dark);
+            color: #333333;
+            opacity: 0.7;
             margin-bottom: 4px;
         }
 
         .speech-title {
+            font-family: 'Inter', sans-serif;
             font-size: var(--font-size-body-large);
-            font-weight: 600;
-            color: #333366;
+            font-weight: 700;
+            color: #333333;
             margin: 0 0 4px 0;
         }
 
         .speech-location {
+            font-family: 'Inter', sans-serif;
             font-size: var(--font-size-body);
-            color: var(--color-gray-dark);
+            color: #333333;
+            opacity: 0.7;
             margin: 0;
         }
 
@@ -62,29 +140,62 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            color: var(--color-primary);
+            color: #333333;
             text-decoration: none;
+            font-family: 'Inter', sans-serif;
             font-size: var(--font-size-body);
-            font-weight: 500;
-            border: 1px solid var(--color-primary);
+            font-weight: 600;
+            border: 1.5px solid #333333;
             padding: 6px 14px;
             transition: background-color 0.2s, color 0.2s;
         }
 
         .speech-download a:hover {
-            background-color: var(--color-primary);
-            color: white;
+            background-color: #333333;
+            color: var(--color-gray);
         }
 
         .speech-download a::before {
             content: '↓';
         }
 
-        .speeches-note {
-            font-size: var(--font-size-body);
-            color: var(--color-gray-dark);
-            font-style: italic;
-            margin-bottom: 24px;
+        /* ---- Dark Mode ---- */
+        body.dark-mode .reden-heading-filled {
+            color: #ff6633;
+        }
+
+        body.dark-mode .reden-heading-outline {
+            -webkit-text-stroke-color: #ff6633;
+            text-stroke-color: #ff6633;
+        }
+
+        body.dark-mode .reden-heading-anchor {
+            color: #666666;
+        }
+
+        body.dark-mode .reden-content-box {
+            background-color: #666666;
+        }
+
+        body.dark-mode .speeches-note,
+        body.dark-mode .speech-date,
+        body.dark-mode .speech-title,
+        body.dark-mode .speech-location {
+            color: #E9E9E4;
+        }
+
+        body.dark-mode .speech-item {
+            border-color: rgba(233, 233, 228, 0.3);
+        }
+
+        body.dark-mode .speech-download a {
+            color: #E9E9E4;
+            border-color: #E9E9E4;
+        }
+
+        body.dark-mode .speech-download a:hover {
+            background-color: #E9E9E4;
+            color: #666666;
         }
     </style>
 </head>
@@ -177,7 +288,7 @@
             </button>
             <ul class="nav-menu">
                 <li><a href="werke.html" data-de="Werke" data-en="Works">Werke</a></li>
-                <li><a href="reden.html" class="active" data-de="Reden" data-en="Speeches">Reden</a></li>
+                <li><a href="reden.html" class="active" data-de="Texte" data-en="Texts">Texte</a></li>
                 <li><a href="kontakt.html" data-de="Kontakt" data-en="Contact">Kontakt</a></li>
                 <li><a href="impressum.html" data-de="Impressum" data-en="Imprint">Impressum</a></li>
             </ul>
@@ -192,44 +303,95 @@
         </div>
     </header>
 
-    <!-- Page Title -->
-    <section class="page-title-section">
-        <h1 class="page-title" data-de="Reden" data-en="Speeches" data-es="Discursos">Reden</h1>
+    <!-- Texte Heading: centered, 2° ascending, 3 layers -->
+    <section class="reden-heading-section">
+        <div class="reden-heading-container">
+            <h1 class="reden-heading reden-heading-anchor" data-de="Texte" data-en="Texts" data-es="Textos">Texte</h1>
+            <h1 class="reden-heading reden-heading-filled" data-de="Texte" data-en="Texts" data-es="Textos">Texte</h1>
+            <h1 class="reden-heading reden-heading-outline" data-de="Texte" data-en="Texts" data-es="Textos">Texte</h1>
+        </div>
     </section>
 
-    <!-- Speeches List -->
-    <section class="speeches-section">
-        <p class="speeches-note locale-de active">Die Reden stehen derzeit nur auf Deutsch zur Verfügung.</p>
-        <p class="speeches-note locale-en">Speeches are currently only available in German.</p>
-        <p class="speeches-note locale-es">Los discursos están disponibles actualmente solo en alemán.</p>
-        <div class="speech-list">
+    <!-- Gray Content Box with Downloads -->
+    <section class="reden-box-section">
+        <div class="reden-content-box">
+            <p class="speeches-note locale-de active">Die Texte stehen derzeit nur auf Deutsch zur Verfügung.</p>
+            <p class="speeches-note locale-en">Texts are currently only available in German.</p>
+            <p class="speeches-note locale-es">Los textos están disponibles actualmente solo en alemán.</p>
+            <div class="speech-list">
 
-            <!-- Reden hier eintragen -->
-            <div class="speech-item">
-                <div class="speech-info">
-                    <div class="speech-date">Datum</div>
-                    <h2 class="speech-title">Titel der Rede</h2>
-                    <p class="speech-location">Anlass / Ort</p>
+                <div class="speech-item">
+                    <div class="speech-info">
+                        <div class="speech-date">07. Juli 2023</div>
+                        <h2 class="speech-title">Marco Stanke »Etwas Spielraum«</h2>
+                        <p class="speech-location">Laudatio · Städtische Galerie im Theater, Kunstverein Ingolstadt</p>
+                    </div>
+                    <div class="speech-download">
+                        <a href="pdf/stanke-etwas-spielraum-2023.pdf" download>PDF</a>
+                    </div>
                 </div>
-                <div class="speech-download">
-                    <a href="pdf/rede-beispiel.pdf" download>PDF</a>
+
+                <div class="speech-item">
+                    <div class="speech-info">
+                        <div class="speech-date">11. Januar 2023</div>
+                        <h2 class="speech-title">Marco Stanke »gut gemacht«</h2>
+                        <p class="speech-location">Laudatio · Neue Galerie, Kunstverein Erlangen</p>
+                    </div>
+                    <div class="speech-download">
+                        <a href="pdf/stanke-gut-gemacht-2023.pdf" download>PDF</a>
+                    </div>
                 </div>
+
+                <div class="speech-item">
+                    <div class="speech-info">
+                        <div class="speech-date">08. Mai 2022</div>
+                        <h2 class="speech-title">Marco Stanke »Ungefährlich«</h2>
+                        <p class="speech-location">Laudatio · Eichenmüllerhaus, Kunstverein Lemgo</p>
+                    </div>
+                    <div class="speech-download">
+                        <a href="pdf/stanke-ungefaehrlich-2022.pdf" download>PDF</a>
+                    </div>
+                </div>
+
+                <div class="speech-item">
+                    <div class="speech-info">
+                        <div class="speech-date">02. Juni 2018</div>
+                        <h2 class="speech-title">Marco Stanke »Marcoland«</h2>
+                        <p class="speech-location">Laudatio · Kohlenhof Kunstverein Nürnberg</p>
+                    </div>
+                    <div class="speech-download">
+                        <a href="pdf/stanke-marcoland-2018.pdf" download>PDF</a>
+                    </div>
+                </div>
+
+                <div class="speech-item">
+                    <div class="speech-info">
+                        <div class="speech-date">23. Februar 2018</div>
+                        <h2 class="speech-title">Daneben ein Strauß Katzengras</h2>
+                        <p class="speech-location">Lesung · Lost Weekend, München</p>
+                    </div>
+                    <div class="speech-download">
+                        <a href="pdf/katzengras-2018.pdf" download>PDF</a>
+                    </div>
+                </div>
+
             </div>
-
         </div>
     </section>
 
     <script src="js/script.js"></script>
+    <script>
+        (function() {
+            const filled = document.querySelector('.reden-heading-filled');
+            function checkFade() {
+                if (!filled) return;
+                filled.classList.toggle('faded-out', window.scrollY > 60);
+            }
+            window.addEventListener('scroll', checkFade, { passive: true });
+        })();
+    </script>
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a>
-                <a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a>
-            </div>
-            <p>&copy; 2026 Martin Zanker</p>
-        </div>
-    </footer>
+    <!-- Copyright -->
+    <p style="text-align: right; padding: 14rem var(--spacing-container) 1.5rem; color: var(--color-dark); font-size: var(--font-size-body); font-weight: bold;">&copy; 2026 Martin Zanker</p>
 </body>
 </html>

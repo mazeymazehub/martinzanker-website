@@ -45,8 +45,13 @@
     --header-height-min: 43px;
 
     /* Image sizes - responsive */
-    --image-alex-width: clamp(200px, 35vw, 420px);
+    --image-alex-width: clamp(288px, 50.4vw, 605px);
     --image-ben-height: clamp(200px, 40vh, 500px);
+
+    /* Grid system (Müller-Brockmann) – 3 Spalten + 2 Gutters innerhalb der Seitenränder */
+    --grid-gutter: 40px;
+    /* 1 Spalte = (Viewport − 2×Seitenrand − 2×Gutter) / 3 */
+    --img-col-width: clamp(200px, calc((100vw - 2 * var(--spacing-container) - 2 * var(--grid-gutter)) / 3), 500px);
 
     /* Komposition: Abstand MALEREI-Oberkante zu Alex-Oberkante */
     --malerei-alex-gap: clamp(50px, 8vw, 100px);
@@ -433,6 +438,7 @@ header {
     margin: 0;
     position: relative;
     z-index: 1; /* Behind box (2) */
+    pointer-events: none;
 }
 
 .konzept-heading-anchor {
@@ -461,6 +467,7 @@ header {
     margin: 0;
     position: relative;
     z-index: 5;
+    pointer-events: none;
 }
 
 /* =============== CONTENT BOX =============== */
@@ -526,7 +533,8 @@ header {
 
 /* =============== RIVUS ANCHOR CONTAINER =============== */
 
-.gesichten-anchor-container {
+.gesichten-anchor-container,
+.rivus-anchor-container {
     position: relative;
     display: grid;
     place-items: start end; /* Rechtsbündig */
@@ -538,7 +546,10 @@ header {
 
 .gesichten-anchor-filled,
 .gesichten-anchor-outline,
-.gesichten-anchor-gray {
+.gesichten-anchor-gray,
+.rivus-anchor-filled,
+.rivus-anchor-outline,
+.rivus-anchor-gray {
     font-family: 'Inter', sans-serif;
     font-size: var(--font-size-heading-large);
     font-weight: 850;
@@ -547,16 +558,19 @@ header {
     margin: 0;
 }
 
-.gesichten-anchor-filled {
+.gesichten-anchor-filled,
+.rivus-anchor-filled {
     color: var(--color-dark);
     grid-column: 1;
     grid-row: 1;
     position: relative;
     top: var(--gesichten-offset);
     z-index: 1;
+    pointer-events: none;
 }
 
-.gesichten-anchor-gray {
+.gesichten-anchor-gray,
+.rivus-anchor-gray {
     color: var(--color-gray);
     position: absolute;
     /* Position (top/left) wird per JavaScript auf load/resize gesetzt */
@@ -567,7 +581,8 @@ header {
     z-index: 0;
 }
 
-.gesichten-anchor-outline {
+.gesichten-anchor-outline,
+.rivus-anchor-outline {
     color: transparent;
     -webkit-text-stroke: 2px var(--color-dark);
     text-stroke: 2px var(--color-dark);
@@ -576,6 +591,7 @@ header {
     position: relative;
     top: var(--gesichten-offset);
     z-index: 5;
+    pointer-events: none;
 }
 
 /* =============== SECOND CONTENT BOX =============== */
@@ -592,7 +608,7 @@ header {
 .content-box-2 {
     background-color: var(--color-gray);
     padding: var(--spacing-box-padding);
-    padding-top: calc(var(--spacing-box-padding) - 10px);
+    padding-top: calc(var(--spacing-box-padding) + 5px);
     width: 120vw;
     max-width: none;
     border-radius: 0;
@@ -614,7 +630,7 @@ header {
 }
 
 /* GESICHTEN: Hintergrund nach links verlängern (rechtsseitig positioniert) */
-#rivus-content-box::before {
+#gesichten-content-box::before {
     content: '';
     position: absolute;
     top: 0;
@@ -654,6 +670,13 @@ header {
     margin-top: -10px;
 }
 
+/* GESICHTEN-Box: Text zentriert, breiter (Landscape + Desktop) */
+#gesichten-content-box p {
+    margin-left: 20vw;
+    margin-right: auto;
+    max-width: calc(60vw - 2 * var(--spacing-box-padding));
+}
+
 
 /* =============== UNTERPUNKT 1 HEADING =============== */
 
@@ -682,6 +705,7 @@ header {
     margin: 0;
     position: relative;
     z-index: 1;
+    pointer-events: none;
 }
 
 .unterpunkt-heading-outline {
@@ -693,9 +717,11 @@ header {
     margin: 0;
     position: relative;
     z-index: 5;
+    pointer-events: none;
 }
 
 .unterpunkt-heading-image {
+    display: block;
     width: auto;
     height: var(--image-ben-height);
     object-fit: cover;
@@ -710,6 +736,16 @@ header {
     grid-column: 1;
     grid-row: 1;
     z-index: 4; /* Unter RIVUS Outline (5) */
+    transition: top 0.3s ease;
+}
+
+body.no-image-transition .unterpunkt-heading-container .image-with-info,
+body.no-image-transition .content-box-wrapper,
+body.no-image-transition .content-box-wrapper-2,
+body.no-image-transition .mythus-box-wrapper,
+body.no-image-transition .gesichten-content-box-wrapper,
+body.no-image-transition .main-heading-image {
+    transition: none !important;
 }
 
 
@@ -722,6 +758,12 @@ header {
     margin: 0;
 }
 
+/* MALEREI-Überschrift: 2° von links nach rechts ansteigend (nur CSS, kein JS-Transform) */
+.main-heading {
+    rotate: -2deg;
+}
+/* Alle anderen Überschriften: rotate(-2deg) wird im JS-Transform eingebaut */
+
 .main-heading-filled {
     color: var(--color-dark);
     grid-column: 1;
@@ -730,6 +772,7 @@ header {
 }
 
 .main-heading-image {
+    display: block;
     width: 100%;
     max-width: var(--image-alex-width);
     height: auto;
@@ -744,6 +787,46 @@ header {
     grid-row: 1;
     z-index: 2;
     margin-top: var(--malerei-alex-gap);
+}
+
+@media (min-width: 601px) {
+    .main-heading-container .words-stair {
+        margin-bottom: -4px; /* 100px tiefer als globale 96px */
+        margin-left: 32px;   /* 80px weiter rechts als globale -48px */
+    }
+}
+
+@media (max-width: 1400px) and (min-width: 601px) and (orientation: landscape) {
+    .main-heading-container .words-stair {
+        margin-bottom: -39px; /* 35px tiefer als Desktop (-4px) */
+        margin-left: 302px;   /* 270px rechts von Desktop (32px) */
+    }
+}
+
+@media (min-width: 601px) {
+    #mythus-daniel-container .words-stair {
+        margin-left: 182px;  /* 230px weiter rechts als globale -48px */
+        margin-bottom: -14px; /* 110px tiefer als globale 96px */
+    }
+    #michael-image-with-info .words-stair {
+        margin-left: 152px;  /* 200px weiter rechts als globale -48px */
+        margin-bottom: 1px;  /* 95px tiefer als globale 96px */
+    }
+}
+
+@media (min-width: 1025px) {
+    #michael-image-with-info .words-stair {
+        margin-left: 182px;
+    }
+    #ben-image-with-info .words-stair {
+        margin-bottom: 51px;
+    }
+    #mythus-daniel-image-with-info .image-info {
+        top: 80px;
+    }
+    #mythus-daniel-image-with-info .words-stair {
+        transform: translate(30px, 200px);
+    }
 }
 
 .main-heading-outline {
@@ -967,6 +1050,17 @@ section {
         /* Box-Offset und Kalibrierung fix für Tablet */
         --box-margin-offset: 450px;
         --konzept-anchor-calibration: 160px;
+        /* Tablet: 2-Spalten-Raster (Bild + Text) statt 3-Spalten */
+        --grid-gutter: 30px;
+        --img-col-width: clamp(200px, calc((100vw - 2 * var(--spacing-container) - var(--grid-gutter)) / 2), 420px);
+    }
+}
+
+/* ===== SCHMALES DESKTOP (1025–1300px): noch 2-Spalten für größere Bilder ===== */
+@media (min-width: 1025px) and (max-width: 1300px) {
+    :root {
+        --grid-gutter: 30px;
+        --img-col-width: clamp(260px, calc((100vw - 2 * var(--spacing-container) - var(--grid-gutter)) / 2), 440px);
     }
 }
 
@@ -979,6 +1073,28 @@ section {
     .content-box-2 p {
         max-width: calc(60vw - 40px - 8rem);
         margin-left: calc(20vw + 20px + 120px);
+    }
+
+    #ben-container .words-stair {
+        margin-left: -128px; /* 80px weiter links als globale -48px */
+        margin-bottom: -154px; /* 250px tiefer als globale 96px */
+    }
+}
+
+@media (max-width: 1024px) and (min-width: 601px) and (orientation: portrait) {
+    #ben-container .words-stair {
+        margin-left: -98px; /* +30px gegenüber iPad allgemein */
+    }
+}
+
+@media (max-width: 1400px) and (min-width: 601px) and (orientation: landscape) {
+    #ben-container .words-stair {
+        margin-left: -38px;   /* 90px rechts von iPad allgemein (-128px) */
+        margin-bottom: 21px;  /* 45px tiefer als vorher (66px) */
+    }
+    #mythus-daniel-container .words-stair {
+        margin-left: -18px;   /* 200px links von Desktop (182px) */
+        margin-bottom: 56px;  /* 70px höher als Desktop (-14px) */
     }
 }
 
@@ -1018,7 +1134,7 @@ section {
     .content-box-wrapper,
     .content-box-wrapper-2,
     #mythus-box-wrapper,
-    #rivus-content-box-wrapper {
+    #gesichten-content-box-wrapper {
         z-index: 10;
     }
 
@@ -1056,13 +1172,14 @@ section {
     }
 
     .konzept-heading-outline,
-    .gesichten-anchor-outline {
+    .gesichten-anchor-outline,
+    .rivus-anchor-outline {
         z-index: 15;
     }
 
     /* RIVUS-Schriften tiefer auf Mobile */
-    #rivus-heading-container .gesichten-anchor-filled,
-    #rivus-heading-container .gesichten-anchor-outline {
+    #rivus-anchor-container .rivus-anchor-filled,
+    #rivus-anchor-container .rivus-anchor-outline {
         top: calc(var(--gesichten-offset) + 40px + 352px) !important;
     }
 
@@ -1080,25 +1197,8 @@ section {
         overflow: hidden;
     }
 
-    /* Info sichtbar bei Tap (JS setzt .info-active + z-index: 20) */
-    .info-active .image-info {
-        opacity: 1 !important;
-    }
-
-    /* Info-Text: am unteren Rand des Bildes (Caption-Overlay, innerhalb des Stacking-Context) */
-    .unterpunkt-heading-container .image-info {
-        position: absolute;
-        left: 8px;
-        bottom: 8px;
-        top: auto;
-        transform: none;
-        width: calc(100% - 16px);
-        white-space: normal;
-        background: rgba(0, 0, 0, 0.35);
-        padding: 4px 6px;
-        border-radius: 2px;
-    }
-
+    /* Mobile: Overlay deckt volle Bildfläche ab (inset: 0 aus Basis-Regel bleibt erhalten) */
+    /* Zeichen werden via .info-active .char (aus Basis-Regel) sichtbar */
     .unterpunkt-heading-container .info-line {
         font-size: clamp(12px, 2.5vw, 16px);
     }
@@ -1623,79 +1723,126 @@ section {
     will-change: transform;
 }
 
+/* Overlay: deckt das gesamte Bild ab */
 .image-info {
     position: absolute;
-    opacity: 0;
+    inset: 0;
     pointer-events: none;
-    transition: opacity 0.4s ease;
     font-family: 'Inter', sans-serif;
     color: #333333;
-    white-space: nowrap;
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 14px 16px;
+    background: linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0) 100%);
+    transition: background 0.35s ease;
+    white-space: normal;
 }
 
-/* Show info on hover */
-.image-with-info:hover .image-info {
+/* Hover: heller Gradient erscheint (Light Mode) */
+.image-with-info:hover .image-info,
+.info-active .image-info {
+    background: linear-gradient(to bottom, transparent 15%, rgba(233,233,228,0.85) 100%);
+    pointer-events: auto;
+}
+
+/* Hover: dunkler Gradient im Dark Mode */
+body.dark-mode .image-with-info:hover .image-info,
+body.dark-mode .info-active .image-info {
+    background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
+}
+
+/* Alex: oranger Gradient (Light Mode) */
+.main-heading-container .image-with-info:hover .image-info,
+.main-heading-container .info-active .image-info {
+    background: linear-gradient(to bottom, transparent 15%, rgba(255,102,51,0.85) 100%);
+}
+
+/* =============== STAIRCASE TEXT EFFECT (nach CodePen bosworthco/YWBLpR) =============== */
+/*
+ * Jede .words-stair__line hat overflow:hidden + feste Höhe (--stair-clip).
+ * Darin zwei <p>: erste leer, zweite mit Text – beide gestapelt.
+ * Normal: leere <p> sichtbar (= nichts zu sehen).
+ * Hover: beide <p> schieben um --stair-clip nach oben → Text erscheint.
+ * Stufenversatz (left) + skew/scaleY erzeugen 3D-Perspektive.
+ */
+
+/* iPad-Portrait-spezifische Zeilen (Ben) – standardmäßig versteckt */
+.ben-ipad-3,
+.ben-ipad-4,
+.ben-ipad-5 {
+    display: none;
+}
+
+.words-stair {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -0.2px;
+    transform: translate3d(0, 0, 0);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-left: -48px;        /* links über den Bildrand */
+    margin-bottom: 96px;       /* vier Zeilen höher */
+}
+
+.words-stair__line {
+    height: 42px; /* --stair-clip */
+    overflow: visible;
+    clip-path: inset(0 -500px); /* nur vertikal clippen, horizontal freigeben */
+    position: relative;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Alternierende 3D-Perspektive */
+.words-stair__line:nth-child(odd) {
+    transform: skew(60deg, -30deg) scaleY(0.66667);
+}
+.words-stair__line:nth-child(even) {
+    transform: skew(0deg, -30deg) scaleY(1.33333);
+}
+
+/* Stufenversatz: jede Zeile 16px weiter rechts */
+.words-stair__line:nth-child(1) { left: 16px; }
+.words-stair__line:nth-child(2) { left: 32px; }
+.words-stair__line:nth-child(3) { left: 48px; }
+.words-stair__line:nth-child(4) { left: 64px; }
+.words-stair__line:nth-child(5) { left: 80px; }
+.words-stair__line:nth-child(6) { left: 96px; }
+
+.words-stair__line p {
+    height: 42px; /* --stair-clip */
+    line-height: 34px;
+    padding: 0 6px;
+    margin: 0;
+    /* Exit-Transition: zurückgleiten, Opacity erst danach sofort auf 0 */
+    transition: transform 0.4s ease-in-out, opacity 0s linear 0.4s;
+    transform: translate3d(0, 0, 0);
+    white-space: nowrap;
+    color: #333333;
+    opacity: 0;
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Hover/Tap: nach oben schieben, Text einblenden */
+.image-with-info:hover .words-stair__line p,
+.info-active .words-stair__line p {
+    transform: translate3d(0, -42px, 0);
     opacity: 1;
-}
-
-.info-line {
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.2;
-}
-
-.info-title {
-    font-style: italic;
-    font-weight: 700;
-}
-
-.info-year {
-    font-style: italic;
-    font-weight: 700;
-}
-
-.info-details {
-    display: block;
-    font-size: 14px;
-    margin-top: 0px;
-    margin-left: 5px;
-}
-
-/* Position info below and left-aligned for main-heading-image (Ben) */
-/* Dynamisch skalierend mit Ben */
-.main-heading-container .image-info {
-    left: clamp(5px, 1.5vw, 12px); /* Kleiner Abstand vom linken Rand */
-    top: calc(100% + clamp(4px, 1vw, 8px)); /* Abstand skaliert mit Viewport */
-    transform: none;
-    width: calc(100% - clamp(5px, 1.5vw, 12px)); /* Breite minus left-offset */
-    white-space: normal; /* Text umbricht bei schmalen Bildschirmen */
-}
-
-.main-heading-container .info-line {
-    font-size: clamp(12px, 2.5vw, 16px); /* Schriftgröße skaliert */
-}
-
-.main-heading-container .info-details {
-    font-size: clamp(10px, 2vw, 14px); /* Details etwas kleiner */
-    margin-left: 0;
-}
-
-/* Position info below and left-aligned for unterpunkt-heading-image (Ben) */
-.unterpunkt-heading-container .image-info {
-    left: 5px;
-    top: calc(100% - 3px);
-    transform: none;
-}
-
-/* Responsive adjustments - nur Ben, Position bleibt unter Bild */
-@media (max-width: 768px) {
-    .unterpunkt-heading-container .image-info {
-        left: 5px;
-        top: calc(100% + 5px);
-        bottom: auto;
-        transform: none;
-    }
+    /* Enter-Transition: slide + fade gleichzeitig */
+    transition: transform 0.4s ease-in-out, opacity 0.35s ease-out;
 }
 
 /* =============== IMPRESSUM PAGE =============== */
@@ -1853,6 +2000,14 @@ body.dark-mode .locale-switch__btn.active[data-locale="de"] {
     opacity: 1;
 }
 
+/* Mobile: lang-switch links vom Menü-Toggle (Kaskaden-Fix) */
+@media (max-width: 768px) {
+    .lang-switch {
+        right: auto;
+        left: 60px;
+    }
+}
+
 /* Textversionierung */
 .lang-text {
     display: none;
@@ -1863,6 +2018,11 @@ body.dark-mode .locale-switch__btn.active[data-locale="de"] {
 }
 
 /* Dark mode */
+body.dark-mode .lang-switch,
+body.dark-mode .locale-switch {
+    background: #666666;
+}
+
 body.dark-mode .lang-switch__btn {
     color: var(--color-light);
 }
@@ -1885,11 +2045,13 @@ body.dark-mode .lang-switch__btn.active {
     z-index: 1001;
 }
 
-body.dark-mode .gesichten-anchor-container .gesichten-anchor-filled {
+body.dark-mode .gesichten-anchor-container .gesichten-anchor-filled,
+body.dark-mode .rivus-anchor-container .rivus-anchor-filled {
     color: #ff6633;
 }
 
-body.dark-mode .gesichten-anchor-container .gesichten-anchor-outline {
+body.dark-mode .gesichten-anchor-container .gesichten-anchor-outline,
+body.dark-mode .rivus-anchor-container .rivus-anchor-outline {
     color: transparent;
     -webkit-text-stroke-color: #ff6633;
     text-stroke-color: #ff6633;
@@ -1935,8 +2097,8 @@ body.dark-mode .gesichten-anchor-container .gesichten-anchor-outline {
 body.dark-mode {
     --color-primary: #ff6633;
     --color-dark: #ff6633;
-    --color-gray: #666666;
-    --color-gray-dark: #4d4d4d;
+    --color-gray: #2a2a2a;
+    --color-gray-dark: #1e1e1e;
     background-color: #333333;
     color: var(--color-primary);
 }
@@ -2002,20 +2164,23 @@ body.dark-mode .header-backdrop {
 body.dark-mode .main-heading-filled,
 body.dark-mode .konzept-heading-filled,
 body.dark-mode .unterpunkt-heading-filled,
-body.dark-mode .gesichten-anchor-filled {
+body.dark-mode .gesichten-anchor-filled,
+body.dark-mode .rivus-anchor-filled {
     color: #ff6633;
 }
 
 body.dark-mode .main-heading-outline,
 body.dark-mode .konzept-heading-outline,
 body.dark-mode .unterpunkt-heading-outline,
-body.dark-mode .gesichten-anchor-outline {
+body.dark-mode .gesichten-anchor-outline,
+body.dark-mode .rivus-anchor-outline {
     -webkit-text-stroke-color: #ff6633;
     text-stroke-color: #ff6633;
 }
 
 body.dark-mode .konzept-heading-anchor,
-body.dark-mode .gesichten-anchor-gray {
+body.dark-mode .gesichten-anchor-gray,
+body.dark-mode .rivus-anchor-gray {
     color: #666666; /* Same as dark mode box color */
 }
 
@@ -2027,7 +2192,7 @@ body.dark-mode .content-box-2 {
 
 body.dark-mode .content-box::before,
 body.dark-mode .content-box-wrapper-2 > .content-box-2::after,
-body.dark-mode #rivus-content-box::before {
+body.dark-mode #gesichten-content-box::before {
     background-color: #666666;
 }
 
@@ -2038,6 +2203,9 @@ body.dark-mode .content-box-2 p {
 
 /* Dark mode image info */
 body.dark-mode .image-info {
+    color: #ff6633;
+}
+body.dark-mode .words-stair__line p {
     color: #ff6633;
 }
 
@@ -2136,6 +2304,7 @@ body.theme-transitioning .bottom-bar-fix {
 body.theme-transitioning .main-heading-filled,
 body.theme-transitioning .konzept-heading-filled,
 body.theme-transitioning .gesichten-anchor-filled,
+body.theme-transitioning .rivus-anchor-filled,
 body.theme-transitioning .unterpunkt-heading-filled {
     transition: opacity 0.3s ease, color 0.5s ease, -webkit-text-stroke-color 0.5s ease;
 }
@@ -2145,6 +2314,8 @@ body.theme-transitioning .konzept-heading-outline,
 body.theme-transitioning .konzept-heading-anchor,
 body.theme-transitioning .gesichten-anchor-outline,
 body.theme-transitioning .gesichten-anchor-gray,
+body.theme-transitioning .rivus-anchor-outline,
+body.theme-transitioning .rivus-anchor-gray,
 body.theme-transitioning .unterpunkt-heading-outline {
     transition: color 0.5s ease, -webkit-text-stroke-color 0.5s ease;
 }
@@ -2217,19 +2388,19 @@ body.theme-transitioning .frame-border-right {
 }
 
 
-#rivus-anchor-container {
+#gesichten-anchor-container {
     place-items: start center; /* Mittig */
     padding-left: 0;
     padding-right: 0;
 }
 
-#rivus-content-box {
+#gesichten-content-box {
     width: 60vw;
     margin-left: 0; /* Override -20vw from .content-box-2 */
 }
 
 
-#rivus-content-box p {
+#gesichten-content-box p {
     margin-left: 0;
     max-width: 90%;
 }
@@ -2239,8 +2410,8 @@ body.theme-transitioning .frame-border-right {
     justify-content: center;
     gap: 10px;
     align-items: center;
-    width: 100%; /* Ensure the wrapper takes full width to center its children */
-    transform: translate(-40px, 10px); /* X: Kompensiert Marcus left:80px; Y: 10px tiefer */
+    width: 100%;
+    transform: translate(-40px, 10px);
 }
 
 #michael-marcus-wrapper .image-with-info {
@@ -2251,7 +2422,7 @@ body.theme-transitioning .frame-border-right {
 #michael-marcus-container {
     padding-left: 0;
     place-items: start center;
-    z-index: 6; /* Über den Textboxen (z-index: 5) */
+    z-index: 6;
 }
 
 #marcus-image-with-info {
@@ -2263,19 +2434,63 @@ body.theme-transitioning .frame-border-right {
     height: calc(var(--image-ben-height) * 7 / 6);
 }
 
+/* Non-Mobile: Nur Michael, so groß wie möglich unter dem GESICHTEN-Block */
+@media (min-width: 601px) {
+    #marcus-image-with-info {
+        display: none !important;
+    }
+
+    #michael-marcus-wrapper {
+        display: flex;
+        justify-content: center;
+        transform: none;
+        gap: 0;
+    }
+
+    #michael-image-with-info {
+        position: relative;
+        left: auto;
+        right: auto;
+    }
+
+    #michael-image-with-info .unterpunkt-heading-image {
+        width: 100%;
+        max-width: calc(2 * var(--img-col-width) + var(--grid-gutter));
+        height: auto;
+        max-height: 80vh;
+    }
+}
+
 /* RIVUS-Schriften 20px tiefer + 15px weiter links */
-#rivus-heading-container {
+#rivus-anchor-container {
     padding-right: calc(var(--spacing-container) + 15px);
 }
-#rivus-heading-container .gesichten-anchor-filled,
-#rivus-heading-container .gesichten-anchor-outline {
+#rivus-anchor-container .rivus-anchor-filled,
+#rivus-anchor-container .rivus-anchor-outline {
     top: calc(var(--gesichten-offset) + 40px);
 }
 
-/* Ben-Bild bei RIVUS: größer + 30px tiefer */
+/* Bild-Container: pointer-events nur auf das Bild selbst, nicht den leeren Container */
+#ben-container,
+#mythus-daniel-container,
+#michael-marcus-container {
+    pointer-events: none;
+}
+#ben-image-with-info,
+#mythus-daniel-image-with-info,
+#michael-image-with-info,
+#marcus-image-with-info {
+    pointer-events: auto;
+}
+
+/* Ben-Bild bei RIVUS: Grid-Breite, rechtsbündig zum Container */
 #ben-container .unterpunkt-heading-image {
-    height: calc(var(--image-ben-height) * 1.4);
-    margin-top: 70px;
+    width: var(--img-col-width);
+    height: auto;
+    margin-top: 0;
+}
+#ben-container .image-with-info {
+    right: calc(var(--spacing-container) + 50px);
 }
 
 /* =============== MYTHUS BLOCK (gespiegelt wie KONZEPT) =============== */
@@ -2290,18 +2505,14 @@ body.theme-transitioning .frame-border-right {
     max-width: calc(80vw - 175px - 150px);
 }
 
-/* MYTHUS Daniel: links statt rechts (gespiegelt) */
+/* MYTHUS Daniel: links statt rechts (gespiegelt), Grid-Breite */
 #mythus-daniel-container .image-with-info {
     right: auto;
-    left: calc(clamp(20px, 5vw, 55px) + 105px - 180px + 40px + 20px);
+    left: var(--spacing-container);
 }
-
-/* Tablet: MYTHUS Daniel links */
-@media (max-width: 1024px) and (min-width: 601px) {
-    #mythus-daniel-container .image-with-info {
-        right: auto;
-        left: clamp(20px, 3vw, 40px);
-    }
+#mythus-daniel-container .unterpunkt-heading-image {
+    width: var(--img-col-width);
+    height: auto;
 }
 
 /* =============== PORTRAIT-MODUS (height/width > 1.2) ===============
@@ -2330,27 +2541,43 @@ body.theme-transitioning .frame-border-right {
         --malerei-alex-gap: calc(clamp(50px, 8vw, 100px) + 50px); /* MALEREI ↔ Alex */
         --font-size-heading-large: 108px;                    /* MALEREI Schriftgröße */
         --heading-top-offset: calc(clamp(100px, 18vh, 200px) - 50px); /* MALEREI Position */
+        /* Portrait: Bilder breiter (ca. 40% der Seite statt 1/3), aber weiterhin aus Grid abgeleitet */
+        --grid-gutter: 30px;
+        --img-col-width: clamp(220px, calc((100vw - 2 * var(--spacing-container) - var(--grid-gutter)) / 2), 440px);
     }
     .konzept-heading-container,
-    .gesichten-anchor-container {
+    .gesichten-anchor-container,
+    .rivus-anchor-container {
         min-height: 75vh;    /* Blockabstände (Landscape: 100vh) */
         padding-top: 51vh;   /* Blockabstände (Landscape: 68.5vh) */
     }
-    #ben-container .unterpunkt-heading-image {
-        height: calc(var(--image-ben-height) * 1.067); /* Ben-Bild: ca. 76% der Landscape-Größe (27% größer als vorher) */
-        margin-top: 300px;
-    }
-
-    /* Ben im Portrait-Modus 15px weiter rechts */
+    /* Ben im Portrait: Grid-Breite (--img-col-width bereits in :root überschrieben) */
     #ben-container .image-with-info {
-        right: calc(clamp(20px, 5vw, 55px) + 10px);
+        right: var(--spacing-container);
     }
-    /* Erster Absatz der RIVUS-Box: Zeilenumbruch 610px weiter rechts (nur Portrait) */
-    .content-box-2:not(#rivus-content-box) p:first-of-type {
+    /* Erster Absatz der RIVUS-Box: Zeilenumbruch weiter rechts (nur Portrait) */
+    .content-box-2:not(#gesichten-content-box) p:first-of-type {
         max-width: calc(70vw - 20px - 10rem + 460px);
     }
+    /* GESICHTEN-Box: Im Portrait fast Rand-zu-Rand (Box startet bei x=0 durch JS-Transform) */
+    /* GESICHTEN-Box: lang-container auf volle Box-Breite zwingen */
+    #gesichten-content-box .lang-container,
+    #gesichten-content-box .lang-text,
+    #gesichten-content-box .locale-de,
+    #gesichten-content-box .locale-en,
+    #gesichten-content-box .locale-es {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+    #gesichten-content-box p {
+        margin-left: 0 !important;
+        max-width: calc(100vw - 2 * var(--spacing-box-padding)) !important;
+    }
+    #gesichten-content-box p:first-child {
+        margin-top: 20px;
+    }
     /* RIVUS-Box: Text 50px tiefer, Box nach unten verlängert */
-    .content-box-2:not(#rivus-content-box) {
+    .content-box-2:not(#gesichten-content-box) {
         padding-top: calc(var(--spacing-box-padding) - 10px + 50px);
     }
     /* MYTHUS-Box Text: linke Kante 30px nach rechts, Umbruch 15px nach rechts */
@@ -2360,24 +2587,12 @@ body.theme-transitioning .frame-border-right {
     #mythus-box p {
         max-width: calc(80vw - 175px - 215px);
     }
-    /* Michael + Marcus: 40px näher zusammen */
     #michael-marcus-wrapper {
         gap: 0px;
-        transform: translateX(-20px); /* Kompensiert Marcus left:40px im Portrait */
+        transform: none;
     }
     #marcus-image-with-info {
         left: 40px;
-    }
-    /* Daniel 3px nach rechts im Portrait */
-    #mythus-daniel-container .image-with-info {
-        left: calc(clamp(20px, 5vw, 55px) + 105px - 180px + 40px + 20px + 3px);
-    }
-}
-
-/* 11" iPad Portrait: Daniel 10px weiter links */
-@media (max-aspect-ratio: 5/6) and (min-width: 601px) and (max-width: 900px) {
-    #mythus-daniel-container .image-with-info {
-        left: calc(clamp(20px, 5vw, 55px) + 105px - 180px + 40px + 20px - 7px);
     }
 }
 

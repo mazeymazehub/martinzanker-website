@@ -5,6 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Impressum - Martin Zanker</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ---- IMPRESSUM Heading ---- */
+        .impressum-heading-section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 73px;
+            padding-bottom: 0;
+            overflow: visible;
+            position: relative;
+        }
+
+        .impressum-heading-container {
+            position: relative;
+            left: 80px;
+            display: grid;
+            place-items: center;
+        }
+
+        .impressum-heading {
+            font-family: 'Inter', sans-serif;
+            font-size: var(--font-size-heading-large);
+            font-weight: 850;
+            letter-spacing: -0.08em;
+            text-transform: uppercase;
+            margin: 0;
+            grid-column: 1;
+            grid-row: 1;
+            white-space: nowrap;
+            position: relative;
+            transform: rotate(2deg);
+        }
+
+        .impressum-heading-anchor {
+            color: var(--color-gray);
+            transform: rotate(-1deg) translate(6px, 6px);
+            z-index: 0;
+        }
+
+        .impressum-heading-filled {
+            color: var(--color-dark);
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .impressum-heading-outline {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--color-dark);
+            text-stroke: 2px var(--color-dark);
+            z-index: 4;
+        }
+
+        /* ---- Gray Content Box ---- */
+        .impressum-box-section {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            padding: 0 var(--spacing-container) clamp(60px, 10vh, 120px);
+            margin-top: -365px;
+            z-index: 3;
+        }
+
+        .impressum-content-box {
+            background-color: var(--color-gray);
+            padding: var(--spacing-box-padding);
+            width: 100%;
+            max-width: 820px;
+            position: relative;
+        }
+
+        .impressum-content-box h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: var(--font-size-body-large);
+            font-weight: 700;
+            color: var(--color-dark);
+            margin: 2em 0 0.4em 0;
+        }
+
+        .impressum-content-box h2:first-child {
+            margin-top: 0;
+        }
+
+        .impressum-content-box p {
+            font-family: 'Inter', sans-serif;
+            font-size: var(--font-size-body);
+            color: var(--color-dark);
+            margin: 0 0 8px 0;
+        }
+
+        /* ---- Dark Mode ---- */
+        body.dark-mode .impressum-heading-filled {
+            color: #ff6633;
+        }
+
+        body.dark-mode .impressum-heading-outline {
+            -webkit-text-stroke-color: #ff6633;
+            text-stroke-color: #ff6633;
+        }
+
+        body.dark-mode .impressum-heading-anchor {
+            color: #666666;
+        }
+
+        body.dark-mode .impressum-content-box {
+            background-color: #666666;
+        }
+
+        body.dark-mode .impressum-content-box h2,
+        body.dark-mode .impressum-content-box p {
+            color: #E9E9E4;
+        }
+    </style>
 </head>
 <body class="sub-page">
 
@@ -95,7 +207,7 @@
             </button>
             <ul class="nav-menu">
                 <li><a href="werke.html" data-de="Werke" data-en="Works" data-es="Obras">Werke</a></li>
-                <li><a href="reden.html" data-de="Reden" data-en="Speeches" data-es="Discursos">Reden</a></li>
+                <li><a href="reden.html" data-de="Texte" data-en="Texts" data-es="Textos">Texte</a></li>
                 <li><a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a></li>
                 <li><a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a></li>
             </ul>
@@ -110,17 +222,21 @@
         </div>
     </header>
 
-    <!-- Page Title -->
-    <section class="page-title-section">
-        <h1 class="page-title" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</h1>
+    <!-- IMPRESSUM Heading -->
+    <section class="impressum-heading-section">
+        <div class="impressum-heading-container">
+            <h2 class="impressum-heading impressum-heading-anchor" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</h2>
+            <h1 class="impressum-heading impressum-heading-filled" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</h1>
+            <h2 class="impressum-heading impressum-heading-outline" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</h2>
+        </div>
     </section>
 
-    <!-- Impressum Section -->
-    <section class="impressum-section">
-        <div class="impressum-content">
+    <!-- Impressum Content Box -->
+    <section class="impressum-box-section">
+        <div class="impressum-content-box">
 
             <h2 data-de="Angaben gemäß § 5 TMG" data-en="Information per § 5 TMG" data-es="Información según § 5 TMG">Angaben gemäß § 5 TMG</h2>
-            <p>Dr. Martin Zanker</p>
+            <p>Dr. phil. Martin Zanker</p>
             <p>Anglerstraße 2</p>
             <p>80339 München</p>
 
@@ -128,7 +244,7 @@
             <p>E-Mail: mail@martinzanker.com</p>
 
             <h2 data-de="Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV" data-en="Responsible for content per § 55 Abs. 2 RStV" data-es="Responsable del contenido según § 55 Abs. 2 RStV">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
-            <p>Dr. Martin Zanker</p>
+            <p>Dr. phil. Martin Zanker</p>
             <p>Anglerstraße 2</p>
             <p>80339 München</p>
 
@@ -247,16 +363,16 @@
     </section>
 
     <script src="js/script.js"></script>
+    <script>
+        const impressumFilled = document.querySelector('.impressum-heading-filled');
+        function checkImpressumFade() {
+            if (!impressumFilled) return;
+            impressumFilled.classList.toggle('faded-out', window.scrollY > 60);
+        }
+        window.addEventListener('scroll', checkImpressumFade, { passive: true });
+    </script>
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Impressum</a>
-                <a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</a>
-            </div>
-            <p>&copy; 2026 Martin Zanker</p>
-        </div>
-    </footer>
+    <!-- Copyright -->
+    <p style="text-align: right; padding: 14rem var(--spacing-container) 1.5rem; color: var(--color-dark); font-size: var(--font-size-body); font-weight: bold;">&copy; 2026 Martin Zanker</p>
 </body>
 </html>
