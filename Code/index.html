@@ -28,6 +28,39 @@
     <!-- Navigation -->
     <nav class="main-nav">
         <div class="nav-container">
+            <!-- Locale-Toggle (DE/EN/ES) -->
+            <div class="locale-switch" role="group" aria-label="Sprache / Language">
+                <button class="locale-switch__btn active" data-locale="de" title="Deutsch" aria-label="Deutsch">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3">
+                        <rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/>
+                        <rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/>
+                        <rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="en" title="English" aria-label="English">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
+                        <rect width="60" height="30" fill="currentColor" opacity="0.4"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/>
+                        <rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/>
+                        <rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/>
+                        <rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/>
+                        <rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="es" title="Español" aria-label="Español">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2">
+                        <rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/>
+                        <rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/>
+                        <rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/>
+                    </svg>
+                </button>
+            </div>
+
+            <label class="theme-switch">
+                <input type="checkbox" class="theme-switch__checkbox">
+                <div class="theme-switch__sun"></div>
+                <div class="theme-switch__moon"></div>
+            </label>
             <!-- Sprachniveau-Toggle -->
             <div class="lang-switch" role="group" aria-label="Sprachniveau">
                 <button class="lang-switch__btn" data-lang="easy" title="Leichte Sprache" aria-label="Leichte Sprache">
@@ -55,39 +88,6 @@
                         <line x1="14.5" y1="9" x2="18.5" y2="9"/>
                         <line x1="14.5" y1="12" x2="18.5" y2="12"/>
                         <line x1="14.5" y1="15" x2="18.5" y2="15"/>
-                    </svg>
-                </button>
-            </div>
-
-            <label class="theme-switch">
-                <input type="checkbox" class="theme-switch__checkbox">
-                <div class="theme-switch__sun"></div>
-                <div class="theme-switch__moon"></div>
-            </label>
-            <!-- Locale-Toggle (DE/EN) -->
-            <div class="locale-switch" role="group" aria-label="Sprache / Language">
-                <button class="locale-switch__btn active" data-locale="de" title="Deutsch" aria-label="Deutsch">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3">
-                        <rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/>
-                        <rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/>
-                        <rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/>
-                    </svg>
-                </button>
-                <button class="locale-switch__btn" data-locale="en" title="English" aria-label="English">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
-                        <rect width="60" height="30" fill="currentColor" opacity="0.4"/>
-                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/>
-                        <rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/>
-                        <rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/>
-                        <rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/>
-                        <rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/>
-                    </svg>
-                </button>
-                <button class="locale-switch__btn" data-locale="es" title="Español" aria-label="Español">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2">
-                        <rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/>
-                        <rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/>
-                        <rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/>
                     </svg>
                 </button>
             </div>
@@ -232,34 +232,34 @@
                     <div class="locale-de active">
                         <p>Im Werkzyklus RIVUS setze ich mich mit den Männern auseinander, die mir Rivalen wie auch Vorbilder waren. »Konkurrenz«, von »<em>concurre</em>« bedeutet im ursprünglichen Wortsinn »miteinander gehend/laufend«. Im Wettbewerb um Männlichkeit galten mir dieselben Menschen mal als schillernde Ideale und mal als Abgrenzungsobjekte.</p>
                         <p>In Kompendien von Pathosformeln finden die Abgebildeten sowohl Affirmation, erleben sich jedoch auch immer im entstandenen Unterschied zu einem Selbst aus vergangener Zeit. Sie sind sowohl körperlich gealtert, wie auch reicher an Erfahrung. Ich selbst erkenne, dass ich immer in Bezug zu anderen lebe.</p>
-                        <p>»<em>River</em>« und »<em>Rivale</em>« stammen von RIVUS: Meine Nachbarn am Fluss.</p>
+                        <p>»<em>River</em>« und »<em>Rivale</em>« stammen von RIVUS:</br>Meine Nachbarn am Fluss.</p>
                     </div>
                     <div class="locale-en">
                         <p>In the work cycle RIVUS, I engage with the men who were both rivals and role models to me. "<em>Konkurrenz</em>" (competition), from "<em>concurrere</em>", originally means "running/walking together." In the competition for masculinity, the same people appeared to me at times as dazzling ideals and at other times as objects of distinction.</p>
                         <p>In compendia of pathos formulae, the depicted find both affirmation, yet also always experience the difference that has arisen from a former self. They have both aged physically and grown richer in experience. I myself recognise that I always live in relation to others.</p>
-                        <p>"River" and "rival" both derive from RIVUS: My neighbours on the river.</p>
+                        <p>"River" and "rival" both derive from RIVUS:<br>My neighbours on the river.</p>
                     </div>
                     <div class="locale-es">
                         <p>En el ciclo de obras RIVUS me confronto con los hombres que fueron para mí tanto rivales como modelos a seguir. «<em>Konkurrenz</em>» (competencia), del latín «<em>concurrere</em>», significa en su sentido original «caminar/correr juntos». En la competencia por la masculinidad, las mismas personas me parecían unas veces ideales deslumbrantes y otras objetos de diferenciación.</p>
                         <p>En compendios de fórmulas del pathos, los retratados encuentran tanto afirmación como, al mismo tiempo, experimentan la diferencia surgida respecto a un yo del pasado. Han envejecido físicamente, pero también son más ricos en experiencia. Yo mismo reconozco que siempre vivo en relación con otros.</p>
-                        <p>«<em>River</em>» y «<em>Rival</em>» derivan de RIVUS: Mis vecinos en el río.</p>
+                        <p>«<em>River</em>» y «<em>Rival</em>» derivan de RIVUS:<br>Mis vecinos en el río.</p>
                     </div>
                 </div>
                 <div class="lang-text lang-expert active">
                     <div class="locale-de active">
-                        <p>Im Werkzyklus RIVUS setze ich mich mit den Männern auseinander, die mir Rivalen wie auch Ideal waren. »Konkurrenz«, von »<em>concurre</em>« bedeutet im ursprünglichen Wortsinn »miteinander gehend/laufend«. Im Wettbewerb der Rollenerfüllung der sich wandelnden Männlichkeitsvorstellungen galten mir dieselben Menschen mal als schillernde Ideale und mal als Abgrenzungsobjekte.</p>
+                        <p>Im Werkzyklus RIVUS setze ich mich mit den Männern auseinander, die mir Rivalen wie auch Ideal waren. »Konkurrenz«, von »<em>concurre</em>« bedeutet im ursprünglichen Wortsinn »miteinander gehend/laufend«. Im Wettbewerb um die Rollenerfüllung der sich wandelnden Männlichkeitsvorstellungen galten mir dieselben Menschen mal als schillernde Ideale und mal als Abgrenzungsobjekte.</p>
                         <p>In Kompendien von Pathosformeln finden die Abgebildeten sowohl Affirmation, erleben sich jedoch auch immer in einer zwangläufigen Differenz zu einem Selbst aus der Vergangenheit. Sie werden oft konfrontiert mit einem überlegenen körperlichen, dafür aber erfahrungsärmeren Zustand. Ich selbst erkenne, dass ich an der Identifikation mit anderen gewachsen bin.</p>
-                        <p>»<em>River</em>« und »<em>Rivale</em>« stammen von RIVUS: Meine Nachbarn am Fluss.</p>
+                        <p>»<em>River</em>« und »<em>Rivale</em>« stammen von RIVUS:</br>Meine Nachbarn am Fluss.</p>
                     </div>
                     <div class="locale-en">
                         <p>In the work cycle RIVUS, I engage with the men who were both rivals and ideals to me. "<em>Konkurrenz</em>" (competition), from "<em>concurrere</em>", originally means "running/walking together." In the competition of fulfilling the shifting expectations of masculinity, the same people appeared to me at times as dazzling ideals and at other times as objects of distinction.</p>
                         <p>In compendia of pathos formulae, the depicted find both affirmation, yet also always experience an inevitable difference from a former self. They are often confronted with a physically superior, yet less experienced state. I myself recognise that I have grown through my identification with others.</p>
-                        <p>"River" and "rival" both derive from RIVUS: My neighbours on the river.</p>
+                        <p>"River" and "rival" both derive from RIVUS:<br>My neighbours on the river.</p>
                     </div>
                     <div class="locale-es">
                         <p>En el ciclo de obras RIVUS me confronto con los hombres que fueron para mí tanto rivales como ideales. «<em>Konkurrenz</em>» (competencia), del latín «<em>concurrere</em>», significa en su sentido original «caminar/correr juntos». En la competencia por cumplir las cambiantes expectativas de masculinidad, las mismas personas me parecían unas veces ideales deslumbrantes y otras objetos de diferenciación.</p>
                         <p>En compendios de fórmulas del pathos, los retratados encuentran tanto afirmación como, al mismo tiempo, experimentan siempre una diferencia inevitable respecto a un yo del pasado. A menudo se ven confrontados con un estado físicamente superior, pero más pobre en experiencia. Yo mismo reconozco que he crecido a través de la identificación con otros.</p>
-                        <p>«<em>River</em>» y «<em>Rival</em>» derivan de RIVUS: Mis vecinos en el río.</p>
+                        <p>«<em>River</em>» y «<em>Rival</em>» derivan de RIVUS:<br>Mis vecinos en el río.</p>
                     </div>
                 </div>
             </div>
@@ -395,47 +395,71 @@
             <div class="lang-container">
                 <div class="lang-text lang-easy">
                     <div class="locale-de active">
-                        <p>Menschen schauen Bilder unterschiedlich an.</p>
-                        <p>Manche Menschen schauen auf die Farben. Oder sie sehen auf die Formen im Bild.</p>
-                        <p>Manche Menschen wollen wissen: Was bedeutet das Bild? Gehört das Bild zu anderen Bildern?</p>
-                        <p>Manche Menschen sehen auf Gesichter. Manche Menschen können Gesichter gar nicht erkennen.</p>
-                        <p>Meine Bilder sind für viele Menschen. Viele Menschen sollen etwas in den Bildern finden können.</p>
+                        <p>Die meisten Menschen erkennen Gesichter.</p>
+                        <p>Sie sehen, ob jemand froh ist oder traurig.</p>
+                        <p>In meinen Bildern male ich nur das Gesicht.</p>
+                        <p>Ich male keine Kleidung.</p>
+                        <p>Ich male keine Frisur.</p>
+                        <p>Ich male keine Schminke.</p>
+                        <p>So spürt man die Bilder im eigenen Körper.</p>
+                        <p>Ich frage mich beim Malen:</p>
+                        <p>Kann auch die Art zu malen zum Gesicht passen?</p>
+                        <p>Zum Beispiel:</p>
+                        <p>Wo ich das Gesicht im Bild platziere.</p>
+                        <p>Wie ich den Pinsel führe.</p>
+                        <p>Welche Farben ich nehme.</p>
                     </div>
                     <div class="locale-en">
-                        <p>People look at pictures in different ways.</p>
-                        <p>Some people look at the colours. Or they look at the shapes in the picture.</p>
-                        <p>Some people want to know: What does the picture mean? Does the picture belong with other pictures?</p>
-                        <p>Some people look at faces. Some people cannot recognise faces at all.</p>
-                        <p>My pictures are for many people. Many people should be able to find something in the pictures.</p>
+                        <p>Most people recognise faces.</p>
+                        <p>They can see if someone is happy or sad.</p>
+                        <p>In my paintings I only paint the face.</p>
+                        <p>I do not paint clothing.</p>
+                        <p>I do not paint hair.</p>
+                        <p>I do not paint make-up.</p>
+                        <p>This way you can feel the paintings in your own body.</p>
+                        <p>While I paint, I ask myself:</p>
+                        <p>Can the way I paint also fit the face?</p>
+                        <p>For example:</p>
+                        <p>Where I place the face in the picture.</p>
+                        <p>How I move the brush.</p>
+                        <p>Which colours I use.</p>
                     </div>
                     <div class="locale-es">
-                        <p>Las personas miran los cuadros de maneras diferentes.</p>
-                        <p>Algunas personas miran los colores. O miran las formas en el cuadro.</p>
-                        <p>Algunas personas quieren saber: ¿Qué significa el cuadro? ¿Este cuadro tiene relación con otros cuadros?</p>
-                        <p>Algunas personas miran los rostros. Algunas personas no pueden reconocer rostros en absoluto.</p>
-                        <p>Mis cuadros son para muchas personas. Muchas personas deberían poder encontrar algo en los cuadros.</p>
+                        <p>La mayoría de las personas reconocen los rostros.</p>
+                        <p>Ven si alguien está alegre o triste.</p>
+                        <p>En mis cuadros solo pinto el rostro.</p>
+                        <p>No pinto la ropa.</p>
+                        <p>No pinto el peinado.</p>
+                        <p>No pinto el maquillaje.</p>
+                        <p>Así puedes sentir los cuadros en tu propio cuerpo.</p>
+                        <p>Mientras pinto, me pregunto:</p>
+                        <p>¿Puede también la manera de pintar ir con el rostro?</p>
+                        <p>Por ejemplo:</p>
+                        <p>Dónde coloco el rostro en el cuadro.</p>
+                        <p>Cómo muevo el pincel.</p>
+                        <p>Qué colores uso.</p>
                     </div>
                 </div>
                 <div class="lang-text lang-clear">
                     <div class="locale-de active">
-                        <p>Die meisten Menschen erkennen Gesichter und deren Ausdruck; diese Menschen, aber auch jene Menschen, die Bilder zunächst im Bildaufbau, Körperdarstellung, Pinselführung und Farbenspiel auf sich wirken lassen sollen ähnliches in Bildern finden können, wie wiederum andere, die Lust an Deutung und geschichtlicher Einordnung gewinnen oder wiederum andere, die mit der Schwierigkeit leben, andere Menschen anhand ihrer Gesichter zu erkennen.</p>
+                        <p>Die meisten Menschen erkennen Gesichter und können den Ausdruck darin lesen. In meinen Bildern verzichte ich weitgehend auf Details, die etwas über die Zeit oder die Kultur der dargestellten Person verraten – also auf Kleidung, Frisur oder Schminke. So sollen die Bilder den Betrachtenden körperlich ansprechen. Mich beschäftigt dabei die Frage, ob auch der Bildaufbau, die gemalte Geste, der Pinselstrich und die Farbgebung dem Gesichtsausdruck entsprechen können.</p>
                     </div>
                     <div class="locale-en">
-                        <p>Most people recognise faces and their expression; these people, but also those who first let pictures take effect through their composition, bodily depiction, brushwork, and play of colour, should be able to find similar things in the images, as in turn should others who take pleasure in interpretation and historical contextualisation, or yet others who live with the difficulty of recognising other people by their faces.</p>
+                        <p>Most people recognise faces and can read what they express. In my paintings I largely leave out details that say something about the time or culture of the person shown – such as clothing, hairstyle, or make-up. In this way, the paintings are meant to address the viewer physically. The question that occupies me is whether the composition, the painted gesture, the brushstroke, and the colour can also correspond to the facial expression.</p>
                     </div>
                     <div class="locale-es">
-                        <p>La mayoría de las personas reconocen rostros y su expresión; estas personas, pero también aquellas que primero dejan que las imágenes actúen sobre ellas a través de la composición, la representación corporal, la pincelada y el juego de colores, deberían poder encontrar algo similar en las imágenes, al igual que otras que disfrutan de la interpretación y la contextualización histórica, o aquellas que viven con la dificultad de reconocer a otras personas por sus rostros.</p>
+                        <p>La mayoría de las personas reconocen los rostros y pueden leer lo que expresan. En mis cuadros prescindo en gran medida de detalles que digan algo sobre la época o la cultura de la persona representada – como la vestimenta, el peinado o el maquillaje. De este modo, los cuadros pretenden dirigirse al cuerpo de quien los mira. La pregunta que me ocupa es si también la composición, el gesto pintado, la pincelada y el color pueden corresponder a la expresión del rostro.</p>
                     </div>
                 </div>
                 <div class="lang-text lang-expert active">
                     <div class="locale-de active">
-                        <p>Die meisten Menschen erkennen Gesichter und deren Ausdruck; diese Menschen, aber auch jene Menschen, die Bilder zunächst in Komposition, Gestus, Duktus und Kolorit auf sich wirken lassen sollen ähnliches in Bildern finden können, wie wiederum andere, die Lust an Interpretation und historische Einordnung gewinnen oder wiederum andere, die z.B. mit Prosopagnosie leben.</p>
+                        <p>Die meisten Menschen erkennen Gesichter und deren Ausdruck. Weitgehend befreit von zeit- und kulturdokumentarischen Bildinhalten wie Kleidung, Frisur oder Schminke, bieten meine Bilder eine körperliche, wenn nicht gar leibliche Begegnung. In ihnen gehe ich der Frage nach, inwieweit dem jeweiligen mimischen Ausdruck auch in Komposition, Gestus, Duktus und Kolorit entsprochen werden kann.</p>
                     </div>
                     <div class="locale-en">
-                        <p>Most people recognise faces and their expression; these people, but also those who first let pictures take effect through composition, gesture, brushwork, and colouring, should be able to find similar things in the images, as in turn should others who take pleasure in interpretation and historical contextualisation, or yet others who live, for example, with prosopagnosia.</p>
+                        <p>Most people recognise faces and read their expressions. Largely freed from pictorial content that documents period or culture – such as clothing, hairstyle, or make-up – my paintings offer a bodily, indeed a corporeal encounter. In them I pursue the question of how far the respective facial expression can also be matched in composition, gesture, brushwork, and colour.</p>
                     </div>
                     <div class="locale-es">
-                        <p>La mayoría de las personas reconocen rostros y su expresión; estas personas, pero también aquellas que primero dejan que las imágenes actúen sobre ellas a través de la composición, el gesto, la factura y el colorido, deberían poder encontrar algo similar en las imágenes, al igual que otras que disfrutan de la interpretación y la contextualización histórica, o aquellas que viven, por ejemplo, con prosopagnosia.</p>
+                        <p>La mayoría de las personas reconocen los rostros y leen su expresión. Liberados en gran medida de contenidos pictóricos que documentan la época o la cultura – como la vestimenta, el peinado o el maquillaje –, mis cuadros ofrecen un encuentro corporal, incluso un encuentro vivido en carne propia. En ellos exploro hasta qué punto la expresión facial puede encontrar correspondencia también en la composición, el gesto, el trazo y el colorido.</p>
                     </div>
                 </div>
             </div>
@@ -476,8 +500,8 @@
 
     <div class="bottom-bar-fix"></div>
 
-    <!-- Copyright -->
-    <p style="text-align: right; padding: 14rem var(--spacing-container) 1.5rem; color: var(--color-dark); font-size: var(--font-size-body); font-weight: bold;">&copy; 2026 Martin Zanker</p>
+    <!-- Copyright: Vertikalposition wird per JS gesetzt (80px unter Michael) -->
+    <p id="page-copyright" style="text-align: right; padding: 0 var(--spacing-container) 1.5rem; color: var(--color-dark); font-size: var(--font-size-body); font-weight: bold;">&copy; 2026 Martin Zanker</p>
 
     <script src="js/script.js"></script>
 </body>

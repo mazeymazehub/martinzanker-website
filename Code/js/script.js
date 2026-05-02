@@ -354,8 +354,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const S_meet_denominator = (1 - speed_Box);
         if (Math.abs(S_meet_denominator) < 0.001) return;
         const S_meet = S_meet_numerator / S_meet_denominator;
-        _sMeetDaniel = S_meet;
-
         // Oberkante des aktiven Textes messen (für Top-Top-Ausrichtung bei S_meet)
         const _activeTextDaniel = mythusBox.querySelector('.lang-text.active') || mythusBox;
         const _firstElDaniel = _activeTextDaniel.querySelector('h2, p');
@@ -604,6 +602,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const needed = lastPoint;
             const contentHeight = document.body.scrollHeight - spacer.offsetHeight;
             spacer.style.height = Math.max(0, needed - contentHeight + window.innerHeight) + 'px';
+        }
+
+        // Copyright 80px unter Michael-Bildunterkante beim letzten Snap-Punkt
+        const copyrightEl = document.getElementById('page-copyright');
+        const michaelElForCp = document.getElementById('michael-image-with-info');
+        if (copyrightEl && michaelElForCp && meetingPoints.length > 0) {
+            const lastSnap = meetingPoints[meetingPoints.length - 1];
+            const michaelHeight = michaelElForCp.offsetHeight;
+            // Am letzten Snap-Punkt ist Michaels Mitte = Viewport-Mitte
+            const michaelBottomDocAtSnap = lastSnap + window.innerHeight / 2 + michaelHeight / 2;
+            const requiredDocTop = michaelBottomDocAtSnap + 80;
+            copyrightEl.style.marginTop = '0';
+            const baseDocTop = getDocumentTop(copyrightEl);
+            copyrightEl.style.marginTop = Math.max(0, requiredDocTop - baseDocTop) + 'px';
         }
     }
 
@@ -931,7 +943,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const S_meet_denominator = (1 - speed_Box);
         if (Math.abs(S_meet_denominator) < 0.001) return; // Division durch Null vermeiden
         const S_meet = S_meet_numerator / S_meet_denominator;
-        _sMeetBen = S_meet;
 
         // 4. Oberkante des aktiven Textes messen (für Top-Top-Ausrichtung bei S_meet)
         const _activeTextBen = contentBox2.querySelector('.lang-text.active') || contentBox2;
@@ -1231,14 +1242,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function afterSwitch() {
+        document.body.classList.add('no-image-transition');
+
         positionMythusBoxText();
-        positionAnchors();
-        // Bildpositionen neu berechnen: contentSpan ändert sich mit Sprache/Niveau
         positionBen();
         positionMythusDaniel();
+        positionAnchors();
+
+        // GESICHTEN-Box-Höhe aktualisieren, dann Michael neu positionieren
+        const _gesichtenBoxEl = document.getElementById('gesichten-content-box');
+        if (_gesichtenBoxEl) _cachedRivusBoxHeight = _gesichtenBoxEl.offsetHeight;
+        positionMichaelAndMarcus();
+
         calculateRivusAParallaxSpeed();
         calculateMeetingPoints();
-        calculateImageFreezeBounds();
+
+        requestAnimationFrame(() => document.body.classList.remove('no-image-transition'));
     }
 
     let currentLocale = null;
@@ -1372,9 +1391,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let _rivusAnchorHeight2 = 0, _rivusAnchorGap2 = 0, _rivusAnchorLeft = 0, _box2WrapperDocTop = 0;
     let _mythusAnchorHeight2 = 0, _mythusAnchorGap2 = 0, _mythusAnchorLeft = 0, _mythusWrapperDocTop = 0;
     let _gesichtenAnchorHeight2 = 0, _gesichtenAnchorGap2 = 0, _gesichtenAnchorLeft = 0, _gesichtenWrapperDocTop = 0;
-    // Image freeze bounds: S_meet = scroll when image top = text top; S_exit = scroll when image bottom = text bottom
-    let _sMeetBen = 0, _sExitBen = 0;
-    let _sMeetDaniel = 0, _sExitDaniel = 0;
     const _heroSection = document.querySelector('.hero-section');
     const _visHeadings = [
         document.querySelector('.main-heading-filled'),
@@ -1640,25 +1656,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isMobile) {
             updateMobileImageVisibility();
         } else {
-            // Berechnet transform-Y mit optionalem Freeze-Fenster [sMeet, sExit].
-            // Phase 1 (vor Snap):  normale Parallax
-            // Phase 2 (Freeze):    Bild steht; transform kompensiert Page-Scroll
-            // Phase 3 (nach Exit): Bild scrollt mit Box-Geschwindigkeit (synchron zum Text)
-            const imgSpeed = BASE_UNTERPUNKT_SPEED;
-            const boxSpeed = BASE_PARALLAX_SPEED;
-            const frozenTransformY = (s, sMeet, sExit) => {
-                if (sMeet <= 0 || sExit <= sMeet) return s * imgSpeed;
-                if (s <= sMeet) return s * imgSpeed;
-                if (s < sExit)  return s - sMeet * (1 - imgSpeed);
-                // Nahtloser Übergang: ab sExit mit boxSpeed wegscrollen (= Textgeschwindigkeit)
-                return (sExit - sMeet * (1 - imgSpeed)) + (s - sExit) * boxSpeed;
-            };
-
             if (_benImage) {
-                _benImage.style.transform = `translate3d(0, ${frozenTransformY(scrollY, _sMeetBen, _sExitBen)}px, 0)`;
+                _benImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
             }
             if (_mythusDaniel) {
-                _mythusDaniel.style.transform = `translate3d(0, ${frozenTransformY(scrollY, _sMeetDaniel, _sExitDaniel)}px, 0)`;
+                _mythusDaniel.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
             }
             if (_michaelImage) {
                 _michaelImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
@@ -1847,55 +1849,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Berechnet S_exit pro Bild: Scroll-Position, bei der Bild-Unterkante = Text-Unterkante.
     // Freeze-Fenster: [S_meet, S_exit]. Nur auf Desktop (non-Mobile).
-    function calculateImageFreezeBounds() {
-        const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
-        if (isMobile) { _sExitBen = 0; _sExitDaniel = 0; return; }
-
-        const boxSpeed = BASE_PARALLAX_SPEED;
-
-        // Hilfsfunktion: exakter Textbereich = Unterkante letztes Element − Oberkante erstes Element
-        function getTextSpan(box) {
-            // Nur aktive Sprachvariante auswählen, damit display:none-Elemente
-            // (deren offsetTop=0) den lastEl nicht verfälschen.
-            const container = box.querySelector('.lang-text.active') || box;
-            const allEls = container.querySelectorAll('h2, p');
-            if (allEls.length === 0) return box.offsetHeight;
-            const firstEl = allEls[0];
-            const lastEl  = allEls[allEls.length - 1];
-            return lastEl.offsetTop + lastEl.offsetHeight - firstEl.offsetTop;
-        }
-
-        // Einheitliche Exit-Formel für beide Ausrichtungsstrategien:
-        // • imgHeight > contentSpan (Bottom-Bottom-Eintritt): Exit wenn Text-OK = Bild-OK
-        // • contentSpan > imgHeight (Top-Top-Eintritt):       Exit wenn Text-UK = Bild-UK
-        // Freeze-Dauer = |imgHeight - contentSpan| / (1 - boxSpeed)
-        function calcSExit(sMeet, imgHeight, contentSpan) {
-            return sMeet + Math.abs(imgHeight - contentSpan) / (1 - boxSpeed);
-        }
-
-        // Ben / RIVUS-Box
-        const box2 = document.getElementById('rivus-content-box');
-        if (_benImage && box2 && _sMeetBen > 0) {
-            const _benInnerImg = _benImage.querySelector('.unterpunkt-heading-image');
-            const _benH = _benInnerImg ? _benInnerImg.offsetHeight : _benImage.offsetHeight;
-            const _benSpan = getTextSpan(box2);
-            _sExitBen = _benH > _benSpan ? 0 : calcSExit(_sMeetBen, _benH, _benSpan);
-        } else {
-            _sExitBen = 0;
-        }
-
-        // Daniel / MYTHUS-Box
-        const mythusBox = document.getElementById('mythus-box');
-        if (_mythusDaniel && mythusBox && _sMeetDaniel > 0) {
-            const _danielInnerImg = _mythusDaniel.querySelector('.unterpunkt-heading-image');
-            const _danielH = _danielInnerImg ? _danielInnerImg.offsetHeight : _mythusDaniel.offsetHeight;
-            const _danielSpan = getTextSpan(mythusBox);
-            _sExitDaniel = _danielH > _danielSpan ? 0 : calcSExit(_sMeetDaniel, _danielH, _danielSpan);
-        } else {
-            _sExitDaniel = 0;
-        }
-    }
-
     function recalculateLayout() {
         _anchorsReady = false; // Zurücksetzen damit updateScene den Fallback nutzt
 
@@ -1949,7 +1902,6 @@ document.addEventListener('DOMContentLoaded', function() {
         applyParallaxEffect(window.scrollY); // Anchors mit korrekten DocTops aktualisieren
         calculateRivusAParallaxSpeed();
         calculateMeetingPoints();
-        calculateImageFreezeBounds();
     }
 
     // =============== BEN STAIRCASE: iPad Portrait Split ===============

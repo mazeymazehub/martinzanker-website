@@ -1882,7 +1882,7 @@ body.dark-mode .info-active .image-info {
 
 .locale-switch {
     position: absolute;
-    right: 110px;
+    right: 20px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -1946,7 +1946,7 @@ body.dark-mode .locale-switch__btn.active[data-locale="de"] {
 @media (max-width: 768px) {
     .locale-switch {
         right: auto;
-        left: 110px;
+        left: 60px;
     }
 }
 
@@ -1954,7 +1954,7 @@ body.dark-mode .locale-switch__btn.active[data-locale="de"] {
 
 .lang-switch {
     position: absolute;
-    right: 20px;
+    right: 118px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -2004,7 +2004,7 @@ body.dark-mode .locale-switch__btn.active[data-locale="de"] {
 @media (max-width: 768px) {
     .lang-switch {
         right: auto;
-        left: 60px;
+        left: 110px;
     }
 }
 
@@ -2097,7 +2097,7 @@ body.dark-mode .rivus-anchor-container .rivus-anchor-outline {
 body.dark-mode {
     --color-primary: #ff6633;
     --color-dark: #ff6633;
-    --color-gray: #2a2a2a;
+    --color-gray: #1a1a1a;
     --color-gray-dark: #1e1e1e;
     background-color: #333333;
     color: var(--color-primary);
@@ -2181,19 +2181,19 @@ body.dark-mode .rivus-anchor-outline {
 body.dark-mode .konzept-heading-anchor,
 body.dark-mode .gesichten-anchor-gray,
 body.dark-mode .rivus-anchor-gray {
-    color: #666666; /* Same as dark mode box color */
+    color: #1a1a1a;
 }
 
 /* Dark mode content boxes */
 body.dark-mode .content-box,
 body.dark-mode .content-box-2 {
-    background-color: #666666;
+    background-color: #1a1a1a;
 }
 
 body.dark-mode .content-box::before,
 body.dark-mode .content-box-wrapper-2 > .content-box-2::after,
 body.dark-mode #gesichten-content-box::before {
-    background-color: #666666;
+    background-color: #1a1a1a;
 }
 
 body.dark-mode .content-box p,
@@ -2228,7 +2228,7 @@ body.dark-mode .category-filter:hover {
 
 body.dark-mode .exhibition-item {
     border-left-color: #ff6633;
-    background-color: #2a2a2a;
+    background-color: #1a1a1a;
 }
 
 body.dark-mode .exhibition-item h2 {
@@ -2243,7 +2243,7 @@ body.dark-mode .exhibition-description {
 
 body.dark-mode .contact-content,
 body.dark-mode .impressum-content {
-    background-color: #2a2a2a;
+    background-color: #1a1a1a;
 }
 
 body.dark-mode .contact-info h2,

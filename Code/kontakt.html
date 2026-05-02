@@ -15,6 +15,21 @@
             padding-bottom: 0;
             overflow: visible;
             position: relative;
+            z-index: 2;
+        }
+
+        .kontakt-outline-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 73px;
+            overflow: visible;
+            pointer-events: none;
+            z-index: 5;
         }
 
         .kontakt-heading-container {
@@ -174,11 +189,11 @@
         }
 
         body.dark-mode .kontakt-heading-anchor {
-            color: #666666;
+            color: #1a1a1a;
         }
 
         body.dark-mode .kontakt-content-box {
-            background-color: #666666;
+            background-color: #1a1a1a;
         }
     </style>
 </head>
@@ -200,37 +215,6 @@
     <!-- Navigation -->
     <nav class="main-nav">
         <div class="nav-container">
-            <!-- Sprachniveau-Toggle -->
-            <div class="lang-switch" role="group" aria-label="Sprachniveau">
-                <button class="lang-switch__btn" data-lang="easy" title="Leichte Sprache" aria-label="Leichte Sprache">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.63 283.46" fill="currentColor">
-                        <path d="M116.81,97.14c26.83,0,48.57-21.75,48.57-48.57S143.64,0,116.81,0s-48.57,21.75-48.57,48.57,21.75,48.57,48.57,48.57"/>
-                        <path d="M231.74,91.31c-10.75-.28-65.42.69-113.04,45.67-.53.5-1.2.75-1.88.75s-1.35-.25-1.88-.75C67.31,92,12.64,91.03,1.89,91.31c-1.06.03-1.89.9-1.89,1.95v141.84c0,1.07.85,1.93,1.92,1.95,10.86.2,65.77,3.36,113.04,45.7.53.47,1.19.71,1.86.71s1.33-.24,1.86-.71c47.27-42.33,102.18-45.49,113.04-45.7,1.07-.02,1.92-.89,1.92-1.95V93.26c0-1.06-.83-1.93-1.89-1.95"/>
-                    </svg>
-                </button>
-                <button class="lang-switch__btn" data-lang="clear" title="Verständlicher Text" aria-label="Verständlicher Text">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 5 Q4 3 6 3 H18 Q20 3 20 5 V13 Q20 15 18 15 H13 L9 19 V15 H6 Q4 15 4 13 Z"/>
-                        <line x1="7" y1="7.5" x2="17" y2="7.5"/>
-                        <line x1="7" y1="10.5" x2="17" y2="10.5"/>
-                        <line x1="7" y1="13.5" x2="13" y2="13.5"/>
-                    </svg>
-                </button>
-                <button class="lang-switch__btn active" data-lang="expert" title="Fachsprache" aria-label="Fachsprache">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 6 C9 5.5 5 5.5 3 6 V19 C5 18.5 9 18.5 12 19"/>
-                        <path d="M12 6 C15 5.5 19 5.5 21 6 V19 C19 18.5 15 18.5 12 19"/>
-                        <line x1="12" y1="6" x2="12" y2="19"/>
-                        <line x1="5.5" y1="9" x2="9.5" y2="9"/>
-                        <line x1="5.5" y1="12" x2="9.5" y2="12"/>
-                        <line x1="5.5" y1="15" x2="9.5" y2="15"/>
-                        <line x1="14.5" y1="9" x2="18.5" y2="9"/>
-                        <line x1="14.5" y1="12" x2="18.5" y2="12"/>
-                        <line x1="14.5" y1="15" x2="18.5" y2="15"/>
-                    </svg>
-                </button>
-            </div>
-
             <label class="theme-switch">
                 <input type="checkbox" class="theme-switch__checkbox">
                 <div class="theme-switch__sun"></div>
@@ -291,7 +275,6 @@
         <div class="kontakt-heading-container">
             <h2 class="kontakt-heading kontakt-heading-anchor" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</h2>
             <h1 class="kontakt-heading kontakt-heading-filled" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</h1>
-            <h2 class="kontakt-heading kontakt-heading-outline" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</h2>
         </div>
     </section>
 
@@ -309,7 +292,7 @@
             <div class="locale-en">
                 <h2>Contact Information</h2>
                 <p><strong>E-Mail:</strong> <a href="mailto:mail@martinzanker.com">mail@martinzanker.com</a></p>
-                <p><strong>Studio:</strong> Anglerstraße 28, 80339 München</p>
+                <p><strong>Studio:</strong> Anglerstraße 28, 80339 Munich</p>
                 <p><strong>Opening Hours:</strong> By appointment</p>
             </div>
             <div class="locale-es">
@@ -343,15 +326,28 @@
         </div>
     </section>
 
+    <div class="kontakt-outline-overlay">
+        <div class="kontakt-heading-container">
+            <h2 class="kontakt-heading kontakt-heading-outline" data-de="Kontakt" data-en="Contact" data-es="Contacto">Kontakt</h2>
+        </div>
+    </div>
+
     <script src="js/script.js"></script>
     <script>
         (function() {
             const filled = document.querySelector('.kontakt-heading-filled');
-            function checkFade() {
-                if (!filled) return;
-                filled.classList.toggle('faded-out', window.scrollY > 60);
+            const anchor = document.querySelector('.kontakt-heading-anchor');
+            const headingSection = document.querySelector('.kontakt-heading-section');
+            const outlineOverlay = document.querySelector('.kontakt-outline-overlay');
+            const PARALLAX = 0.45;
+            function updateScroll() {
+                const sy = window.scrollY;
+                if (headingSection) headingSection.style.transform = `translateY(${-sy * PARALLAX}px)`;
+                if (outlineOverlay) outlineOverlay.style.transform = `translateY(${-sy * PARALLAX}px)`;
+                if (anchor) anchor.style.transform = `rotate(-2deg) translate(-6px, 6px) translateY(${sy * PARALLAX}px)`;
+                if (filled) filled.classList.toggle('faded-out', sy > 60);
             }
-            window.addEventListener('scroll', checkFade, { passive: true });
+            window.addEventListener('scroll', updateScroll, { passive: true });
         })();
 
         document.getElementById('contactForm').addEventListener('submit', function(e) {
