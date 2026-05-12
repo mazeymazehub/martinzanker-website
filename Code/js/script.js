@@ -158,9 +158,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.innerHeight / window.innerWidth > 1.2) {
             minGap += 350;
         }
-        // Mobile: MYTHUS-Block 68px tiefer
+        // Mobile: MYTHUS-Block 2px tiefer (war 68, um 70px angehoben)
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            minGap += 68;
+            minGap -= 2;
         }
         // Desktop (Landscape): MYTHUS-Position angepasst (verhindert Doppel-Snap mit RIVUS)
         const isPortrait = window.innerHeight / window.innerWidth > 1.2;
@@ -578,7 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const anchorGap = getGesichtenAnchorGap();
             const anchorStart = _gesichtenWrapperDocTop + 50 - anchorGap - anchorHeight;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            const gesichtenZone = window.innerWidth < BREAKPOINT_MOBILE ? { before: 400 } : undefined;
+            const gesichtenZone = window.innerWidth < BREAKPOINT_MOBILE ? { before: 700, after: 840 } : undefined;
             if (sMeet > 100) _namedPoints.push({ s: sMeet, name: 'GESICHTEN', zone: gesichtenZone });
         }
 
@@ -1205,24 +1205,69 @@ document.addEventListener('DOMContentLoaded', function() {
     const allInfoImages = document.querySelectorAll(
         '.image-with-info, #ben-image-with-info, #mythus-daniel-image-with-info, #michael-image-with-info, #marcus-image-with-info'
     );
+    const _stairGhost = document.getElementById('stair-ghost');
+    let _ghostFadeTimer = null;
+    function deactivateStairGhost() {
+        if (!_stairGhost) return;
+        _stairGhost.style.opacity = '0';
+        clearTimeout(_ghostFadeTimer);
+        _ghostFadeTimer = setTimeout(() => { _stairGhost.innerHTML = ''; }, 380);
+    }
+    function activateStairGhost(container) {
+        const stair = container.querySelector('.words-stair');
+        if (!stair || !_stairGhost) return;
+        clearTimeout(_ghostFadeTimer);
+        const r = stair.getBoundingClientRect();
+        const clone = stair.cloneNode(true);
+        clone.style.margin = '0';
+        const srcLines = stair.querySelectorAll('.words-stair__line');
+        const dstLines = clone.querySelectorAll('.words-stair__line');
+        const isDark = document.body.classList.contains('dark-mode');
+        srcLines.forEach((line, i) => {
+            const cs = window.getComputedStyle(line);
+            dstLines[i].style.display   = cs.display;
+            dstLines[i].style.left      = cs.left;
+            dstLines[i].style.transform = cs.transform;
+            const srcPs = line.querySelectorAll('p');
+            const dstPs = dstLines[i].querySelectorAll('p');
+            srcPs.forEach((p, j) => {
+                const cp = window.getComputedStyle(p);
+                dstPs[j].style.opacity    = '1';
+                dstPs[j].style.transform  = 'translate3d(0,-42px,0)';
+                dstPs[j].style.color      = isDark ? '#E9E9E4' : cp.color;
+                dstPs[j].style.fontSize   = (parseFloat(cp.fontSize) * 0.9) + 'px';
+                dstPs[j].style.transition = 'none';
+            });
+        });
+        _stairGhost.innerHTML = '';
+        _stairGhost.appendChild(clone);
+        const isAlex   = !!container.closest('.main-heading-container');
+        const isDaniel = container.id === 'mythus-daniel-image-with-info';
+        const leftOffset = isAlex ? -10 : isDaniel ? 50 : 0;
+        _stairGhost.style.top   = (r.top + 10) + 'px';
+        _stairGhost.style.left  = (r.left + leftOffset) + 'px';
+        _stairGhost.style.width = r.width + 'px';
+        requestAnimationFrame(() => { _stairGhost.style.opacity = '1'; });
+    }
+    function clearInfoOverlay(el) {
+        deactivateStairGhost();
+        // Gradient fade-out: info-active erst nach Transition entfernen
+        el.classList.remove('info-active');
+    }
     allInfoImages.forEach(container => {
         container.addEventListener('click', function(e) {
             const isActive = this.classList.contains('info-active');
-            // Alle anderen schließen
-            document.querySelectorAll('.info-active').forEach(el => {
-                el.classList.remove('info-active');
-            });
+            document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
             if (!isActive) {
                 this.classList.add('info-active');
+                activateStairGhost(this);
             }
             e.stopPropagation();
         });
     });
     // Tap außerhalb schließt Info
     document.addEventListener('click', () => {
-        document.querySelectorAll('.info-active').forEach(el => {
-            el.classList.remove('info-active');
-        });
+        document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
     });
 
     // Locale-Toggle (DE/EN)
@@ -1345,6 +1390,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeMobileDropdowns() {
         if (mobileLocaleMenu) mobileLocaleMenu.classList.remove('open');
         if (mobileLangMenu) mobileLangMenu.classList.remove('open');
+        const _navMenu = document.querySelector('.nav-menu');
+        const _navToggle = document.querySelector('.nav-toggle');
+        if (_navMenu && _navMenu.classList.contains('active')) {
+            _navMenu.classList.remove('active');
+            if (_navToggle) {
+                const spans = _navToggle.querySelectorAll('span');
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            }
+        }
     }
 
     function syncMobileActive() {
@@ -1515,6 +1571,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateScene();
 
     window.addEventListener('scroll', () => {
+        document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
         latestScroll = window.scrollY;
         if (!ticking) {
             window.requestAnimationFrame(() => {
@@ -1738,9 +1795,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const mythusTop  = _mythusBoxWrapper ? _mythusBoxWrapper.getBoundingClientRect().top : Infinity;
         const gesichtenTop = _gesichtenContentBoxWrapper ? _gesichtenContentBoxWrapper.getBoundingClientRect().top : Infinity;
 
-        const show = el => { if (el) { el.style.opacity = '1'; el.style.zIndex = '20'; } };
-        const showBehind = el => { if (el) { el.style.opacity = '1'; } };
-        const hide = el => { if (el) { el.style.opacity = '0'; el.classList.remove('info-active'); el.style.zIndex = ''; } };
+        const show = el => { if (el) { el.style.opacity = '1'; el.style.zIndex = '8'; el.style.pointerEvents = 'auto'; } };
+        const showBehind = el => { if (el) { el.style.opacity = '1'; el.style.zIndex = ''; el.style.pointerEvents = 'auto'; } };
+        const hide = el => { if (el) { el.style.opacity = '0'; clearInfoOverlay(el); el.style.zIndex = ''; el.style.pointerEvents = 'none'; } };
 
         if (gesichtenTop < imageFixedTop) {
             hide(_benImage); hide(_mythusDaniel); showBehind(_michaelImage); hide(_marcusImage);
@@ -2078,7 +2135,58 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function updateDanielStaircase() {
+        const danielList = document.querySelector('#mythus-daniel-image-with-info .words-stair');
+        if (!danielList) return;
+
+        const isMobile = window.innerWidth <= 600;
+        const step = 16;
+        const oddT  = 'skew(60deg, -30deg) scaleY(0.66667)';
+        const evenT = 'skew(0deg, -30deg) scaleY(1.33333)';
+
+        const d1     = danielList.querySelector('.daniel-desktop-1');
+        const d3     = danielList.querySelector('.daniel-desktop-3');
+        const year   = danielList.querySelector('.daniel-year');
+        const canvas = danielList.querySelector('.daniel-canvas');
+        const size   = danielList.querySelector('.daniel-size');
+        const m1     = danielList.querySelector('.daniel-mobile-1');
+        const m2     = danielList.querySelector('.daniel-mobile-2');
+        const m3     = danielList.querySelector('.daniel-mobile-3');
+        const m4     = danielList.querySelector('.daniel-mobile-4');
+
+        if (!d1 || !d3 || !year || !canvas || !size || !m1 || !m2 || !m3 || !m4) return;
+
+        if (isMobile) {
+            d1.style.display = 'none';
+            d3.style.display = 'none';
+            m1.style.display = 'list-item';
+            m2.style.display = 'list-item';
+            m3.style.display = 'list-item';
+            m4.style.display = 'list-item';
+
+            m1.style.left = `${step * 1}px`;     m1.style.transform = oddT;
+            m2.style.left = `${step * 2}px`;     m2.style.transform = evenT;
+            year.style.left = `${step * 3}px`;   year.style.transform = oddT;
+            m3.style.left = `${step * 4}px`;     m3.style.transform = evenT;
+            m4.style.left = `${step * 5}px`;     m4.style.transform = oddT;
+            canvas.style.left = `${step * 6}px`; canvas.style.transform = evenT;
+            size.style.left = `${step * 7}px`;   size.style.transform = oddT;
+        } else {
+            d1.style.display = '';
+            d3.style.display = '';
+            m1.style.display = 'none';
+            m2.style.display = 'none';
+            m3.style.display = 'none';
+            m4.style.display = 'none';
+
+            year.style.left = '';   year.style.transform = '';
+            canvas.style.left = ''; canvas.style.transform = '';
+            size.style.left = '';   size.style.transform = '';
+        }
+    }
+
     updateBenStaircase();
+    updateDanielStaircase();
 
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
@@ -2087,6 +2195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resizeTimer = setTimeout(() => {
             recalculateLayout();
             updateBenStaircase();
+            updateDanielStaircase();
             requestAnimationFrame(() => document.body.classList.remove('no-image-transition'));
         }, 150);
     });

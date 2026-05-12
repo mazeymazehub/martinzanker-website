@@ -1144,12 +1144,13 @@ section {
         left: auto;
     }
 
-    /* Textboxen über Bilder (Daniel, Ben) */
+    /* Textboxen über Bilder (Daniel, Ben) — kein pointer-events, damit Hover/Tap auf Bild durchfällt */
     .content-box-wrapper,
     .content-box-wrapper-2,
     #mythus-box-wrapper,
     #gesichten-content-box-wrapper {
         z-index: 10;
+        pointer-events: none;
     }
 
     /* Mobile: Bilder hinter allem (Schriften + Textboxen) */
@@ -1162,17 +1163,19 @@ section {
         width: calc(100vw - 40px) !important;
         height: auto !important;
         max-height: 80vh !important;
-        overflow: hidden;
+        overflow: visible;
         opacity: 0;
         transition: opacity 0.2s ease;
         z-index: 0;
         transform: none !important;
+        pointer-events: none;
     }
 
     #ben-container,
     #mythus-daniel-container {
-        z-index: 0;
+        z-index: auto; /* Kein Stacking-Context – Ben/Daniel landen im Root-Context */
     }
+
 
     #ben-image-with-info .unterpunkt-heading-image,
     #mythus-daniel-image-with-info .unterpunkt-heading-image,
@@ -1332,20 +1335,53 @@ section {
         left: 60px;
     }
     .nav-menu {
-        position: absolute;
-        top: 30px;
-        left: 0;
-        width: 100%;
-        background-color: var(--color-dark);
+        position: fixed;
+        bottom: 25px;
+        right: 0;
+        left: auto;
+        width: auto;
+        min-width: 140px;
+        background: rgba(233, 233, 228, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         flex-direction: column;
-        align-items: center;
-        padding: 1rem 0;
-        gap: 1rem;
+        align-items: flex-start;
+        padding: 4px 0;
+        gap: 0;
         display: none;
+        box-shadow: none;
+        border-radius: 0;
+        z-index: 2000;
     }
 
     .nav-menu.active {
         display: flex;
+    }
+
+    .nav-menu li a {
+        display: block;
+        width: 100%;
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        text-decoration: none;
+        color: #333;
+        transition: none;
+    }
+
+    .nav-menu li a::after {
+        display: none;
+    }
+
+    .nav-menu li a:hover {
+        opacity: 1;
+        background: #333333;
+        color: #E9E9E4;
+    }
+
+    body.dark-mode .nav-menu {
+        background: rgba(26, 26, 26, 0.95);
     }
 
     .nav-toggle {
@@ -1410,6 +1446,78 @@ section {
         flex-direction: column;
         gap: 1rem;
     }
+
+    /* Dropdowns öffnen nach oben, nur Inhaltshöhe, kein Schatten */
+    .mobile-dropdown__menu {
+        top: auto !important;
+        bottom: 25px !important;
+        box-shadow: none !important;
+    }
+
+    #gesichten-anchor-container {
+        pointer-events: none;
+    }
+
+    #mythus-daniel-image-with-info .words-stair {
+        margin-left: -60px;
+    }
+
+    .daniel-desktop-1,
+    .daniel-desktop-3 {
+        display: none !important;
+    }
+
+    .daniel-mobile-1,
+    .daniel-mobile-2,
+    .daniel-mobile-3,
+    .daniel-mobile-4 {
+        display: list-item !important;
+    }
+
+    #mythus-daniel-image-with-info .daniel-mobile-1 { left: 16px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #mythus-daniel-image-with-info .daniel-mobile-2 { left: 32px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #mythus-daniel-image-with-info .daniel-year     { left: 48px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #mythus-daniel-image-with-info .daniel-mobile-3 { left: 64px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #mythus-daniel-image-with-info .daniel-mobile-4 { left: 80px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #mythus-daniel-image-with-info .daniel-canvas   { left: 96px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #mythus-daniel-image-with-info .daniel-size     { left: 112px; transform: skew(60deg, -30deg) scaleY(0.66667); }
+
+    .michael-desktop-3 { display: none !important; }
+    .michael-mobile-3, .michael-mobile-4 { display: list-item !important; }
+
+    #michael-image-with-info .michael-mobile-3          { left: 48px; transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #michael-image-with-info .michael-mobile-4          { left: 64px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #michael-image-with-info .words-stair__line:nth-child(6) { left: 80px; transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #michael-image-with-info .words-stair__line:nth-child(7) { left: 96px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+
+
+    body:not(.dark-mode) .image-info {
+        background: linear-gradient(to bottom, transparent 15%, rgba(255,102,51,0) 100%);
+        transition: background 0.2s ease;
+    }
+
+    body:not(.dark-mode) .info-active .image-info,
+    body:not(.dark-mode) #ben-image-with-info.info-active .image-info,
+    body:not(.dark-mode) #mythus-daniel-image-with-info.info-active .image-info,
+    body:not(.dark-mode) .main-heading-container .info-active .image-info,
+    body:not(.dark-mode) #michael-image-with-info.info-active .image-info {
+        background: linear-gradient(to bottom, transparent 15%, rgba(255,102,51,0.85) 100%);
+    }
+
+    body:not(.dark-mode) .words-stair__line p {
+        color: #E9E9E4;
+    }
+
+    body.dark-mode #michael-image-with-info.info-active .image-info {
+        background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
+    }
+
+
+    #stair-ghost .words-stair {
+        transform: perspective(700px) rotateY(-8deg);
+        transform-origin: left bottom;
+    }
+
 }
 
 /* ===== SMALL MOBILE (max-width: 480px) ===== */
@@ -1432,12 +1540,6 @@ section {
     /* Unterer Rahmen wird durch Nav ersetzt */
     body::before {
         display: none;
-    }
-
-    /* Dropdowns öffnen nach oben */
-    .mobile-dropdown__menu {
-        top: auto;
-        bottom: 25px;
     }
 
     .nav-container {
@@ -1484,6 +1586,10 @@ section {
         bottom: 24px; /* Nav (25px) - 1px Überlappung */
     }
 
+    #page-copyright {
+        padding-right: 28px !important; /* Rahmen (20px) + 8px Abstand */
+    }
+
     .shrinking-header {
         height: 46px;
     }
@@ -1520,6 +1626,16 @@ section {
     /* Horizontale Balken im Light Mode weiß */
     .background-stripe-top {
         background-color: #E9E9E4;
+    }
+
+    /* Rahmen oben/unten über Viewport hinaus — verdeckt orange Subpixel-Linien */
+    .background-stripe-top {
+        top: -4px;
+        height: 34px;
+    }
+    body::before {
+        bottom: -4px;
+        height: 24px;
     }
 
     /* Hamburger-Streifen kleiner */
@@ -1903,42 +2019,28 @@ section {
     white-space: normal;
 }
 
-/* Hover: heller Gradient erscheint (Light Mode) */
-.image-with-info:hover .image-info,
+/* Tap/Klick — alle Geräte: Gradient über .info-active */
 .info-active .image-info {
     background: linear-gradient(to bottom, transparent 15%, rgba(233,233,228,0.85) 100%);
     pointer-events: auto;
 }
-
-/* Hover: dunkler Gradient im Dark Mode */
-body.dark-mode .image-with-info:hover .image-info,
 body.dark-mode .info-active .image-info {
     background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
 }
-
-/* Ben + Daniel: Standard-Gradient (Light Mode) */
-#ben-image-with-info:hover .image-info,
 #ben-image-with-info.info-active .image-info,
-#mythus-daniel-image-with-info:hover .image-info,
 #mythus-daniel-image-with-info.info-active .image-info {
     background: linear-gradient(to bottom, transparent 15%, rgba(233,233,228,0.85) 100%);
     pointer-events: auto;
 }
-
-body.dark-mode #ben-image-with-info:hover .image-info,
 body.dark-mode #ben-image-with-info.info-active .image-info,
-body.dark-mode #mythus-daniel-image-with-info:hover .image-info,
 body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
     background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
 }
-
-/* Alex + Michael: oranger Gradient (Light Mode) */
-.main-heading-container .image-with-info:hover .image-info,
 .main-heading-container .info-active .image-info,
-#michael-image-with-info:hover .image-info,
 #michael-image-with-info.info-active .image-info {
     background: linear-gradient(to bottom, transparent 15%, rgba(255,102,51,0.85) 100%);
 }
+
 
 /* =============== STAIRCASE TEXT EFFECT (nach CodePen bosworthco/YWBLpR) =============== */
 /*
@@ -1953,6 +2055,16 @@ body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
 .ben-ipad-3,
 .ben-ipad-4,
 .ben-ipad-5 {
+    display: none;
+}
+
+/* Mobile-spezifische Zeilen (Daniel) – standardmäßig versteckt */
+.daniel-mobile-1,
+.daniel-mobile-2,
+.daniel-mobile-3,
+.daniel-mobile-4,
+.michael-mobile-3,
+.michael-mobile-4 {
     display: none;
 }
 
@@ -2017,37 +2129,40 @@ body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
     -webkit-backface-visibility: hidden;
 }
 
-/* Hover/Tap: nach oben schieben, Text einblenden */
-.image-with-info:hover .words-stair__line p,
-.info-active .words-stair__line p {
-    transform: translate3d(0, -42px, 0);
-    opacity: 1;
-    /* Enter-Transition: slide + fade gleichzeitig */
-    transition: transform 0.4s ease-in-out, opacity 0.35s ease-out;
+#stair-ghost {
+    position: fixed;
+    z-index: 21;
+    pointer-events: none;
+    overflow: visible;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+#stair-ghost .words-stair {
+    margin: 0;
 }
 
 /* Staircase iPhone: 16px (proportional skaliert) */
 @media (max-width: 480px) {
     .words-stair {
         font-size: 16px;
-        margin-left: 105px;
-        margin-bottom: 57px;
+        margin-left: -10px;
+        margin-bottom: 17px;
     }
 
     .main-heading-container .words-stair {
-        margin-left: 125px;
+        margin-left: -10px;
         margin-bottom: -3px;
     }
 
     .words-stair__line {
-        height: 21px;
+        height: 41px;
     }
 
     .words-stair__line p {
-        height: 21px;
-        line-height: 17px;
-        font-size: 16px;
-        padding: 0 4px;
+        height: 41px;
+        line-height: 32px;
+        font-size: 31px;
+        padding: 0 6px;
     }
 
     .words-stair__line:nth-child(1) { left: 8px; }
@@ -2057,9 +2172,15 @@ body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
     .words-stair__line:nth-child(5) { left: 40px; }
     .words-stair__line:nth-child(6) { left: 48px; }
 
-    .image-with-info:hover .words-stair__line p,
+    .main-heading-container .words-stair__line:nth-child(1) { left: 16px; }
+    .main-heading-container .words-stair__line:nth-child(2) { left: 32px; }
+    .main-heading-container .words-stair__line:nth-child(3) { left: 48px; }
+    .main-heading-container .words-stair__line:nth-child(4) { left: 64px; }
+    .main-heading-container .words-stair__line:nth-child(5) { left: 80px; }
+    .main-heading-container .words-stair__line:nth-child(6) { left: 96px; }
+
     .info-active .words-stair__line p {
-        transform: translate3d(0, -21px, 0);
+        transform: translate3d(0, -41px, 0);
     }
 }
 
@@ -2144,8 +2265,8 @@ body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
     margin: 0;
     z-index: 2000;
     min-width: 140px;
-    border-radius: 8px;
-    background: rgba(255, 102, 51, 0.95);
+    border-radius: 0;
+    background: rgba(233, 233, 228, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 4px 16px rgba(0,0,0,0.18);
@@ -2183,12 +2304,19 @@ body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
     background: rgba(255,255,255,0.25);
 }
 
+@media (max-width: 600px) {
+    .mobile-dropdown__menu li button.active {
+        background: #333333;
+        color: #E9E9E4;
+    }
+}
+
 body.dark-mode .mobile-dropdown__menu {
-    background: rgba(51, 51, 51, 0.95);
+    background: rgba(26, 26, 26, 0.95);
 }
 
 body.dark-mode .mobile-dropdown__menu li button {
-    color: #E9E9E4;
+    color: #ff6633;
 }
 
 body.dark-mode .mobile-dropdown__trigger {
@@ -2444,11 +2572,17 @@ body.dark-mode .nav-lower-layer {
 }
 
 body.dark-mode .nav-menu li a {
-    color: #E9E9E4; /* Light gray links */
+    color: #E9E9E4;
 }
 
 body.dark-mode .nav-menu li a::after {
-    background-color: #E9E9E4; /* Orange underline */
+    background-color: #E9E9E4;
+}
+
+@media (max-width: 600px) {
+    body.dark-mode .nav-menu li a {
+        color: #ff6633;
+    }
 }
 
 .logo-gif-dark {

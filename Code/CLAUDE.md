@@ -4,6 +4,23 @@ Dieses Dokument beschreibt die technische Logik der Landing-Page (`index.html`).
 
 ---
 
+## ⚠️ GESPERRTE BEREICHE — NICHT ANFASSEN
+
+**Mobile-Styles sind eingefroren** und dürfen nur mit ausdrücklicher Freigabe durch den Nutzer geändert werden.
+
+Gesperrte CSS-Blöcke:
+- `@media (max-width: 600px)` — vollständig gesperrt
+- `@media (max-width: 480px)` — vollständig gesperrt
+- `@media (max-width: 480px) { .main-heading-container … }` — gesperrt
+
+Gesperrte JS-Bereiche:
+- Alle Zweige, die auf `window.innerWidth < BREAKPOINT_MOBILE` oder `window.innerWidth <= 600` prüfen (Mobile-spezifische Logik)
+
+**Achtung bei Desktop-/Global-Änderungen:**  
+Globale CSS-Regeln (außerhalb jeder `@media`-Query) und JS-Funktionen ohne Breakpoint-Check wirken auf alle Bildschirmgrößen. Bei jeder Änderung dort prüfen, ob sie unbeabsichtigt auf Mobile durchschlägt — und wenn ja, mit dem Nutzer klären, bevor etwas geändert wird.
+
+---
+
 ## Dateistruktur
 
 ```
