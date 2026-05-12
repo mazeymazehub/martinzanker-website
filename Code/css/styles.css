@@ -559,6 +559,12 @@ header {
 }
 
 .gesichten-anchor-filled,
+.gesichten-anchor-outline,
+.gesichten-anchor-gray {
+    hyphens: none;
+}
+
+.gesichten-anchor-filled,
 .rivus-anchor-filled {
     color: var(--color-dark);
     grid-column: 1;
@@ -668,6 +674,14 @@ header {
 
 .content-box-2 p:first-child {
     margin-top: -10px;
+}
+
+#rivus-content-box .lang-container {
+    padding-top: 1.5em;
+}
+
+#mythus-box .lang-container {
+    margin-top: -1.5em;
 }
 
 /* GESICHTEN-Box: Text zentriert, breiter (Landscape + Desktop) */
@@ -1146,8 +1160,9 @@ section {
         position: fixed !important;
         left: 20px !important;
         width: calc(100vw - 40px) !important;
-        height: 80vh !important;
-        overflow: visible;
+        height: auto !important;
+        max-height: 80vh !important;
+        overflow: hidden;
         opacity: 0;
         transition: opacity 0.2s ease;
         z-index: 0;
@@ -1177,6 +1192,8 @@ section {
         z-index: 15;
     }
 
+
+
     /* RIVUS-Schriften tiefer auf Mobile */
     #rivus-anchor-container .rivus-anchor-filled,
     #rivus-anchor-container .rivus-anchor-outline {
@@ -1187,6 +1204,17 @@ section {
     #mythus-anchor-container .konzept-heading-filled,
     #mythus-anchor-container .konzept-heading-outline {
         top: calc(var(--konzept-offset) + 352px) !important;
+    }
+
+    /* GESICHTEN-Schriften tiefer auf Mobile (analog RIVUS/MYTHUS) */
+    #gesichten-anchor-container .gesichten-anchor-filled,
+    #gesichten-anchor-container .gesichten-anchor-outline {
+        top: calc(var(--gesichten-offset) + 352px) !important;
+        font-size: 60px !important;
+    }
+
+    #gesichten-anchor-gray {
+        font-size: 60px !important;
     }
 
     /* Clip-Container übernimmt overflow:hidden; äußerer Container kann overflow:visible */
@@ -1232,6 +1260,34 @@ section {
         margin-left: -10vw;
     }
 
+    /* KONZEPT-Box: Volle Breite, Blocksatz, mittig */
+    .content-box:not(#mythus-box) {
+        padding-left: var(--spacing-box-padding) !important;
+        padding-right: var(--spacing-box-padding) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    .content-box:not(#mythus-box) p {
+        text-align: justify;
+        max-width: calc(100vw - 72px) !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* RIVUS-Box: Volle Breite, Blocksatz — margin-left:0 damit ::after-Hintergrund lückenlos */
+    #rivus-content-box {
+        padding-left: var(--spacing-box-padding) !important;
+        padding-right: var(--spacing-box-padding) !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    #rivus-content-box p {
+        text-align: justify;
+        max-width: calc(100vw - 72px) !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
     /* MYTHUS-Box: Volle Breite, Blocksatz, mittig */
     #mythus-box {
         padding-left: var(--spacing-box-padding) !important;
@@ -1244,6 +1300,28 @@ section {
         max-width: calc(100vw - 72px) !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
+    }
+
+    /* GESICHTEN-Box: Volle Breite, Blocksatz */
+    #gesichten-content-box {
+        width: 110vw !important;
+        padding-left: var(--spacing-box-padding) !important;
+        padding-right: var(--spacing-box-padding) !important;
+        padding-top: calc(var(--spacing-box-padding) + 5px + 12px) !important;
+        margin-top: -12px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    #gesichten-content-box p {
+        text-align: justify;
+        max-width: calc(100vw - 72px) !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Michael: wrapper-transform entfernen, damit position:fixed korrekt zum Viewport funktioniert */
+    #michael-marcus-wrapper {
+        transform: none !important;
     }
 }
 
@@ -1343,27 +1421,75 @@ section {
     .main-nav {
         font-size: 14px;
         height: 25px;
+        top: auto;
+        bottom: 0;
+        color: #333333;
+        background-color: #E9E9E4!important;
+        backdrop-filter: none!important;
+        -webkit-backdrop-filter: none!important;
+    }
+
+    /* Unterer Rahmen wird durch Nav ersetzt */
+    body::before {
+        display: none;
+    }
+
+    /* Dropdowns öffnen nach oben */
+    .mobile-dropdown__menu {
+        top: auto;
+        bottom: 25px;
     }
 
     .nav-container {
         height: 25px;
     }
 
+    /* Originale Toggles auf Mobile verstecken */
+    .locale-switch,
+    .lang-switch {
+        display: none !important;
+    }
+
+    /* Mobile Dropdowns anzeigen */
+    .mobile-dropdown {
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    /* Kleiner Abstand zwischen Aa-Button und Hamburger */
+    .nav-toggle {
+        margin-left: 10px;
+    }
+
+    /* KONZEPT: Text zentriert — Box bei wrapper-padding(16px) + box-padding(20px) = 36px
+       Text mit margin-left:0 startet exakt bei 36px, endet bei 354px → symmetrisch */
+    .content-box p {
+        max-width: calc(100vw - 72px) !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
     header {
-        top: 25px;
+        top: 30px; /* Unterhalb des 30px stripe-top – gleich wie Desktop */
     }
 
     .header-backdrop {
-        height: 88px; /* Nav (25px) + shrinking Header (63px) */
+        height: 76px; /* stripe-top (30px) + shrinking Header (46px) */
     }
 
     .frame-border-left,
     .frame-border-right {
-        top: 24px; /* 1px Überlappung mit 25px-Nav */
+        top: 29px;    /* 1px Überlappung mit stripe-top (30px) – gleich wie Desktop */
+        bottom: 24px; /* Nav (25px) - 1px Überlappung */
     }
 
     .shrinking-header {
-        height: 63px;
+        height: 46px;
+    }
+
+    .logo-gif {
+        height: 34px;
     }
 
     .fixed-header {
@@ -1390,6 +1516,43 @@ section {
     .text-front {
         font-size: clamp(1.5rem, 12vw, 3.5rem);
     }
+
+    /* Horizontale Balken im Light Mode weiß */
+    .background-stripe-top {
+        background-color: #E9E9E4;
+    }
+
+    /* Hamburger-Streifen kleiner */
+    .nav-toggle span {
+        width: 18px;
+        height: 2px;
+        margin: 2px 0;
+        background-color: #333333;
+    }
+
+    /* Theme-Toggle dunkel im Light Mode */
+    .theme-switch__sun,
+    .theme-switch__moon {
+        filter: invert(1);
+    }
+
+    /* Dark Mode: Farben zurücksetzen */
+    body.dark-mode .main-nav {
+        background-color: #1a1a1a!important;
+        backdrop-filter: none!important;
+        -webkit-backdrop-filter: none!important;
+        color: #E9E9E4;
+    }
+
+    body.dark-mode .nav-toggle span {
+        background-color: #E9E9E4;
+    }
+
+    body.dark-mode .theme-switch__sun,
+    body.dark-mode .theme-switch__moon {
+        filter: none;
+    }
+
 }
 
 /* =============== PERFORMANCE OPTIMIERUNG =============== */
@@ -1753,9 +1916,27 @@ body.dark-mode .info-active .image-info {
     background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
 }
 
-/* Alex: oranger Gradient (Light Mode) */
+/* Ben + Daniel: Standard-Gradient (Light Mode) */
+#ben-image-with-info:hover .image-info,
+#ben-image-with-info.info-active .image-info,
+#mythus-daniel-image-with-info:hover .image-info,
+#mythus-daniel-image-with-info.info-active .image-info {
+    background: linear-gradient(to bottom, transparent 15%, rgba(233,233,228,0.85) 100%);
+    pointer-events: auto;
+}
+
+body.dark-mode #ben-image-with-info:hover .image-info,
+body.dark-mode #ben-image-with-info.info-active .image-info,
+body.dark-mode #mythus-daniel-image-with-info:hover .image-info,
+body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
+    background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
+}
+
+/* Alex + Michael: oranger Gradient (Light Mode) */
 .main-heading-container .image-with-info:hover .image-info,
-.main-heading-container .info-active .image-info {
+.main-heading-container .info-active .image-info,
+#michael-image-with-info:hover .image-info,
+#michael-image-with-info.info-active .image-info {
     background: linear-gradient(to bottom, transparent 15%, rgba(255,102,51,0.85) 100%);
 }
 
@@ -1845,6 +2026,43 @@ body.dark-mode .info-active .image-info {
     transition: transform 0.4s ease-in-out, opacity 0.35s ease-out;
 }
 
+/* Staircase iPhone: 16px (proportional skaliert) */
+@media (max-width: 480px) {
+    .words-stair {
+        font-size: 16px;
+        margin-left: 105px;
+        margin-bottom: 57px;
+    }
+
+    .main-heading-container .words-stair {
+        margin-left: 125px;
+        margin-bottom: -3px;
+    }
+
+    .words-stair__line {
+        height: 21px;
+    }
+
+    .words-stair__line p {
+        height: 21px;
+        line-height: 17px;
+        font-size: 16px;
+        padding: 0 4px;
+    }
+
+    .words-stair__line:nth-child(1) { left: 8px; }
+    .words-stair__line:nth-child(2) { left: 16px; }
+    .words-stair__line:nth-child(3) { left: 24px; }
+    .words-stair__line:nth-child(4) { left: 32px; }
+    .words-stair__line:nth-child(5) { left: 40px; }
+    .words-stair__line:nth-child(6) { left: 48px; }
+
+    .image-with-info:hover .words-stair__line p,
+    .info-active .words-stair__line p {
+        transform: translate3d(0, -21px, 0);
+    }
+}
+
 /* =============== IMPRESSUM PAGE =============== */
 
 .impressum-section {
@@ -1879,6 +2097,103 @@ body.dark-mode .info-active .image-info {
 /* =============== THEME TOGGLE SWITCH =============== */
 
 /* =============== LOCALE SWITCH (DE/EN) =============== */
+
+/* Mobile Dropdowns: auf Desktop versteckt */
+@media (min-width: 481px) {
+    .mobile-dropdown {
+        display: none;
+    }
+}
+
+.mobile-dropdown__trigger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    padding: 2px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+    opacity: 0.85;
+}
+
+.mobile-dropdown__trigger:hover { opacity: 1; }
+
+.mobile-dropdown__trigger svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+}
+
+.mobile-aa-icon {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+
+.mobile-dropdown__menu {
+    display: none;
+    position: fixed;
+    top: 25px;
+    right: 0;
+    list-style: none;
+    padding: 4px 0;
+    margin: 0;
+    z-index: 2000;
+    min-width: 140px;
+    border-radius: 8px;
+    background: rgba(255, 102, 51, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+
+.mobile-dropdown__menu.open {
+    display: block;
+}
+
+.mobile-dropdown__menu li button {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 9px 14px;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.mobile-dropdown__menu li button svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.mobile-dropdown__menu li button:hover,
+.mobile-dropdown__menu li button.active {
+    background: rgba(255,255,255,0.25);
+}
+
+body.dark-mode .mobile-dropdown__menu {
+    background: rgba(51, 51, 51, 0.95);
+}
+
+body.dark-mode .mobile-dropdown__menu li button {
+    color: #E9E9E4;
+}
+
+body.dark-mode .mobile-dropdown__trigger {
+    color: #E9E9E4;
+}
 
 .locale-switch {
     position: absolute;
@@ -2394,9 +2709,24 @@ body.theme-transitioning .frame-border-right {
     padding-right: 0;
 }
 
+
 #gesichten-content-box {
     width: 60vw;
     margin-left: 0; /* Override -20vw from .content-box-2 */
+}
+
+@media (max-width: 480px) {
+#gesichten-content-box {
+        width: calc(100vw - 40px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #gesichten-content-box p {
+        max-width: calc(100vw - 72px);
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 
 
@@ -2422,7 +2752,6 @@ body.theme-transitioning .frame-border-right {
 #michael-marcus-container {
     padding-left: 0;
     place-items: start center;
-    z-index: 6;
 }
 
 #marcus-image-with-info {
@@ -2498,6 +2827,8 @@ body.theme-transitioning .frame-border-right {
 /* MYTHUS Box: Text weiter rechts (Daniel-Bild links) – Feinabstimmung per JS */
 #mythus-box {
     padding-left: calc(var(--spacing-box-padding) + 150px);
+    padding-top: calc(var(--spacing-box-padding) + 45px);
+    padding-bottom: calc(var(--spacing-box-padding) + 45px);
 }
 
 /* Zeilenumbruch: max-width um 150px reduziert (Ausgleich für extra padding) */
@@ -2594,5 +2925,16 @@ body.theme-transitioning .frame-border-right {
     #marcus-image-with-info {
         left: 40px;
     }
+}
+
+#slide-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--color-bg);
+    z-index: 9999;
+    pointer-events: none;
+    transform: translateX(100%);
+    transition: transform 0.18s ease-in-out;
+    will-change: transform;
 }
 

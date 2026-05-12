@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const mythusBaseTop = getDocumentTop(mythusContainer);
 
         const naturalGap = mythusBaseTop - box2LogicalBottom;
-        const offset = minGap - naturalGap;
+        const offset = minGap - naturalGap - 300;
         mythusContainer.style.marginTop = `${offset}px`;
     }
 
@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let finalOffset = alignmentOffset_Daniel + parallaxCorrection_Daniel;
 
         const isPortraitDaniel = window.innerHeight / window.innerWidth > 1.2;
-        if (window.innerWidth >= 1025 && !isPortraitDaniel) finalOffset += 55;
+        if (window.innerWidth >= 1025 && !isPortraitDaniel) finalOffset += -15;
 
         mythusDaniel.style.top = `${finalOffset}px`;
     }
@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
             : getDocumentTop(contentBox2);
         const anchorHeight = gesichtenAnchor.offsetHeight;
         const anchorGap = getGesichtenAnchorGap();
-        const anchorStart = box2Start + 15 - anchorGap - anchorHeight;
+        const anchorStart = box2Start + 50 - anchorGap - anchorHeight;
 
         // Anchor's effektive Geschwindigkeit (wie Box)
         const anchorEffectiveSpeed = BASE_PARALLAX_SPEED; // 0.35
@@ -456,18 +456,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const meetingRatio = getMeetingRatio();
         let meetY = window.innerHeight * meetingRatio;
-        if (window.innerHeight / window.innerWidth > 1.2 && window.innerWidth >= BREAKPOINT_MOBILE) {
-            meetY += 80; // Portrait (Tablet): Treffpunkt 80px tiefer
+        if (window.innerWidth < BREAKPOINT_MOBILE) {
+            meetY = window.innerHeight * 0.70 - 75; // Mobile: 30% vom unteren Bildschirmrand, filled/outline höher
+        } else if (window.innerHeight / window.innerWidth > 1.2) {
+            meetY += 80; // Portrait (Tablet)
         } else {
-            meetY += 70; // Landscape/Desktop: +70 kompensiert den +70-Anchor-Offset
+            meetY += 70; // Landscape/Desktop
         }
 
         const aStart = getDocumentTop(rivusFilled);
 
-        const box3Start = getDocumentTop(document.getElementById('gesichten-content-box-wrapper'));
+        const box3Start = (_gesichtenContentBoxWrapper && _gesichtenContentBoxWrapper.style.position === 'fixed')
+            ? _gesichtenWrapperDocTop
+            : getDocumentTop(document.getElementById('gesichten-content-box-wrapper'));
         const anchorHeight = rivusAnchor.offsetHeight;
-        const anchorGap = getGesichtenAnchorGap(); // We can reuse this
-        const anchorStart = box3Start + 70 - anchorGap - anchorHeight;
+        const anchorGap = getGesichtenAnchorGap();
+        const anchorStart = box3Start + 50 - anchorGap - anchorHeight;
 
         const anchorEffectiveSpeed = BASE_PARALLAX_SPEED;
 
@@ -488,13 +492,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Berechnet die Scroll-Positionen, an denen Anchor und Parallaxschrift exakt übereinanderliegen.
     // Wird nach dem Positionieren aufgerufen (load + resize).
     let meetingPoints = [];
+    let meetingPointNames = [];
     let meetingPointZoneOverrides = new Map();
     let isSnapping = false;
     let scrollEndTimer;
     let magnetAnimFrame = null;
 
     function calculateMeetingPoints() {
-        meetingPoints = [];
+        const _namedPoints = []; // { s, name, zone? }
         meetingPointZoneOverrides = new Map();
 
         // KONZEPT
@@ -508,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const anchorGap = getKonzeptAnchorGap();
             const anchorStart = getDocumentTop(alexImg) + alexImg.offsetHeight + getBoxAlexGap() - anchorGap - anchorHeight;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 100) meetingPoints.push(sMeet);
+            if (sMeet > 100) _namedPoints.push({ s: sMeet, name: 'KONZEPT' });
         }
 
         // RIVUS
@@ -526,12 +531,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Sicherstellen, dass Snap erst passiert wenn RIVUS-Filled noch sichtbar ist
                 meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
             }
+            meetY -= 24;
             const anchorHeight = gesichtenAnchorEl.offsetHeight;
             const anchorGap = getGesichtenAnchorGap();
             // _box2WrapperDocTop nutzen: fixed Wrapper → getDocumentTop() liefert 0
-            const anchorStart = _box2WrapperDocTop + 15 - anchorGap - anchorHeight;
+            const anchorStart = _box2WrapperDocTop + 50 - anchorGap - anchorHeight;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 100) meetingPoints.push(sMeet);
+            if (sMeet > 100) _namedPoints.push({ s: sMeet, name: 'RIVUS' });
         }
 
         // MYTHUS
@@ -540,21 +546,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const meetingRatio = getMeetingRatio();
             let meetY = window.innerHeight * meetingRatio - 75;
             if (window.innerWidth < BREAKPOINT_MOBILE) {
-                meetY = window.innerHeight * 0.80 - 200;
+                meetY = window.innerHeight * 0.80 - 220;
             } else if (window.innerHeight / window.innerWidth > 1.2) {
                 meetY += 60;
             } else {
                 meetY -= 8;
                 meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
             }
+            meetY -= 20;
             const anchorHeight = mythusAnchorEl.offsetHeight;
             const anchorGap = getKonzeptAnchorGap();
             const mobileAnchorOffset = window.innerWidth < BREAKPOINT_MOBILE ? 33 : 0;
             const anchorStart = getDocumentTop(document.getElementById('mythus-box-wrapper')) - anchorGap - anchorHeight + mobileAnchorOffset;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
             if (sMeet > 100) {
-                meetingPoints.push(sMeet);
-                meetingPointZoneOverrides.set(sMeet, { before: 500, after: 180 });
+                _namedPoints.push({ s: sMeet, name: 'MYTHUS', zone: { before: 500, after: 180 } });
             }
         }
 
@@ -563,59 +569,79 @@ document.addEventListener('DOMContentLoaded', function() {
         if (rivusAnchorEl) {
             const meetingRatio = getMeetingRatio();
             let meetY = window.innerHeight * meetingRatio;
-            if (window.innerHeight / window.innerWidth > 1.2 && window.innerWidth >= BREAKPOINT_MOBILE) {
+            if (window.innerWidth < BREAKPOINT_MOBILE) {
+                meetY = window.innerHeight * 0.70; // Mobile: 30% vom unteren Bildschirmrand
+            } else if (window.innerHeight / window.innerWidth > 1.2 && window.innerWidth >= BREAKPOINT_MOBILE) {
                 meetY += 80; // Portrait (Tablet): Treffpunkt 80px tiefer
             }
             const anchorHeight = rivusAnchorEl.offsetHeight;
             const anchorGap = getGesichtenAnchorGap();
-            const anchorStart = getDocumentTop(document.getElementById('gesichten-content-box-wrapper')) + 70 - anchorGap - anchorHeight;
+            const anchorStart = _gesichtenWrapperDocTop + 50 - anchorGap - anchorHeight;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 100) meetingPoints.push(sMeet);
+            const gesichtenZone = window.innerWidth < BREAKPOINT_MOBILE ? { before: 400 } : undefined;
+            if (sMeet > 100) _namedPoints.push({ s: sMeet, name: 'GESICHTEN', zone: gesichtenZone });
         }
 
         // MICHAEL (Non-Mobile): Snap so dass Bildmitte = Viewport-Mitte
-        if (window.innerWidth >= 601) {
+        // _michaelVisualDocTop wird in positionMichaelAndMarcus() mit style.top='0px' gemessen
+        // und ist daher unabhängig davon, ob das Element position:relative oder :absolute hat.
+        if (window.innerWidth >= 601 && _michaelVisualDocTop > 0) {
             const michaelEl = document.getElementById('michael-image-with-info');
             if (michaelEl) {
-                // position:relative → getDocumentTop gibt natural flow-Top ohne style.top
-                // Visueller Offset durch JS-positionierung (style.top) muss addiert werden
-                const naturalTop = getDocumentTop(michaelEl);
-                const styleTop = parseFloat(michaelEl.style.top || '0');
-                const michaelVisualDocTop = naturalTop + styleTop;
                 const michaelHeight = michaelEl.offsetHeight;
-                const sMichael = (michaelVisualDocTop + michaelHeight / 2 - window.innerHeight / 2) / (1 - BASE_UNTERPUNKT_SPEED);
+                const sMichael = (_michaelVisualDocTop + michaelHeight / 2 - window.innerHeight / 2) / (1 - BASE_UNTERPUNKT_SPEED);
                 if (sMichael > 100) {
-                    meetingPoints.push(sMichael);
                     const isDesktop = window.innerWidth >= 1025 && window.innerHeight / window.innerWidth <= 1.2;
-                    if (isDesktop) meetingPointZoneOverrides.set(sMichael, 600);
+                    _namedPoints.push({ s: sMichael, name: 'MICHAEL', zone: isDesktop ? 600 : undefined });
                 }
             }
         }
 
-        meetingPoints.sort((a, b) => a - b);
-        console.log('snapPoints:', meetingPoints.map(p => Math.round(p)));
+        _namedPoints.sort((a, b) => a.s - b.s);
+        meetingPoints = _namedPoints.map(p => p.s);
+        meetingPointNames = _namedPoints.map(p => p.name);
+        _namedPoints.forEach(p => { if (p.zone !== undefined) meetingPointZoneOverrides.set(p.s, p.zone); });
 
-        // Spacer-Höhe dynamisch setzen: letzter Snap-Punkt muss erreichbar sein
-        const spacer = document.getElementById('scroll-spacer');
-        if (spacer && meetingPoints.length > 0) {
-            const lastPoint = meetingPoints[meetingPoints.length - 1];
-            const needed = lastPoint;
-            const contentHeight = document.body.scrollHeight - spacer.offsetHeight;
-            spacer.style.height = Math.max(0, needed - contentHeight + window.innerHeight) + 'px';
-        }
-
-        // Copyright 80px unter Michael-Bildunterkante beim letzten Snap-Punkt
         const copyrightEl = document.getElementById('page-copyright');
+        const spacer = document.getElementById('scroll-spacer');
+
+        // 1. Copyright zurücksetzen für saubere Messung
+        if (copyrightEl) copyrightEl.style.marginTop = '0';
+        if (spacer) spacer.style.height = '0px';
+
+        // 2. Copyright-Position: beim MICHAEL-Snap sichtbar am unteren Viewport-Rand.
+        // Ziel-Viewport-Y: 80px unter Michaels Unterkante, maximal jedoch 20px über Viewport-Unterkante.
+        // So ist Copyright immer sichtbar wenn Michael einrastet, auch bei kleinen Viewports.
         const michaelElForCp = document.getElementById('michael-image-with-info');
-        if (copyrightEl && michaelElForCp && meetingPoints.length > 0) {
-            const lastSnap = meetingPoints[meetingPoints.length - 1];
+        let copyrightBottom = 0;
+        if (copyrightEl && michaelElForCp && meetingPoints.length > 0 && _michaelVisualDocTop > 0) {
             const michaelHeight = michaelElForCp.offsetHeight;
-            // Am letzten Snap-Punkt ist Michaels Mitte = Viewport-Mitte
-            const michaelBottomDocAtSnap = lastSnap + window.innerHeight / 2 + michaelHeight / 2;
-            const requiredDocTop = michaelBottomDocAtSnap + 80;
-            copyrightEl.style.marginTop = '0';
+            const lastSnap = meetingPoints[meetingPoints.length - 1];
+            const copyrightHeight = copyrightEl.offsetHeight;
+            const vh = window.innerHeight;
+            // Michaels Unterkante bei Snap: viewport Y = vh/2 + michaelH/2
+            const michaelBottomViewport = vh / 2 + michaelHeight / 2;
+            // Gewünschte Position: 80px unter Michaels Unterkante, aber nicht unterhalb des Viewports
+            const copyrightViewportY = Math.min(michaelBottomViewport + 80, vh - copyrightHeight - 8);
+            const requiredDocTop = lastSnap + copyrightViewportY;
             const baseDocTop = getDocumentTop(copyrightEl);
             copyrightEl.style.marginTop = Math.max(0, requiredDocTop - baseDocTop) + 'px';
+            copyrightBottom = Math.max(requiredDocTop, baseDocTop) + copyrightHeight;
+        }
+
+        // 3. Spacer: Seite muss bis zum letzten Snap UND bis unter das Copyright scrollbar sein
+        if (spacer && meetingPoints.length > 0) {
+            const lastSnap = meetingPoints[meetingPoints.length - 1];
+            let needed = Math.max(lastSnap, copyrightBottom > 0 ? copyrightBottom - window.innerHeight : 0);
+            // Mobile: GESICHTEN-Text scrollt über Michael-Position hinaus bis Copyright sichtbar
+            if (window.innerWidth < BREAKPOINT_MOBILE) {
+                const gesichtenBox = document.getElementById('gesichten-content-box-wrapper');
+                const gesichtenHeight = gesichtenBox ? gesichtenBox.offsetHeight : 0;
+                const meetY = window.innerHeight * 0.70;
+                needed = Math.max(needed, lastSnap + (meetY + gesichtenHeight) / (1 - BASE_PARALLAX_SPEED));
+            }
+            const contentHeight = document.body.scrollHeight; // spacer ist bereits 0
+            spacer.style.height = Math.max(0, needed - contentHeight + window.innerHeight) + 'px';
         }
     }
 
@@ -731,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.innerWidth < BREAKPOINT_MOBILE) {
             const benHeight = window.innerHeight * 0.80;
             const benBottom = box1LogicalBottom + UNTERPUNKT_BOX_GAP + benHeight;
-            const targetTop = benBottom + 40 - 200; // 200px höher
+            const targetTop = benBottom + 40 - 300; // 300px höher (150 + 150)
             const offset = targetTop - gesichtenBaseTop;
             gesichtenContainer.style.marginTop = `${offset}px`;
             return;
@@ -745,7 +771,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const naturalGap = gesichtenBaseTop - box1LogicalBottom;
-        const offset = minGap - naturalGap;
+        const offset = minGap - naturalGap - 190;
         gesichtenContainer.style.marginTop = `${offset}px`;
     }
 
@@ -773,7 +799,10 @@ document.addEventListener('DOMContentLoaded', function() {
         let offset = minGap - naturalGap - 20;
         const isPortrait = window.innerHeight / window.innerWidth > 1.2;
         const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
-        if (!isPortrait && !isMobile) offset -= 300;
+        if (!isPortrait && !isMobile) offset -= 510;
+        if (isMobile) offset += Math.round(window.innerHeight * 0.9);
+        if (isMobile) offset -= 450;
+        else offset -= 250;
         rivusContainer.style.marginTop = `${offset}px`;
     }
 
@@ -1053,8 +1082,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const isPortrait = window.innerHeight / window.innerWidth > 1.2;
         const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
-        const desktopOffset = (!isPortrait && !isMobile) ? -120 : 0;
+        const desktopOffset = (!isPortrait && !isMobile) ? -200 : 0;
         const imageTop = finalOffset + desktopOffset;
+        // naturalTop wurde mit style.top='0px' gemessen → sicher positions-unabhängig
+        _michaelVisualDocTop = michaelNaturalTop + imageTop;
         michaelContainer.style.top = `${imageTop}px`;
 
         // Container-Mindesthöhe: sicherstellen, dass Michael vollständig sichtbar ist
@@ -1112,8 +1143,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_rivusAnchor && _rivusFilled && _rivusContentBoxWrapper2) {
             _rivusAnchorHeight2 = _rivusAnchor.offsetHeight;
             _rivusAnchorGap2 = getGesichtenAnchorGap();
-            // Nur aus DOM messen wenn Wrapper zurückgesetzt (nach recalculateLayout-Reset).
-            // Bei afterSwitch()-Aufruf ist Wrapper fixed → getDocumentTop()=0 → vorherigen Wert behalten.
             if (_rivusContentBoxWrapper2.style.position !== 'fixed') {
                 _box2WrapperDocTop = getDocumentTop(_rivusContentBoxWrapper2);
             }
@@ -1140,7 +1169,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_gesichtenAnchorGray && _gesichtenAnchorFilled && _gesichtenContentBoxWrapper) {
             _gesichtenAnchorHeight2 = _gesichtenAnchorGray.offsetHeight;
             _gesichtenAnchorGap2 = getGesichtenAnchorGap();
-            _gesichtenWrapperDocTop = getDocumentTop(_gesichtenContentBoxWrapper);
+            if (_gesichtenContentBoxWrapper.style.position !== 'fixed') {
+                _gesichtenWrapperDocTop = getDocumentTop(_gesichtenContentBoxWrapper);
+            }
             _gesichtenAnchorLeft = _gesichtenAnchorFilled.getBoundingClientRect().left;
         }
 
@@ -1170,27 +1201,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Touch-Toggle für Bild-Info (nur Mobile)
-    document.querySelectorAll('#ben-image-with-info, #mythus-daniel-image-with-info, #michael-image-with-info, #marcus-image-with-info').forEach(container => {
+    // Tap-to-Toggle für Bild-Info (Mobile: alle Bilder inkl. Alex; Desktop: nur Klick)
+    const allInfoImages = document.querySelectorAll(
+        '.image-with-info, #ben-image-with-info, #mythus-daniel-image-with-info, #michael-image-with-info, #marcus-image-with-info'
+    );
+    allInfoImages.forEach(container => {
         container.addEventListener('click', function(e) {
-            if (window.innerWidth >= BREAKPOINT_MOBILE) return;
             const isActive = this.classList.contains('info-active');
+            // Alle anderen schließen
             document.querySelectorAll('.info-active').forEach(el => {
                 el.classList.remove('info-active');
-                el.style.zIndex = '';
             });
             if (!isActive) {
                 this.classList.add('info-active');
-                this.style.zIndex = '20';
             }
             e.stopPropagation();
         });
     });
+    // Tap außerhalb schließt Info
     document.addEventListener('click', () => {
-        if (window.innerWidth >= BREAKPOINT_MOBILE) return;
         document.querySelectorAll('.info-active').forEach(el => {
             el.classList.remove('info-active');
-            el.style.zIndex = '';
         });
     });
 
@@ -1212,64 +1243,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Wechselt Sprache/Level ohne Bildpositionen zu verschieben.
     // Kompensiert parent-Verschiebung durch DOM-Reflow direkt am style.top der Bilder.
-    function applyWithStableImages(switchFn) {
-        const imageIds = [
-            'ben-image-with-info',
-            'mythus-daniel-image-with-info',
-            'michael-image-with-info',
-        ];
-        const snapshots = imageIds.map(id => {
-            const el = document.getElementById(id);
-            const parent = el ? el.offsetParent : null;
-            return { el, beforeTop: parent ? getDocumentTop(parent) : 0 };
-        });
+    let _isSliding = false;
+    function slideTransition(applyFn) {
+        if (_isSliding) return;
+        _isSliding = true;
+        const overlay = document.getElementById('slide-overlay');
+        if (!overlay) {
+            applyFn();
+            recalculateLayout();
+            _isSliding = false;
+            return;
+        }
+        overlay.style.transform = 'translateX(0)';
+        overlay.addEventListener('transitionend', function onIn() {
+            overlay.removeEventListener('transitionend', onIn);
 
-        switchFn();
-        document.body.classList.add('no-image-transition');
-
-        // Bildpositionen kompensieren
-        snapshots.forEach(({ el, beforeTop }) => {
-            if (!el) return;
-            const parent = el.offsetParent;
-            const afterTop = parent ? getDocumentTop(parent) : 0;
-            const delta = afterTop - beforeTop;
-            if (delta !== 0) {
-                el.style.top = (parseFloat(el.style.top || '0') - delta) + 'px';
+            // Section-Name des nächsten Snaps vor dem Wechsel merken
+            const sBefore = window.scrollY;
+            let nearestSection = null;
+            let nearestIdx = -1, minDist = Infinity;
+            for (let i = 0; i < meetingPoints.length; i++) {
+                const d = Math.abs(sBefore - meetingPoints[i]);
+                if (d < minDist) { minDist = d; nearestIdx = i; nearestSection = meetingPointNames[i]; }
             }
-        });
 
-        requestAnimationFrame(() => document.body.classList.remove('no-image-transition'));
+            applyFn();
+            document.body.classList.add('no-image-transition');
+            recalculateLayout();
+
+            // Zum äquivalenten Snap im neuen Layout springen (unter Overlay, unsichtbar).
+            // Matching erfolgt per Section-Name (KONZEPT/RIVUS/MYTHUS/GESICHTEN/MICHAEL),
+            // damit Index-Verschiebungen durch wegfallende Snap-Punkte korrekt aufgefangen werden.
+            if (nearestIdx >= 0 && minDist <= 500 && meetingPoints.length > 0) {
+                const newSectionIdx = nearestSection ? meetingPointNames.indexOf(nearestSection) : -1;
+                const idx = newSectionIdx >= 0
+                    ? newSectionIdx
+                    : Math.min(nearestIdx, meetingPoints.length - 1);
+                const target = meetingPoints[idx];
+                cancelMagnetSnap();
+                clearTimeout(scrollEndTimer);
+                window.scrollTo({ top: target, behavior: 'instant' });
+                latestScroll = target;
+                applyParallaxEffect(target);
+                updateScene();
+            }
+
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                document.body.classList.remove('no-image-transition');
+                overlay.style.transform = 'translateX(-100%)';
+                overlay.addEventListener('transitionend', function onOut() {
+                    overlay.removeEventListener('transitionend', onOut);
+                    overlay.style.transition = 'none';
+                    overlay.style.transform = 'translateX(100%)';
+                    requestAnimationFrame(() => { overlay.style.transition = ''; });
+                    _isSliding = false;
+                }, { once: true });
+            }));
+        }, { once: true });
     }
 
-    function afterSwitch() {
-        document.body.classList.add('no-image-transition');
-
-        positionMythusBoxText();
-        positionBen();
-        positionMythusDaniel();
-        positionAnchors();
-
-        // GESICHTEN-Box-Höhe aktualisieren, dann Michael neu positionieren
-        const _gesichtenBoxEl = document.getElementById('gesichten-content-box');
-        if (_gesichtenBoxEl) _cachedRivusBoxHeight = _gesichtenBoxEl.offsetHeight;
-        positionMichaelAndMarcus();
-
-        calculateRivusAParallaxSpeed();
-        calculateMeetingPoints();
-
-        requestAnimationFrame(() => document.body.classList.remove('no-image-transition'));
-    }
-
-    let currentLocale = null;
+    const _localeUrls = { de: 'index.html', en: 'index-en.html', es: 'index-es.html' };
+    let currentLocale = document.documentElement.lang || 'de';
     localeBtns.forEach(btn => btn.addEventListener('click', () => {
         const locale = btn.dataset.locale;
         if (locale === currentLocale) return;
-        currentLocale = locale;
-        applyWithStableImages(() => { setLocale(locale); capTextRightBoundary(); });
-        requestAnimationFrame(() => afterSwitch());
+        if (_localeUrls[locale]) window.location.href = _localeUrls[locale];
     }));
-    setLocale(localStorage.getItem('locale') || 'de');
-    currentLocale = localStorage.getItem('locale') || 'de';
+    setLocale(currentLocale);
 
     // Sprachniveau-Toggle
     const langBtns = document.querySelectorAll('.lang-switch__btn');
@@ -1288,14 +1328,83 @@ document.addEventListener('DOMContentLoaded', function() {
             const lang = btn.dataset.lang;
             if (lang === currentLang) return;
             currentLang = lang;
-            applyWithStableImages(() => { setLanguage(lang); capTextRightBoundary(); });
-            requestAnimationFrame(() => afterSwitch());
+            slideTransition(() => { setLanguage(lang); capTextRightBoundary(); });
         });
     });
 
     // Gespeicherte Präferenz wiederherstellen (Standard: expert)
     setLanguage(localStorage.getItem('lang-level') || 'expert');
     currentLang = localStorage.getItem('lang-level') || 'expert';
+
+    // Mobile Dropdowns (Globus + Aa) — nur ≤480px sichtbar
+    const mobileLocaleTrigger = document.getElementById('mobile-locale-trigger');
+    const mobileLocaleMenu = document.getElementById('mobile-locale-menu');
+    const mobileLangTrigger = document.getElementById('mobile-lang-trigger');
+    const mobileLangMenu = document.getElementById('mobile-lang-menu');
+
+    function closeMobileDropdowns() {
+        if (mobileLocaleMenu) mobileLocaleMenu.classList.remove('open');
+        if (mobileLangMenu) mobileLangMenu.classList.remove('open');
+    }
+
+    function syncMobileActive() {
+        if (mobileLocaleMenu) {
+            mobileLocaleMenu.querySelectorAll('button[data-locale]').forEach(b =>
+                b.classList.toggle('active', b.dataset.locale === currentLocale));
+        }
+        if (mobileLangMenu) {
+            mobileLangMenu.querySelectorAll('button[data-lang]').forEach(b =>
+                b.classList.toggle('active', b.dataset.lang === currentLang));
+        }
+    }
+
+    if (mobileLocaleTrigger) {
+        mobileLocaleTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = mobileLocaleMenu.classList.contains('open');
+            closeMobileDropdowns();
+            if (!isOpen) mobileLocaleMenu.classList.add('open');
+        });
+    }
+
+    if (mobileLangTrigger) {
+        mobileLangTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = mobileLangMenu.classList.contains('open');
+            closeMobileDropdowns();
+            if (!isOpen) mobileLangMenu.classList.add('open');
+        });
+    }
+
+    if (mobileLocaleMenu) {
+        mobileLocaleMenu.addEventListener('click', (e) => e.stopPropagation());
+        mobileLocaleMenu.querySelectorAll('button[data-locale]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const locale = btn.dataset.locale;
+                closeMobileDropdowns();
+                if (locale !== currentLocale && _localeUrls[locale]) {
+                    window.location.href = _localeUrls[locale];
+                }
+            });
+        });
+    }
+
+    if (mobileLangMenu) {
+        mobileLangMenu.addEventListener('click', (e) => e.stopPropagation());
+        mobileLangMenu.querySelectorAll('button[data-lang]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.dataset.lang;
+                closeMobileDropdowns();
+                if (lang !== currentLang) {
+                    const existingBtn = document.querySelector(`.lang-switch__btn[data-lang="${lang}"]`);
+                    if (existingBtn) existingBtn.click();
+                }
+            });
+        });
+    }
+
+    document.addEventListener('click', closeMobileDropdowns);
+    syncMobileActive();
 
     // Mobile Navigation Toggle
     const navToggle = document.querySelector('.nav-toggle');
@@ -1385,6 +1494,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const _headerBackdrop = document.querySelector('.header-backdrop');
 
     // Cached anchor positioning data (computed in positionAnchors, used per frame)
+    let _michaelVisualDocTop = 0; // gesetzt in positionMichaelAndMarcus(), genutzt in calculateMeetingPoints()
     let _anchorsReady = false;
     let _alexDocTop = 0, _alexHeight = 0, _boxAlexGap = 0;
     let _konzeptAnchorHeight = 0, _konzeptAnchorGap = 0, _konzeptAnchorLeft = 0;
@@ -1499,8 +1609,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (windowWidth <= 480) {
             // Smallest mobile
-            startHeight = 63;
-            endHeight = 63; // No shrinking on smallest mobile
+            startHeight = 46;
+            endHeight = 46; // No shrinking on smallest mobile
             navHeight = 25;
             startTextSize = 34; // 20% smaller than 42px (42 × 0.8 = 33.6)
             endTextSize = 34;
@@ -1512,9 +1622,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const progress = Math.min(clampedScroll / maxScroll, 1);
             const newHeight = startHeight;
             const header = document.querySelector('header');
-            if (header) header.style.top = `${navHeight + introOffset}px`;
-            if (_heroSection) _heroSection.style.marginTop = `${navHeight + newHeight + introOffset}px`;
-            if (_headerBackdrop) _headerBackdrop.style.height = `${navHeight + newHeight}px`;
+            if (header) header.style.top = `${30 + introOffset}px`; // stripe-top (30px) + Intro-Offset
+            for (let i = 0; i < _headerLogos.length; i++) {
+                _headerLogos[i].style.height = `${startTextSize}px`;
+            }
+            if (_heroSection) _heroSection.style.marginTop = `${30 + newHeight + introOffset}px`;
+            if (_headerBackdrop) _headerBackdrop.style.height = `${30 + newHeight}px`;
             return;
         } else if (windowWidth <= 768) {
             // Tablet/mobile
@@ -1625,13 +1738,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const mythusTop  = _mythusBoxWrapper ? _mythusBoxWrapper.getBoundingClientRect().top : Infinity;
         const gesichtenTop = _gesichtenContentBoxWrapper ? _gesichtenContentBoxWrapper.getBoundingClientRect().top : Infinity;
 
-        const show = el => { if (el) el.style.opacity = '1'; };
-        const hide = el => { if (el) el.style.opacity = '0'; };
+        const show = el => { if (el) { el.style.opacity = '1'; el.style.zIndex = '20'; } };
+        const showBehind = el => { if (el) { el.style.opacity = '1'; } };
+        const hide = el => { if (el) { el.style.opacity = '0'; el.classList.remove('info-active'); el.style.zIndex = ''; } };
 
         if (gesichtenTop < imageFixedTop) {
-            hide(_benImage); hide(_mythusDaniel); hide(_michaelImage); show(_marcusImage);
+            hide(_benImage); hide(_mythusDaniel); showBehind(_michaelImage); hide(_marcusImage);
         } else if (mythusTop < imageFixedTop) {
-            hide(_benImage); hide(_mythusDaniel); show(_michaelImage); hide(_marcusImage);
+            hide(_benImage); hide(_mythusDaniel); showBehind(_michaelImage); hide(_marcusImage);
         } else if (_benImage && rivusTop < _benImage.getBoundingClientRect().top) {
             hide(_benImage); show(_mythusDaniel); hide(_michaelImage); hide(_marcusImage);
         } else if (konzeptTop < imageFixedTop) {
@@ -1672,7 +1786,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Content box 1 - horizontaler Offset auf Box, Vertikalposition via transform auf Wrapper
         if (_contentBox) {
-            _contentBox.style.transform = 'translate3d(20%, 0, 0)';
+            _contentBox.style.transform = isMobile ? '' : 'translate3d(20%, 0, 0)';
         }
         if (_anchorsReady && _contentBoxWrapper) {
             const boxTop = _alexDocTop + _alexHeight - scrollY * (1 - BASE_PARALLAX_SPEED) + _boxAlexGap;
@@ -1691,14 +1805,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // RIVUS Anchor – folgt RIVUS Box 2 Wrapper
             if (_rivusAnchor) {
                 const wrapperVisualTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
-                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 15;
+                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28;
                 _rivusAnchor.style.transform = `translate3d(${_rivusAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
 
             // MYTHUS Anchor – folgt MYTHUS Box Wrapper
             if (_mythusAnchor) {
                 const wrapperVisualTop = _mythusWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
-                const mobileOffset = window.innerWidth < BREAKPOINT_MOBILE ? 38 : 0;
+                const mobileOffset = window.innerWidth < BREAKPOINT_MOBILE ? 17 : 0;
                 const anchorTop = wrapperVisualTop - _mythusAnchorHeight2 - _mythusAnchorGap2 + mobileOffset;
                 _mythusAnchor.style.transform = `translate3d(${_mythusAnchorLeft}px, ${anchorTop}px, 0) rotate(4deg)`;
             }
@@ -1706,7 +1820,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // GESICHTEN Anchor – folgt GESICHTEN Box Wrapper
             if (_gesichtenAnchorGray) {
                 const wrapperVisualTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
-                const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 70;
+                const mobileAnchorOffset = isMobile ? 4 : 0;
+                const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 28 + mobileAnchorOffset;
                 _gesichtenAnchorGray.style.transform = `translate3d(${_gesichtenAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
         }
@@ -1731,10 +1846,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // MYTHUS filled & outline
         if (_mythusFilled) {
-            _mythusFilled.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed}px, 0) rotate(2deg)`;
+            _mythusFilled.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8}px, 0) rotate(2deg)`;
         }
         if (_mythusOutline) {
-            _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed}px, 0) rotate(2deg)`;
+            _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8}px, 0) rotate(2deg)`;
         }
 
         // RIVUS content box (links) - position:fixed wie KONZEPT, Transform: docTop - scrollY*(1-speed)
@@ -1748,14 +1863,15 @@ document.addEventListener('DOMContentLoaded', function() {
             _rivusContentBox2.style.transform = `translate3d(${totalXOffset}px, 0, 0)`;
         }
 
-        // GESICHTEN content box - vertikal auf Wrapper, horizontal auf Box
-        if (_gesichtenContentBoxWrapper) {
-            _gesichtenContentBoxWrapper.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED}px, 0)`;
+        // GESICHTEN content box - position:fixed wie RIVUS, transform analog zu _box2WrapperDocTop
+        if (_anchorsReady && _gesichtenContentBoxWrapper) {
+            const mobileGesichtenOffset = isMobile ? 46 : 0;
+            const gesichtenTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mobileGesichtenOffset;
+            _gesichtenContentBoxWrapper.style.transform = `translate3d(0, ${gesichtenTop}px, 0)`;
         }
         if (_gesichtenContentBox) {
-            const totalXOffset = window.innerWidth * 0.2;
             const isPortrait = window.innerHeight / window.innerWidth > 1.2;
-            const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
+            const totalXOffset = (isMobile || isPortrait) ? 0 : window.innerWidth * 0.2;
             const yOffset = (!isPortrait && !isMobile) ? 50 : 0;
             _gesichtenContentBox.style.transform = `translate3d(${totalXOffset}px, ${yOffset}px, 0)`;
         }
@@ -1769,11 +1885,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // GESICHTEN filled & outline
+        const gesichtenFilledOffset = isMobile ? -26 : 0;
         if (_gesichtenAnchorFilled) {
-            _gesichtenAnchorFilled.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed}px, 0) rotate(-2deg)`;
+            _gesichtenAnchorFilled.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset}px, 0) rotate(-2deg)`;
         }
         if (_gesichtenAnchorOutline) {
-            _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed}px, 0) rotate(-2deg)`;
+            _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset}px, 0) rotate(-2deg)`;
         }
 
         // Text-Layer
@@ -1867,6 +1984,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         _resetFixedWrapper(_contentBoxWrapper);
         _resetFixedWrapper(_rivusContentBoxWrapper2);
+        _resetFixedWrapper(_gesichtenContentBoxWrapper);
 
         // Box-Höhen neu messen (orientierungsabhängig)
         const _box2El = document.getElementById('rivus-content-box');
@@ -1898,10 +2016,18 @@ document.addEventListener('DOMContentLoaded', function() {
         positionRivusAndBox3();
         positionMichaelAndMarcus();
         calculateMichaelMobileParallaxSpeed();
-        if (_gesichtenContentBoxWrapper) _gesichtenWrapperDocTop = getDocumentTop(_gesichtenContentBoxWrapper);
+        if (_gesichtenContentBoxWrapper) {
+            _gesichtenWrapperDocTop = getDocumentTop(_gesichtenContentBoxWrapper);
+            _gesichtenContentBoxWrapper.style.position = 'fixed';
+            _gesichtenContentBoxWrapper.style.top = '0';
+            _gesichtenContentBoxWrapper.style.left = '0';
+            _gesichtenContentBoxWrapper.style.width = '100%';
+            _gesichtenContentBoxWrapper.style.marginTop = '0';
+        }
         applyParallaxEffect(window.scrollY); // Anchors mit korrekten DocTops aktualisieren
         calculateRivusAParallaxSpeed();
         calculateMeetingPoints();
+        updateScene(); // faded-out nach korrekter Positionierung neu auswerten
     }
 
     // =============== BEN STAIRCASE: iPad Portrait Split ===============
