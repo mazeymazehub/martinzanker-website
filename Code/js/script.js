@@ -940,6 +940,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const headerEl = document.querySelector('header');
             const topPos = headerEl ? headerEl.offsetHeight + 15 : 50;
             benContainer.style.top = `${topPos}px`;
+            const overlay = document.getElementById('ben-stair-overlay');
+            if (overlay) {
+                overlay.style.top = `${topPos}px`;
+                const imgEl = benContainer.querySelector('.unterpunkt-heading-image');
+                if (imgEl) overlay.style.height = imgEl.offsetHeight + 'px';
+            }
             return;
         }
 
@@ -1207,22 +1213,34 @@ document.addEventListener('DOMContentLoaded', function() {
     );
     const _stairGhost = document.getElementById('stair-ghost');
     let _ghostFadeTimer = null;
+    let _ghostClearTimer = null;
     function deactivateStairGhost() {
         if (!_stairGhost) return;
-        _stairGhost.style.opacity = '0';
         clearTimeout(_ghostFadeTimer);
-        _ghostFadeTimer = setTimeout(() => { _stairGhost.innerHTML = ''; }, 380);
+        clearTimeout(_ghostClearTimer);
+        _stairGhost.querySelectorAll('.words-stair__line p').forEach(p => {
+            p.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            p.style.opacity    = '0';
+            p.style.transform  = 'translate3d(0,-84px,0)';
+        });
+        _stairGhost.style.transition = '';
+        _ghostFadeTimer = setTimeout(() => {
+            _stairGhost.style.opacity = '0';
+            _ghostClearTimer = setTimeout(() => { _stairGhost.innerHTML = ''; }, 380);
+        }, 700);
     }
     function activateStairGhost(container) {
         const stair = container.querySelector('.words-stair');
         if (!stair || !_stairGhost) return;
         clearTimeout(_ghostFadeTimer);
+        clearTimeout(_ghostClearTimer);
         const r = stair.getBoundingClientRect();
         const clone = stair.cloneNode(true);
         clone.style.margin = '0';
         const srcLines = stair.querySelectorAll('.words-stair__line');
         const dstLines = clone.querySelectorAll('.words-stair__line');
         const isDark = document.body.classList.contains('dark-mode');
+        const animTargets = [];
         srcLines.forEach((line, i) => {
             const cs = window.getComputedStyle(line);
             dstLines[i].style.display   = cs.display;
@@ -1232,11 +1250,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const dstPs = dstLines[i].querySelectorAll('p');
             srcPs.forEach((p, j) => {
                 const cp = window.getComputedStyle(p);
-                dstPs[j].style.opacity    = '1';
-                dstPs[j].style.transform  = 'translate3d(0,-42px,0)';
+                dstPs[j].style.opacity    = '0';
+                dstPs[j].style.transform  = 'translate3d(0,42px,0)';
                 dstPs[j].style.color      = isDark ? '#E9E9E4' : cp.color;
                 dstPs[j].style.fontSize   = (parseFloat(cp.fontSize) * 0.9) + 'px';
                 dstPs[j].style.transition = 'none';
+                animTargets.push({ el: dstPs[j], delay: 0 });
             });
         });
         _stairGhost.innerHTML = '';
@@ -1244,10 +1263,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const isAlex   = !!container.closest('.main-heading-container');
         const isDaniel = container.id === 'mythus-daniel-image-with-info';
         const leftOffset = isAlex ? -10 : isDaniel ? 50 : 0;
-        _stairGhost.style.top   = (r.top + 10) + 'px';
-        _stairGhost.style.left  = (r.left + leftOffset) + 'px';
-        _stairGhost.style.width = r.width + 'px';
-        requestAnimationFrame(() => { _stairGhost.style.opacity = '1'; });
+        _stairGhost.style.top        = (r.top + 10) + 'px';
+        _stairGhost.style.left       = (r.left + leftOffset) + 'px';
+        _stairGhost.style.width      = r.width + 'px';
+        _stairGhost.style.transition = 'none';
+        _stairGhost.style.opacity    = '1';
+        void _stairGhost.offsetHeight;
+        animTargets.forEach(({ el, delay }) => {
+            el.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+            el.style.opacity    = '1';
+            el.style.transform  = 'translate3d(0,-42px,0)';
+        });
     }
     function clearInfoOverlay(el) {
         deactivateStairGhost();
@@ -1567,6 +1593,20 @@ document.addEventListener('DOMContentLoaded', function() {
         _mythusFilled
     ];
 
+    // Mobile RIVUS: Treppentext-Overlay außerhalb des Bild-Stacking-Contexts
+    function initBenStairOverlay() {
+        if (window.innerWidth >= BREAKPOINT_MOBILE) return;
+        if (document.getElementById('ben-stair-overlay')) return;
+        const imgInfo = _benImage ? _benImage.querySelector('.image-info') : null;
+        const stairSrc = imgInfo ? imgInfo.querySelector('.words-stair') : null;
+        if (!stairSrc) return;
+        const overlay = document.createElement('div');
+        overlay.id = 'ben-stair-overlay';
+        overlay.appendChild(stairSrc.cloneNode(true));
+        document.body.appendChild(overlay);
+    }
+    initBenStairOverlay();
+
     // Initial update
     updateScene();
 
@@ -1795,9 +1835,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const mythusTop  = _mythusBoxWrapper ? _mythusBoxWrapper.getBoundingClientRect().top : Infinity;
         const gesichtenTop = _gesichtenContentBoxWrapper ? _gesichtenContentBoxWrapper.getBoundingClientRect().top : Infinity;
 
-        const show = el => { if (el) { el.style.opacity = '1'; el.style.zIndex = '8'; el.style.pointerEvents = 'auto'; } };
+        const _benOverlay = document.getElementById('ben-stair-overlay');
+        const show = el => {
+            if (el) { el.style.opacity = '1'; el.style.zIndex = '0'; el.style.pointerEvents = 'auto'; }
+            if (el === _benImage && _benOverlay) _benOverlay.style.opacity = '1';
+        };
         const showBehind = el => { if (el) { el.style.opacity = '1'; el.style.zIndex = ''; el.style.pointerEvents = 'auto'; } };
-        const hide = el => { if (el) { el.style.opacity = '0'; clearInfoOverlay(el); el.style.zIndex = ''; el.style.pointerEvents = 'none'; } };
+        const hide = el => {
+            if (el) { el.style.opacity = '0'; clearInfoOverlay(el); el.style.zIndex = ''; el.style.pointerEvents = 'none'; }
+            if (el === _benImage && _benOverlay) _benOverlay.style.opacity = '0';
+        };
 
         if (gesichtenTop < imageFixedTop) {
             hide(_benImage); hide(_mythusDaniel); showBehind(_michaelImage); hide(_marcusImage);

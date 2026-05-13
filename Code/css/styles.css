@@ -1144,7 +1144,7 @@ section {
         left: auto;
     }
 
-    /* Textboxen über Bilder (Daniel, Ben) — kein pointer-events, damit Hover/Tap auf Bild durchfällt */
+    /* Wrapper-Container transparent — pointer-events werden über .content-box/.content-box-2 geregelt */
     .content-box-wrapper,
     .content-box-wrapper-2,
     #mythus-box-wrapper,
@@ -1195,7 +1195,46 @@ section {
         z-index: 15;
     }
 
+    /* RIVUS: Bild+Gradient(0) < Anchor(2) < Filled(3) < Outline(15) < StairOverlay(20) < Ghost(21) */
+    .rivus-anchor-gray   { z-index: 2; }
+    .rivus-anchor-filled { z-index: 3; }
 
+    /* Original-Treppentext im Bild-Container verstecken (Gradient bleibt sichtbar) */
+    #ben-image-with-info .words-stair { visibility: hidden; }
+
+    /* Ben-Treppentext-Overlay: eigener Stacking-Context im Root, über allen Anchor-Schriften */
+    #ben-stair-overlay {
+        position: fixed;
+        z-index: 20;
+        left: 20px;
+        width: calc(100vw - 40px);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 14px 16px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    /* Anchor-Container transparent, aber sichtbare Kindelemente blockieren Taps */
+    #rivus-anchor-container,
+    #mythus-anchor-container,
+    #gesichten-anchor-container { pointer-events: none; }
+
+    .rivus-anchor-gray,
+    .rivus-anchor-filled,
+    .rivus-anchor-outline,
+    .konzept-heading-filled,
+    .konzept-heading-outline,
+    .gesichten-anchor-gray,
+    .gesichten-anchor-filled,
+    .gesichten-anchor-outline { pointer-events: auto; }
+
+    /* Content-Boxen blockieren Taps auf verdeckten Bildbereichen (Wrapper bleibt transparent) */
+    .content-box,
+    .content-box-2 { pointer-events: auto; }
 
     /* RIVUS-Schriften tiefer auf Mobile */
     #rivus-anchor-container .rivus-anchor-filled,
