@@ -6,7 +6,9 @@ Dieses Dokument beschreibt die technische Logik der Landing-Page (`index.html`).
 
 ## ⚠️ GESPERRTE BEREICHE — NICHT ANFASSEN
 
-**Mobile-Styles sind eingefroren** und dürfen nur mit ausdrücklicher Freigabe durch den Nutzer geändert werden.
+### Mobile (EINGEFROREN — Stand: Mai 2026)
+
+**Die Mobile-Version ist abgeschlossen und darf NICHT verändert werden**, außer der Nutzer weist explizit darauf hin.
 
 Gesperrte CSS-Blöcke:
 - `@media (max-width: 600px)` — vollständig gesperrt
@@ -15,8 +17,11 @@ Gesperrte CSS-Blöcke:
 
 Gesperrte JS-Bereiche:
 - Alle Zweige, die auf `window.innerWidth < BREAKPOINT_MOBILE` oder `window.innerWidth <= 600` prüfen (Mobile-spezifische Logik)
+- `initBenStairOverlay()` und der `#ben-stair-overlay`-Mechanismus
+- `updateMobileImageVisibility()` und alle show/hide/showBehind-Funktionen darin
 
-**Achtung bei Desktop-/Global-Änderungen:**  
+### Achtung bei Desktop-/Global-Änderungen
+
 Globale CSS-Regeln (außerhalb jeder `@media`-Query) und JS-Funktionen ohne Breakpoint-Check wirken auf alle Bildschirmgrößen. Bei jeder Änderung dort prüfen, ob sie unbeabsichtigt auf Mobile durchschlägt — und wenn ja, mit dem Nutzer klären, bevor etwas geändert wird.
 
 ---
