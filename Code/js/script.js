@@ -875,6 +875,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const gesichtenBox = document.getElementById('gesichten-content-box-wrapper');
                 const gesH = gesichtenBox ? gesichtenBox.offsetHeight : 0;
                 needed = (_gesichtenWrapperDocTop + 46 - 1500 + gesH) / (1 - BASE_PARALLAX_SPEED) + 120;
+                // Michael (Unterpunkt-Bild, Speed 0,5) liegt unter der GESICHTEN-Box und würde bei
+                // niedriger Fensterhöhe (z. B. MacBook 11") unten abgeschnitten. Ende mindestens so,
+                // dass seine visuelle Unterkante (_michaelVisualDocTop + mh − s·0,5) bei der aktuellen
+                // Fensterhöhe mit kleinem Rand sichtbar ist.
+                const michaelEl = document.getElementById('michael-image-with-info');
+                if (michaelEl && _michaelVisualDocTop > 0) {
+                    const mh = michaelEl.offsetHeight;
+                    const michaelEnd = (_michaelVisualDocTop + mh - window.innerHeight + 40) / (1 - BASE_UNTERPUNKT_SPEED);
+                    needed = Math.max(needed, michaelEnd);
+                }
                 vhRef = window.innerHeight;
             } else if (window.innerWidth < BREAKPOINT_MOBILE) {
                 // Mobile (Touch): GESICHTEN-Text scrollt über die Michael-Position hinaus
@@ -2773,12 +2783,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isDark) {
             document.body.classList.add('dark-mode');
             document.documentElement.classList.add('dark-mode');
-            if (themeColorMeta) themeColorMeta.setAttribute('content', '#1a1a1a');
+            if (themeColorMeta) themeColorMeta.setAttribute('content', '#1a1a1a'); // dunkle Rahmenfarbe
             if (themeSwitch) themeSwitch.checked = true;
         } else {
             document.body.classList.remove('dark-mode');
             document.documentElement.classList.remove('dark-mode');
-            if (themeColorMeta) themeColorMeta.setAttribute('content', '#E9E9E4');
+            if (themeColorMeta) themeColorMeta.setAttribute('content', '#ff6633'); // orange Rahmenfarbe
             if (themeSwitch) themeSwitch.checked = false;
         }
     };

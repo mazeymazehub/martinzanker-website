@@ -75,9 +75,30 @@
         }
     }
 
+    // Inline-Styles, die der Schmalmodus auf die Bilder schreibt, beim Wechsel auf
+    // breitere Fenster wieder entfernen — sonst bleibt das gerade ausgeblendete/
+    // weggeclippte Bild (z. B. Daniel) mit opacity:0 oder clip-path versteckt hängen.
+    let _narrowActive = false;
+    function clearInline(el) {
+        if (!el) return;
+        el.style.opacity       = '';
+        el.style.clipPath      = '';
+        el.style.zIndex        = '';
+        el.style.pointerEvents = '';
+        el.style.transition    = '';
+    }
+    function resetWideMode() {
+        const el = refs();
+        [el.ben, el.daniel, el.michael, el.marcus, el.benOverlay].forEach(clearInline);
+    }
+
     // ── Haupt-Update ───────────────────────────────────────────────────────────
     function update() {
-        if (window.innerWidth >= BP) return;
+        if (window.innerWidth >= BP) {
+            if (_narrowActive) { resetWideMode(); _narrowActive = false; }
+            return;
+        }
+        _narrowActive = true;
 
         const el = refs();
         const benR = el.ben ? el.ben.getBoundingClientRect() : null;
