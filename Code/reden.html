@@ -13,6 +13,7 @@
             align-items: flex-start;
             padding-top: 73px;
             padding-bottom: 0;
+            min-height: 548px;
             overflow: visible;
             position: relative;
             z-index: 2;
@@ -108,7 +109,7 @@
 
         .speech-item {
             display: flex;
-            align-items: baseline;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 24px;
             padding: 20px 0;
@@ -149,12 +150,15 @@
 
         .speech-download {
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .speech-download a {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             color: #333333;
             text-decoration: none;
             font-family: 'Inter', sans-serif;
@@ -163,6 +167,7 @@
             border: 1.5px solid #333333;
             padding: 6px 14px;
             transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap;
         }
 
         .speech-download a:hover {
@@ -170,8 +175,14 @@
             color: var(--color-gray);
         }
 
-        .speech-download a::before {
-            content: '↓';
+        .speech-download a svg {
+            width: 22px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .speech-download a .flag-de {
+            transform: scaleY(-1);
         }
 
         /* ---- Dark Mode ---- */
@@ -213,12 +224,15 @@
             color: #666666;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 639px) {
             .reden-heading-container {
                 left: 0;
             }
+            .reden-heading-section {
+                min-height: 398px;
+            }
             .reden-box-section {
-                margin-top: -270px;
+                margin-top: -240px;
             }
         }
     </style>
@@ -316,9 +330,9 @@
                         <p class="speech-location" data-de="Laudatio · Städtische Galerie im Theater, Kunstverein Ingolstadt" data-en="Laudatio · Städtische Galerie im Theater, Kunstverein Ingolstadt" data-es="Laudatio · Städtische Galerie im Theater, Kunstverein Ingolstadt">Laudatio · Städtische Galerie im Theater, Kunstverein Ingolstadt</p>
                     </div>
                     <div class="speech-download">
-                        <a class="locale-de active" href="pdf/stanke-etwas-spielraum-2023.pdf" download>PDF</a>
-                        <a class="locale-en" href="pdf/stanke-etwas-spielraum-2023-en.pdf" download>PDF</a>
-                        <a class="locale-es" href="pdf/stanke-etwas-spielraum-2023-es.pdf" download>PDF</a>
+                        <a href="pdf/stanke-etwas-spielraum-2023.pdf" download><svg class="flag-de" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3"><rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/><rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/><rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/></svg> ↓ PDF</a>
+                        <a href="pdf/stanke-etwas-spielraum-2023-en.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect width="60" height="30" fill="currentColor" opacity="0.4"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/><rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/><rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/><rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/><rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/></svg> ↓ PDF</a>
+                        <a href="pdf/stanke-etwas-spielraum-2023-es.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/><rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/><rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/></svg> ↓ PDF</a>
                     </div>
                 </div>
 
@@ -329,9 +343,9 @@
                         <p class="speech-location" data-de="Laudatio · Neue Galerie, Kunstverein Erlangen" data-en="Laudatio · Neue Galerie, Kunstverein Erlangen" data-es="Laudatio · Neue Galerie, Kunstverein Erlangen">Laudatio · Neue Galerie, Kunstverein Erlangen</p>
                     </div>
                     <div class="speech-download">
-                        <a class="locale-de active" href="pdf/stanke-gut-gemacht-2023.pdf" download>PDF</a>
-                        <a class="locale-en" href="pdf/stanke-gut-gemacht-2023-en.pdf" download>PDF</a>
-                        <a class="locale-es" href="pdf/stanke-gut-gemacht-2023-es.pdf" download>PDF</a>
+                        <a href="pdf/stanke-gut-gemacht-2023.pdf" download><svg class="flag-de" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3"><rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/><rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/><rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/></svg> ↓ PDF</a>
+                        <a href="pdf/stanke-gut-gemacht-2023-en.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect width="60" height="30" fill="currentColor" opacity="0.4"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/><rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/><rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/><rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/><rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/></svg> ↓ PDF</a>
+                        <a href="pdf/stanke-gut-gemacht-2023-es.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/><rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/><rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/></svg> ↓ PDF</a>
                     </div>
                 </div>
 
@@ -342,9 +356,9 @@
                         <p class="speech-location" data-de="Laudatio · Eichenmüllerhaus, Kunstverein Lemgo" data-en="Laudatio · Eichenmüllerhaus, Kunstverein Lemgo" data-es="Laudatio · Eichenmüllerhaus, Kunstverein Lemgo">Laudatio · Eichenmüllerhaus, Kunstverein Lemgo</p>
                     </div>
                     <div class="speech-download">
-                        <a class="locale-de active" href="pdf/stanke-ungefaehrlich-2022.pdf" download>PDF</a>
-                        <a class="locale-en" href="pdf/stanke-ungefaehrlich-2022-en.pdf" download>PDF</a>
-                        <a class="locale-es" href="pdf/stanke-ungefaehrlich-2022-es.pdf" download>PDF</a>
+                        <a href="pdf/stanke-ungefaehrlich-2022.pdf" download><svg class="flag-de" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3"><rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/><rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/><rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/></svg> ↓ PDF</a>
+                        <a href="pdf/stanke-ungefaehrlich-2022-en.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect width="60" height="30" fill="currentColor" opacity="0.4"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/><rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/><rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/><rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/><rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/></svg> ↓ PDF</a>
+                        <a href="pdf/stanke-ungefaehrlich-2022-es.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/><rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/><rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/></svg> ↓ PDF</a>
                     </div>
                 </div>
 
@@ -355,9 +369,9 @@
                         <p class="speech-location" data-de="Laudatio · Kohlenhof Kunstverein Nürnberg" data-en="Laudatio · Kohlenhof Kunstverein Nürnberg" data-es="Laudatio · Kohlenhof Kunstverein Nürnberg">Laudatio · Kohlenhof Kunstverein Nürnberg</p>
                     </div>
                     <div class="speech-download">
-                        <a class="locale-de active" href="pdf/stanke-marcoland-2018.pdf" download>PDF</a>
-                        <a class="locale-en" href="pdf/stanke-marcoland-2018-en.pdf" download>PDF</a>
-                        <a class="locale-es" href="pdf/stanke-marcoland-2018-es.pdf" download>PDF</a>
+                        <a href="pdf/stanke-marcoland-2018.pdf" download><svg class="flag-de" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3"><rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/><rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/><rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/></svg> ↓ PDF</a>
+                        <a href="pdf/stanke-marcoland-2018-en.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect width="60" height="30" fill="currentColor" opacity="0.4"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/><rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/><rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/><rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/><rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/></svg> ↓ PDF</a>
+                        <a href="pdf/stanke-marcoland-2018-es.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/><rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/><rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/></svg> ↓ PDF</a>
                     </div>
                 </div>
 
@@ -368,9 +382,9 @@
                         <p class="speech-location" data-de="Lesung · Lost Weekend, München" data-en="Reading · Lost Weekend, Munich" data-es="Lectura · Lost Weekend, Múnich">Lesung · Lost Weekend, München</p>
                     </div>
                     <div class="speech-download">
-                        <a class="locale-de active" href="pdf/katzengras-2018.pdf" download>PDF</a>
-                        <a class="locale-en" href="pdf/katzengras-2018-en.pdf" download>PDF</a>
-                        <a class="locale-es" href="pdf/katzengras-2018-es.pdf" download>PDF</a>
+                        <a href="pdf/katzengras-2018.pdf" download><svg class="flag-de" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3"><rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/><rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/><rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/></svg> ↓ PDF</a>
+                        <a href="pdf/katzengras-2018-en.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect width="60" height="30" fill="currentColor" opacity="0.4"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/><rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/><rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/><rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/><rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/></svg> ↓ PDF</a>
+                        <a href="pdf/katzengras-2018-es.pdf" download><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/><rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/><rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/></svg> ↓ PDF</a>
                     </div>
                 </div>
 

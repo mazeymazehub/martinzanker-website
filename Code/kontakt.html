@@ -13,6 +13,7 @@
             align-items: flex-start;
             padding-top: 73px;
             padding-bottom: 0;
+            min-height: 548px;
             overflow: visible;
             position: relative;
             z-index: 2;
@@ -195,6 +196,18 @@
         body.dark-mode .kontakt-content-box {
             background-color: #1a1a1a;
         }
+
+        @media (max-width: 639px) {
+            .kontakt-heading-container {
+                left: 0;
+            }
+            .kontakt-heading-section {
+                min-height: 398px;
+            }
+            .kontakt-box-section {
+                margin-top: -240px;
+            }
+        }
     </style>
 </head>
 <body class="sub-page">
@@ -286,20 +299,17 @@
             <div class="locale-de active">
                 <h2>Kontaktinformationen</h2>
                 <p><strong>E-Mail:</strong> <a href="mailto:mail@martinzanker.com">mail@martinzanker.com</a></p>
-                <p><strong>Atelier:</strong> Anglerstraße 28, 80339 München</p>
-                <p><strong>Öffnungszeiten:</strong> Nach Vereinbarung</p>
+                <p><strong>Atelierbesuch:</strong> Nach Vereinbarung</p>
             </div>
             <div class="locale-en">
                 <h2>Contact Information</h2>
                 <p><strong>E-Mail:</strong> <a href="mailto:mail@martinzanker.com">mail@martinzanker.com</a></p>
-                <p><strong>Studio:</strong> Anglerstraße 28, 80339 Munich</p>
-                <p><strong>Opening Hours:</strong> By appointment</p>
+                <p><strong>Studio Visit:</strong> By appointment</p>
             </div>
             <div class="locale-es">
                 <h2>Información de contacto</h2>
                 <p><strong>E-Mail:</strong> <a href="mailto:mail@martinzanker.com">mail@martinzanker.com</a></p>
-                <p><strong>Estudio:</strong> Anglerstraße 28, 80339 Múnich</p>
-                <p><strong>Horario:</strong> Con cita previa</p>
+                <p><strong>Visita al estudio:</strong> Con cita previa</p>
             </div>
 
             <!-- Kontaktformular -->

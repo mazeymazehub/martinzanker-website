@@ -73,7 +73,7 @@ Diese durch echte Bilder ersetzen:
 ```
 
 ### Farben anpassen
-Die Hauptfarbe ist `#333366` (Dunkelblau). Um sie zu ändern, suche und ersetze alle Vorkommen in [css/styles.css](css/styles.css).
+Die Farben sind als CSS-Variablen in `:root` in [css/styles.css](css/styles.css) definiert: `--color-primary` (#ff6633, Orange), `--color-dark` (#333333), `--color-light` (#E9E9E4).
 
 ### Kontaktdaten
 Aktualisiere die Platzhalter in:

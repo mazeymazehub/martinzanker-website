@@ -5,6 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Werke - Martin Zanker</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ---- Werke Heading (gestapelt, wie die anderen Subseiten) ---- */
+        .werke-heading-section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 73px;
+            padding-bottom: 0;
+            min-height: 320px;
+            overflow: visible;
+            position: relative;
+            z-index: 2;
+        }
+
+        .werke-outline-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 73px;
+            overflow: visible;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .werke-heading-container {
+            position: relative;
+            left: 0;
+            display: grid;
+            place-items: center;
+        }
+
+        .werke-heading {
+            font-family: 'Inter', sans-serif;
+            font-size: var(--font-size-heading-large);
+            font-weight: 850;
+            letter-spacing: -0.08em;
+            text-transform: uppercase;
+            margin: 0;
+            grid-column: 1;
+            grid-row: 1;
+            white-space: nowrap;
+            position: relative;
+            transform: rotate(-2deg);
+        }
+
+        .werke-heading-anchor {
+            color: var(--color-gray);
+            transform: rotate(-3deg) translate(-5px, 6px);
+            z-index: 0;
+        }
+
+        .werke-heading-filled {
+            color: #333333;
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .werke-heading-outline {
+            color: transparent;
+            -webkit-text-stroke: 2px #333333;
+            text-stroke: 2px #333333;
+            z-index: 4;
+        }
+
+        /* ---- Galerie ---- */
+        .werke-gallery-section {
+            position: relative;
+            z-index: 1;
+            padding: 0 var(--spacing-container) clamp(60px, 10vh, 120px);
+            margin-top: 10px;
+        }
+
+        .werke-grid {
+            display: grid;
+            grid-template-columns: 1fr;               /* Mobile: untereinander */
+            gap: clamp(16px, 2.5vw, 32px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Spaltenzahl je nach Breite: 2 / 3 / 4 */
+        @media (min-width: 641px)  { .werke-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 960px)  { .werke-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1300px) { .werke-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        /* Bild füllt seine Zelle, einheitliches Hochformat */
+        .werke-grid .image-with-info {
+            display: block;
+            width: 100%;
+        }
+        .werke-grid .unterpunkt-heading-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+        }
+
+        /* Treppentext darf links/oben über die Zelle hinausragen (wie auf der Landingpage) */
+        .werke-grid .image-info {
+            overflow: visible;
+        }
+        .werke-grid .words-stair {
+            margin-left: -32px;
+            margin-bottom: 24px;
+        }
+        body.dark-mode .werke-grid .words-stair__line p {
+            color: #E9E9E4;
+        }
+
+        /* ---- Dark Mode Heading ---- */
+        body.dark-mode .werke-heading-filled {
+            color: #ff6633;
+        }
+        body.dark-mode .werke-heading-outline {
+            -webkit-text-stroke-color: #ff6633;
+            text-stroke-color: #ff6633;
+        }
+        body.dark-mode .werke-heading-anchor {
+            color: #1a1a1a;
+        }
+
+        /* ---- Mobile-Breite (echtes Mobile + schmales Desktop-Fenster) ---- */
+        @media (max-width: 639px) {
+            .werke-heading-container {
+                left: 0;
+            }
+            .werke-heading-section {
+                min-height: 240px;
+            }
+        }
+    </style>
 </head>
 <body class="sub-page">
 
@@ -79,161 +214,120 @@
         </div>
     </header>
 
-    <!-- Page Title -->
-    <section class="page-title-section">
-        <h1 class="page-title" data-de="Werke" data-en="Works" data-es="Obras">Werke</h1>
-    </section>
-
-    <!-- Gallery Grid -->
-    <section class="works-gallery">
-        <div class="gallery-categories">
-            <button class="category-filter active" data-category="all" data-de="Alle" data-en="All" data-es="Todas">Alle</button>
-            <button class="category-filter" data-category="portraits" data-de="Portraits" data-en="Portraits">Portraits</button>
-            <button class="category-filter" data-category="landscapes" data-de="Landschaften" data-en="Landscapes" data-es="Paisajes">Landschaften</button>
-            <button class="category-filter" data-category="abstract" data-de="Abstrakt" data-en="Abstract" data-es="Abstracto">Abstrakt</button>
-        </div>
-
-        <div class="works-grid">
-            <!-- Existing Images -->
-            <div class="work-item" data-category="portraits">
-                <div class="work-image-wrapper">
-                    <img src="img/parallax/Ben.jpg" alt="Portrait Ben" class="work-image">
-                    <div class="work-overlay">
-                        <h3>Portrait Ben</h3>
-                        <p data-de="Öl auf Leinwand, 2024" data-en="Oil on canvas, 2024" data-es="Óleo sobre lienzo, 2024">Öl auf Leinwand, 2024</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="portraits">
-                <div class="work-image-wrapper">
-                    <img src="img/Gesichten/Michael.jpg" alt="Portrait Michael" class="work-image">
-                    <div class="work-overlay">
-                        <h3>Portrait Michael</h3>
-                        <p data-de="Öl auf Leinwand, 2024" data-en="Oil on canvas, 2024" data-es="Óleo sobre lienzo, 2024">Öl auf Leinwand, 2024</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="portraits">
-                <div class="work-image-wrapper">
-                    <img src="img/Gesichten/Marcus.jpg" alt="Portrait Marcus" class="work-image">
-                    <div class="work-overlay">
-                        <h3>Portrait Marcus</h3>
-                        <p data-de="Öl auf Leinwand, 2024" data-en="Oil on canvas, 2024" data-es="Óleo sobre lienzo, 2024">Öl auf Leinwand, 2024</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="portraits">
-                <div class="work-image-wrapper">
-                    <img src="img/Gesichten/Kai Schreck.jpg" alt="Portrait Kai Schreck" class="work-image">
-                    <div class="work-overlay">
-                        <h3>Portrait Kai Schreck</h3>
-                        <p data-de="Öl auf Leinwand, 2024" data-en="Oil on canvas, 2024" data-es="Óleo sobre lienzo, 2024">Öl auf Leinwand, 2024</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="portraits">
-                <div class="work-image-wrapper">
-                    <img src="img/Gesichten/Daniel.jpg" alt="Portrait Daniel" class="work-image">
-                    <div class="work-overlay">
-                        <h3>Portrait Daniel</h3>
-                        <p data-de="Öl auf Leinwand, 2024" data-en="Oil on canvas, 2024" data-es="Óleo sobre lienzo, 2024">Öl auf Leinwand, 2024</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dummy Images - Replace with actual images later -->
-            <div class="work-item" data-category="landscapes">
-                <div class="work-image-wrapper">
-                    <div class="dummy-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <span data-de="Landschaft 1" data-en="Landscape 1" data-es="Paisaje 1">Landschaft 1</span>
-                    </div>
-                    <div class="work-overlay">
-                        <h3 data-de="Landschaft 1" data-en="Landscape 1" data-es="Paisaje 1">Landschaft 1</h3>
-                        <p data-de="Öl auf Leinwand, 2024" data-en="Oil on canvas, 2024" data-es="Óleo sobre lienzo, 2024">Öl auf Leinwand, 2024</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="landscapes">
-                <div class="work-image-wrapper">
-                    <div class="dummy-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <span data-de="Landschaft 2" data-en="Landscape 2" data-es="Paisaje 2">Landschaft 2</span>
-                    </div>
-                    <div class="work-overlay">
-                        <h3 data-de="Landschaft 2" data-en="Landscape 2" data-es="Paisaje 2">Landschaft 2</h3>
-                        <p data-de="Acryl auf Leinwand, 2024" data-en="Acrylic on canvas, 2024" data-es="Acrílico sobre lienzo, 2024">Acryl auf Leinwand, 2024</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="abstract">
-                <div class="work-image-wrapper">
-                    <div class="dummy-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        <span data-de="Abstrakt 1" data-en="Abstract 1" data-es="Abstracto 1">Abstrakt 1</span>
-                    </div>
-                    <div class="work-overlay">
-                        <h3 data-de="Abstrakt 1" data-en="Abstract 1" data-es="Abstracto 1">Abstrakt 1</h3>
-                        <p data-de="Mischtechnik, 2024" data-en="Mixed media, 2024" data-es="Técnica mixta, 2024">Mischtechnik, 2024</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="abstract">
-                <div class="work-image-wrapper">
-                    <div class="dummy-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                        <span data-de="Abstrakt 2" data-en="Abstract 2" data-es="Abstracto 2">Abstrakt 2</span>
-                    </div>
-                    <div class="work-overlay">
-                        <h3 data-de="Abstrakt 2" data-en="Abstract 2" data-es="Abstracto 2">Abstrakt 2</h3>
-                        <p data-de="Öl auf Leinwand, 2023" data-en="Oil on canvas, 2023" data-es="Óleo sobre lienzo, 2023">Öl auf Leinwand, 2023</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="landscapes">
-                <div class="work-image-wrapper">
-                    <div class="dummy-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                        <span data-de="Landschaft 3" data-en="Landscape 3" data-es="Paisaje 3">Landschaft 3</span>
-                    </div>
-                    <div class="work-overlay">
-                        <h3 data-de="Landschaft 3" data-en="Landscape 3" data-es="Paisaje 3">Landschaft 3</h3>
-                        <p data-de="Aquarell, 2023" data-en="Watercolour, 2023" data-es="Acuarela, 2023">Aquarell, 2023</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="portraits">
-                <div class="work-image-wrapper">
-                    <div class="dummy-image" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
-                        <span data-de="Portrait 6" data-en="Portrait 6">Portrait 6</span>
-                    </div>
-                    <div class="work-overlay">
-                        <h3>Portrait 6</h3>
-                        <p data-de="Öl auf Leinwand, 2023" data-en="Oil on canvas, 2023" data-es="Óleo sobre lienzo, 2023">Öl auf Leinwand, 2023</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="work-item" data-category="abstract">
-                <div class="work-image-wrapper">
-                    <div class="dummy-image" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
-                        <span data-de="Abstrakt 3" data-en="Abstract 3" data-es="Abstracto 3">Abstrakt 3</span>
-                    </div>
-                    <div class="work-overlay">
-                        <h3 data-de="Abstrakt 3" data-en="Abstract 3" data-es="Abstracto 3">Abstrakt 3</h3>
-                        <p data-de="Mischtechnik, 2023" data-en="Mixed media, 2023" data-es="Técnica mixta, 2023">Mischtechnik, 2023</p>
-                    </div>
-                </div>
-            </div>
+    <!-- Werke Heading: gestapelt, 3 Ebenen -->
+    <section class="werke-heading-section">
+        <div class="werke-heading-container">
+            <h1 class="werke-heading werke-heading-anchor" data-de="Werke" data-en="Works" data-es="Obras">Werke</h1>
+            <h1 class="werke-heading werke-heading-filled" data-de="Werke" data-en="Works" data-es="Obras">Werke</h1>
         </div>
     </section>
+
+    <!-- Galerie: responsives Raster mit Hover-/Treppentext wie auf der Landingpage -->
+    <section class="werke-gallery-section">
+        <div class="werke-grid">
+
+            <div class="image-with-info">
+                <div class="image-clip"><img src="img/Werke/Mythus/Alex.jpeg" alt="Alex" class="unterpunkt-heading-image"></div>
+                <div class="image-info">
+                    <ul class="words-stair">
+                        <li class="words-stair__line"><p></p><p>Alex</p></li>
+                        <li class="words-stair__line"><p></p><p>(2025)</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="Acryl, Bleistift" data-en="Acrylic, pencil" data-es="Acrílico, lápiz">Acryl, Bleistift</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="und Farbstift" data-en="and coloured pencil" data-es="y lápiz de color">und Farbstift</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">auf Leinwand,</p></li>
+                        <li class="words-stair__line"><p></p><p>100 × 100 cm</p></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="image-with-info">
+                <div class="image-clip"><img src="img/Werke/Rivus/Ben.jpg" alt="Ben" class="unterpunkt-heading-image"></div>
+                <div class="image-info">
+                    <ul class="words-stair">
+                        <li class="words-stair__line"><p></p><p>Ben</p></li>
+                        <li class="words-stair__line"><p></p><p>(2015)</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="Acryl, Bleistift" data-en="Acrylic, pencil" data-es="Acrílico, lápiz">Acryl, Bleistift</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="und Farbstift" data-en="and coloured pencil" data-es="y lápiz de color">und Farbstift</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">auf Leinwand,</p></li>
+                        <li class="words-stair__line"><p></p><p>100 × 120 cm</p></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="image-with-info">
+                <div class="image-clip"><img src="img/Werke/Mythus/Daniel.jpg" alt="Daniel" class="unterpunkt-heading-image"></div>
+                <div class="image-info">
+                    <ul class="words-stair">
+                        <li class="words-stair__line"><p></p><p>Daniel</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="(als Patroklos)" data-en="(as Patroclus)" data-es="(como Patroclo)">(als Patroklos)</p></li>
+                        <li class="words-stair__line"><p></p><p>(2015)</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="Acryl und" data-en="Acrylic and" data-es="Acrílico y">Acryl und</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="Bleistift" data-en="pencil" data-es="lápiz">Bleistift</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">auf Leinwand,</p></li>
+                        <li class="words-stair__line"><p></p><p>100 × 100 cm</p></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="image-with-info">
+                <div class="image-clip"><img src="img/Werke/Gesichten/Michael.jpg" alt="Michael" class="unterpunkt-heading-image"></div>
+                <div class="image-info">
+                    <ul class="words-stair">
+                        <li class="words-stair__line"><p></p><p data-de="Michael (am Kreuz)" data-en="Michael (at the Cross)" data-es="Michael (en la Cruz)">Michael (am Kreuz)</p></li>
+                        <li class="words-stair__line"><p></p><p>(2015)</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="Acryl und" data-en="Acrylic and" data-es="Acrílico y">Acryl und</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="Bleistift" data-en="pencil" data-es="lápiz">Bleistift</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">auf Leinwand,</p></li>
+                        <li class="words-stair__line"><p></p><p>80 × 120 cm</p></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="image-with-info">
+                <div class="image-clip"><img src="img/Werke/Gesichten/Marcus.jpg" alt="Marcus" class="unterpunkt-heading-image"></div>
+                <div class="image-info">
+                    <ul class="words-stair">
+                        <li class="words-stair__line"><p></p><p>Marcus</p></li>
+                        <li class="words-stair__line"><p></p><p>(2017)</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="Acryl, Blei-" data-en="Acrylic, graphite" data-es="Acrílico, grafito">Acryl, Blei-</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="und Holzstift" data-en="and wood pencil" data-es="y lápiz de madera">und Holzstift</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">auf Leinwand,</p></li>
+                        <li class="words-stair__line"><p></p><p>100 × 140 cm</p></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Outline-Ebene der Überschrift (liegt über der Galerie) -->
+    <div class="werke-outline-overlay">
+        <div class="werke-heading-container">
+            <h1 class="werke-heading werke-heading-outline" data-de="Werke" data-en="Works" data-es="Obras">Werke</h1>
+        </div>
+    </div>
+
+    <!-- Ghost-Element für Tap-Treppentext auf Mobile (wie Landingpage) -->
+    <div id="stair-ghost"></div>
 
     <script src="js/script.js"></script>
-    <script src="js/works.js"></script>
+    <script>
+        (function() {
+            const filled = document.querySelector('.werke-heading-filled');
+            const anchor = document.querySelector('.werke-heading-anchor');
+            const headingSection = document.querySelector('.werke-heading-section');
+            const outlineOverlay = document.querySelector('.werke-outline-overlay');
+            const PARALLAX = 0.45;
+            function updateScroll() {
+                const sy = window.scrollY;
+                if (headingSection) headingSection.style.transform = `translateY(${-sy * PARALLAX}px)`;
+                if (outlineOverlay) outlineOverlay.style.transform = `translateY(${-sy * PARALLAX}px)`;
+                if (anchor) anchor.style.transform = `rotate(-3deg) translate(-5px, 6px) translateY(${sy * PARALLAX}px)`;
+                if (filled) filled.classList.toggle('faded-out', sy > 60);
+            }
+            window.addEventListener('scroll', updateScroll, { passive: true });
+        })();
+    </script>
 
     <!-- Copyright -->
     <p style="text-align: right; padding: 14rem var(--spacing-container) 1.5rem; color: var(--color-dark); font-size: var(--font-size-body); font-weight: bold;">&copy; 2026 Martin Zanker</p>

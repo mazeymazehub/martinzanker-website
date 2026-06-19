@@ -50,8 +50,10 @@
 
     /* Grid system (Müller-Brockmann) – 3 Spalten + 2 Gutters innerhalb der Seitenränder */
     --grid-gutter: 40px;
-    /* 1 Spalte = (Viewport − 2×Seitenrand − 2×Gutter) / 3 */
-    --img-col-width: clamp(200px, calc((100vw - 2 * var(--spacing-container) - 2 * var(--grid-gutter)) / 3), 500px);
+    /* 1 Spalte = (Viewport − 2×Seitenrand − 2×Gutter) / 3.
+       Untergrenze 440px = der Wert am 2-Spalten-Bereich (≤1300px), damit die Bilder beim
+       Überschreiten von 1300px nicht schrumpfen (stetiger Übergang statt Sprung 440→372). */
+    --img-col-width: clamp(440px, calc((100vw - 2 * var(--spacing-container) - 2 * var(--grid-gutter)) / 3), 500px);
 
     /* Komposition: Abstand MALEREI-Oberkante zu Alex-Oberkante */
     --malerei-alex-gap: clamp(50px, 8vw, 100px);
@@ -653,6 +655,12 @@ header {
     z-index: 2;
 }
 
+/* RIVUS-Text: sanfter Übergang der per JS gesetzten Zentrierung/Breite bei Breiten-Änderung.
+   An .theme-transitioning gekoppelt → beim ersten Laden kein Animations-Slide. */
+body.theme-transitioning #rivus-content-box p {
+    transition: transform 0.35s ease, max-width 0.35s ease;
+}
+
 .content-box-2 h2 {
     font-family: 'Inter', sans-serif;
     font-size: 1.8rem;
@@ -736,8 +744,8 @@ header {
 
 .unterpunkt-heading-image {
     display: block;
-    width: auto;
-    height: var(--image-ben-height);
+    width: var(--img-col-width);
+    height: auto;
     object-fit: cover;
     will-change: transform;
 }
@@ -803,21 +811,14 @@ body.no-image-transition .main-heading-image {
     margin-top: var(--malerei-alex-gap);
 }
 
-@media (min-width: 601px) {
+@media (min-width: 641px) {
     .main-heading-container .words-stair {
         margin-bottom: -4px; /* 100px tiefer als globale 96px */
         margin-left: 32px;   /* 80px weiter rechts als globale -48px */
     }
 }
 
-@media (max-width: 1400px) and (min-width: 601px) and (orientation: landscape) {
-    .main-heading-container .words-stair {
-        margin-bottom: -39px; /* 35px tiefer als Desktop (-4px) */
-        margin-left: 302px;   /* 270px rechts von Desktop (32px) */
-    }
-}
-
-@media (min-width: 601px) {
+@media (min-width: 641px) {
     #mythus-daniel-container .words-stair {
         margin-left: 182px;  /* 230px weiter rechts als globale -48px */
         margin-bottom: -14px; /* 110px tiefer als globale 96px */
@@ -924,24 +925,6 @@ section {
     white-space: nowrap;
 }
 
-.text-behind {
-    color: #333366;
-    z-index: 1;
-    opacity: 1;
-    -webkit-text-stroke: 0;
-}
-
-.text-behind.hidden {
-    opacity: 0;
-}
-
-.text-front {
-    -webkit-text-stroke: 1px #333366;
-    text-stroke: 1px #333366;
-    color: transparent;
-    z-index: 6;
-}
-
 /* =============== IMAGE GRID =============== */
 
 .image-grid {
@@ -997,62 +980,8 @@ section {
     transform: scale(1.05);
 }
 
-/* =============== CONTENT WRAPPER =============== */
-
-.content-wrapper {
-    max-width: 800px;
-    margin: 5% auto;
-    padding: 2rem;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 1px solid #333366;
-}
-
-.content-wrapper p {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #333366;
-}
-
-/* =============== FOOTER =============== */
-
-.main-footer {
-    background-color: #333366;
-    color: white;
-    padding: 3rem 5%;
-    margin-top: 5rem;
-}
-
-.footer-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.footer-links {
-    display: flex;
-    gap: 2rem;
-}
-
-.footer-links a {
-    color: white;
-    text-decoration: none;
-    transition: opacity 0.3s;
-}
-
-.footer-links a:hover {
-    opacity: 0.8;
-}
-
-.footer-content p {
-    margin: 0;
-}
-
 /* =============== RESPONSIVE DESIGN =============== */
-/* 3 Breakpoints: Desktop (>1024px), Tablet (601-1024px), Mobile (<=600px) */
+/* 3 Breakpoints: Desktop (>1024px), Tablet (641-1024px), Mobile (<=640px) */
 
 /* ===== TABLET (max-width: 1024px) ===== */
 @media (max-width: 1024px) {
@@ -1070,6 +999,13 @@ section {
     }
 }
 
+/* ===== SCHMALMODUS HOVER-GERÄT (≤ 639px, Maus/Trackpad) ===== */
+@media (hover: hover) and (pointer: fine) and (max-width: 639px) {
+    :root {
+        --image-alex-width: clamp(252px, 56vw, 490px);
+    }
+}
+
 /* ===== SCHMALES DESKTOP (1025–1300px): noch 2-Spalten für größere Bilder ===== */
 @media (min-width: 1025px) and (max-width: 1300px) {
     :root {
@@ -1079,7 +1015,7 @@ section {
 }
 
 /* ===== TABLET - Ben neben Text (601-1024px) ===== */
-@media (max-width: 1024px) and (min-width: 601px) {
+@media (max-width: 1024px) and (min-width: 641px) {
     .unterpunkt-heading-container .image-with-info {
         right: clamp(20px, 3vw, 40px);
     }
@@ -1095,25 +1031,25 @@ section {
     }
 }
 
-@media (max-width: 1024px) and (min-width: 601px) and (orientation: portrait) {
-    #ben-container .words-stair {
+@media (max-width: 1024px) and (min-width: 641px) {
+    body:not(.orient-landscape) #ben-container .words-stair {
         margin-left: -98px; /* +30px gegenüber iPad allgemein */
     }
 }
 
-@media (max-width: 1400px) and (min-width: 601px) and (orientation: landscape) {
-    #ben-container .words-stair {
+@media (max-width: 1400px) and (min-width: 641px) {
+    body.orient-landscape #ben-container .words-stair {
         margin-left: -38px;   /* 90px rechts von iPad allgemein (-128px) */
         margin-bottom: 21px;  /* 45px tiefer als vorher (66px) */
     }
-    #mythus-daniel-container .words-stair {
+    body.orient-landscape #mythus-daniel-container .words-stair {
         margin-left: -18px;   /* 200px links von Desktop (182px) */
         margin-bottom: 56px;  /* 70px höher als Desktop (-14px) */
     }
 }
 
-/* ===== MOBILE (max-width: 600px) ===== */
-@media (max-width: 600px) {
+/* ===== MOBILE (max-width: 640px) ===== */
+@media (max-width: 640px) {
     :root {
         --spacing-container: 16px;
         --spacing-box-padding: 20px;
@@ -1223,6 +1159,12 @@ section {
     #mythus-anchor-container,
     #gesichten-anchor-container { pointer-events: none; }
 
+    /* Wipe-Z-Reihenfolge: Images(z:1/2) < Gray(z:3) < Filled(z:4) < TextBox(z:10) < Outline(z:15) */
+    #mythus-anchor           { z-index: 3; }
+    #gesichten-anchor-gray   { z-index: 3; }
+    #mythus-anchor-container .konzept-heading-filled,
+    #gesichten-anchor-container .gesichten-anchor-filled { z-index: 4; }
+
     .rivus-anchor-gray,
     .rivus-anchor-filled,
     .rivus-anchor-outline,
@@ -1317,8 +1259,9 @@ section {
     }
 
     /* RIVUS-Box: Volle Breite, Blocksatz — margin-left:0 damit ::after-Hintergrund lückenlos */
+    /* padding-left = spacing-box-padding + spacing-container, damit Text bündig mit KONZEPT/MYTHUS */
     #rivus-content-box {
-        padding-left: var(--spacing-box-padding) !important;
+        padding-left: calc(var(--spacing-box-padding) + var(--spacing-container)) !important;
         padding-right: var(--spacing-box-padding) !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -1547,6 +1490,10 @@ section {
         color: #E9E9E4;
     }
 
+    body.dark-mode .words-stair__line p {
+        color: #E9E9E4;
+    }
+
     body.dark-mode #michael-image-with-info.info-active .image-info {
         background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
     }
@@ -1623,10 +1570,6 @@ section {
     .frame-border-right {
         top: 29px;    /* 1px Überlappung mit stripe-top (30px) – gleich wie Desktop */
         bottom: 24px; /* Nav (25px) - 1px Überlappung */
-    }
-
-    #page-copyright {
-        padding-right: 28px !important; /* Rahmen (20px) + 8px Abstand */
     }
 
     .shrinking-header {
@@ -1738,10 +1681,10 @@ section {
 .page-title {
     font-family: 'Inter', sans-serif;
     font-size: clamp(2.5rem, 6vw, 5rem);
-    color: #333366;
+    color: var(--color-dark);
     margin: 0;
-    -webkit-text-stroke: 1px #333366;
-    text-stroke: 1px #333366;
+    -webkit-text-stroke: 1px var(--color-dark);
+    text-stroke: 1px var(--color-dark);
     color: transparent;
 }
 
@@ -1762,8 +1705,8 @@ section {
 .category-filter {
     padding: 0.8rem 2rem;
     background-color: transparent;
-    border: 2px solid #333366;
-    color: #333366;
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1772,12 +1715,12 @@ section {
 }
 
 .category-filter:hover {
-    background-color: #333366;
+    background-color: var(--color-primary);
     color: white;
 }
 
 .category-filter.active {
-    background-color: #333366;
+    background-color: var(--color-primary);
     color: white;
 }
 
@@ -1890,7 +1833,7 @@ section {
 }
 
 .exhibition-item {
-    border-left: 4px solid #333366;
+    border-left: 4px solid var(--color-primary);
     padding: 2rem;
     margin-bottom: 3rem;
     background-color: #f9f9f9;
@@ -1912,7 +1855,7 @@ section {
 }
 
 .exhibition-item h2 {
-    color: #333366;
+    color: var(--color-dark);
     margin: 0 0 1rem 0;
     font-size: 1.8rem;
 }
@@ -1947,7 +1890,7 @@ section {
 }
 
 .contact-info h2 {
-    color: #333366;
+    color: var(--color-dark);
     margin-bottom: 1.5rem;
     font-size: 2rem;
 }
@@ -1959,7 +1902,7 @@ section {
 }
 
 .contact-info a {
-    color: #333366;
+    color: var(--color-primary);
     text-decoration: none;
     font-weight: 600;
     transition: opacity 0.3s;
@@ -1974,7 +1917,7 @@ section {
 }
 
 .contact-form h2 {
-    color: #333366;
+    color: var(--color-dark);
     margin-bottom: 1.5rem;
     font-size: 2rem;
 }
@@ -1986,7 +1929,7 @@ section {
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #333366;
+    color: var(--color-dark);
     font-weight: 600;
 }
 
@@ -2004,7 +1947,7 @@ section {
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #333366;
+    border-color: var(--color-primary);
 }
 
 .form-group textarea {
@@ -2013,7 +1956,7 @@ section {
 }
 
 .submit-button {
-    background-color: #333366;
+    background-color: var(--color-primary);
     color: white;
     padding: 1rem 3rem;
     border: none;
@@ -2053,31 +1996,126 @@ section {
     flex-direction: column;
     justify-content: flex-end;
     padding: 14px 16px;
-    background: linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0) 100%);
-    transition: background 0.35s ease;
     white-space: normal;
 }
 
-/* Tap/Klick — alle Geräte: Gradient über .info-active */
-.info-active .image-info {
+/* Gradient als separates Pseudo-Element → per opacity sanft ein-/ausblendbar.
+   (Gradienten/background-image selbst sind in CSS nicht transitionierbar → das
+   bloße Umschalten des background würde aufploppen.) */
+.image-info::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background: linear-gradient(to bottom, transparent 15%, rgba(233,233,228,0.85) 100%);
-    pointer-events: auto;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
 }
-body.dark-mode .info-active .image-info {
+body.dark-mode .image-info::after {
     background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
 }
-#ben-image-with-info.info-active .image-info,
-#mythus-daniel-image-with-info.info-active .image-info {
-    background: linear-gradient(to bottom, transparent 15%, rgba(233,233,228,0.85) 100%);
-    pointer-events: auto;
-}
-body.dark-mode #ben-image-with-info.info-active .image-info,
-body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
-    background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
-}
-.main-heading-container .info-active .image-info,
-#michael-image-with-info.info-active .image-info {
+.main-heading-container .image-info::after {
     background: linear-gradient(to bottom, transparent 15%, rgba(255,102,51,0.85) 100%);
+}
+/* Michael im Normalmodus (Desktop, Light-Mode, kein "großer Michael"): oranger Gradient statt weiß */
+@media (min-width: 641px) {
+    body:not(.dark-mode):not(.michael-tall) #michael-image-with-info .image-info::after {
+        background: linear-gradient(to bottom, transparent 15%, rgba(255,102,51,0.85) 100%);
+    }
+}
+
+/* Hover — nur Desktop (Maus/Trackpad) */
+@media (hover: hover) and (pointer: fine) and (min-width: 641px) {
+    .image-with-info:hover .image-info {
+        pointer-events: auto;
+    }
+    .image-with-info:hover .image-info::after {
+        opacity: 1;
+    }
+    .main-heading-container .image-info {
+        overflow: visible;
+    }
+    .main-heading-container .image-info .words-stair {
+        position: absolute;
+        left: 100%;
+        bottom: 0;
+        transform: translate(-100%, 0%);
+        margin: 0;
+    }
+    #mythus-daniel-image-with-info .image-info {
+        overflow: visible;
+    }
+    #mythus-daniel-image-with-info .image-info .words-stair {
+        position: absolute;
+        left: 100%;
+        bottom: 0;
+        transform: translate(-100%, 0%);
+        margin: 0;
+    }
+    #ben-image-with-info .image-info {
+        overflow: visible;
+    }
+    #ben-image-with-info .image-info .words-stair {
+        position: absolute;
+        left: -32px;
+        bottom: 65px;
+        margin: 0;
+    }
+    .image-with-info:not(.info-active):hover .words-stair__line p {
+        transform: translate3d(0, -42px, 0);
+        opacity: 1;
+        transition: transform 0.4s ease-in-out, opacity 0.35s ease-out;
+    }
+}
+
+/* Bild-Beschriftungen auf Desktop tiefer (überschreibt den Hover-Block) */
+@media (hover: hover) and (pointer: fine) and (min-width: 1025px) {
+    #ben-image-with-info .image-info .words-stair {
+        bottom: 15px; /* 50px tiefer als 65px */
+    }
+    #mythus-daniel-image-with-info .image-info .words-stair {
+        transform: translate(-100%, 100px); /* 100px tiefer */
+    }
+}
+
+/* Tap/Klick — alle Geräte: Gradient über .info-active (Farbe kommt aus .image-info::after) */
+.info-active .image-info {
+    pointer-events: auto;
+}
+/* ::after-Fade nur ab 641px (Desktop/Tablet); Mobile (<640) nutzt sein eigenes,
+   eingefrorenes Gradient-System und würde sonst doppelt überlagern. */
+@media (min-width: 641px) {
+    .info-active .image-info::after {
+        opacity: 1;
+    }
+}
+
+/* narrowHover (Desktop-Schmalfenster), Dark-Mode: Gradient hinter dem Treppentext für alle Bilder.
+   Im eingefrorenen Mobile-System ist die Dark-Mode-Variante nur für Michael definiert; hier ergänzt
+   für Ben/Daniel/Marcus. Nur Hover-Geräte → echtes Touch-Mobile bleibt unberührt. */
+@media (hover: hover) and (pointer: fine) and (max-width: 639px) {
+    body.dark-mode .info-active .image-info {
+        background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
+    }
+    /* GESICHTEN-Schriften (filled/outline/anchor) 1,35× größer als die 60px aus dem Mobile-Block
+       (= 81px). !important, um die Mobile-Regel zu überschreiben. Touch-Mobile bleibt bei 60px. */
+    #gesichten-anchor-container .gesichten-anchor-filled,
+    #gesichten-anchor-container .gesichten-anchor-outline,
+    #gesichten-anchor-gray {
+        font-size: 81px !important;
+    }
+}
+
+/* Schmales Desktop-Fenster (Hover, 481–639px): Die Nav sitzt hier oben (der untere
+   Nav-Modus greift erst < 480px). Das Dropdown öffnet im 768er-Block aber unten
+   (bottom:25px) → es erscheint am unteren Fensterrand, weit weg vom Hamburger oben
+   und wirkt dadurch "kaputt". Daher hier unter die obere Nav setzen. */
+@media (hover: hover) and (pointer: fine) and (min-width: 481px) and (max-width: 639px) {
+    .nav-menu {
+        top: 30px;
+        bottom: auto;
+    }
 }
 
 
@@ -2141,12 +2179,24 @@ body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
 }
 
 /* Stufenversatz: jede Zeile 16px weiter rechts */
-.words-stair__line:nth-child(1) { left: 16px; }
-.words-stair__line:nth-child(2) { left: 32px; }
-.words-stair__line:nth-child(3) { left: 48px; }
-.words-stair__line:nth-child(4) { left: 64px; }
-.words-stair__line:nth-child(5) { left: 80px; }
-.words-stair__line:nth-child(6) { left: 96px; }
+.words-stair__line:nth-child(1)  { left:  16px; }
+.words-stair__line:nth-child(2)  { left:  32px; }
+.words-stair__line:nth-child(3)  { left:  48px; }
+.words-stair__line:nth-child(4)  { left:  64px; }
+.words-stair__line:nth-child(5)  { left:  80px; }
+.words-stair__line:nth-child(6)  { left:  96px; }
+.words-stair__line:nth-child(7)  { left: 112px; }
+.words-stair__line:nth-child(8)  { left: 128px; }
+.words-stair__line:nth-child(9)  { left: 144px; }
+.words-stair__line:nth-child(10) { left: 160px; }
+.words-stair__line:nth-child(11) { left: 176px; }
+
+/* Daniel Desktop: fehlende left-Positionen und korrekter Transform für desktop-3 */
+@media (min-width: 769px) {
+    #mythus-daniel-image-with-info .daniel-desktop-3 { transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #mythus-daniel-image-with-info .daniel-canvas    { left: 128px; }
+    #mythus-daniel-image-with-info .daniel-size      { left: 144px; }
+}
 
 .words-stair__line p {
     height: 42px; /* --stair-clip */
@@ -2239,7 +2289,7 @@ body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
 }
 
 .impressum-content h2 {
-    color: #333366;
+    color: var(--color-dark);
     margin-top: 2rem;
     margin-bottom: 1rem;
     font-size: 1.5rem;
@@ -2343,7 +2393,7 @@ body.dark-mode #mythus-daniel-image-with-info.info-active .image-info {
     background: rgba(255,255,255,0.25);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .mobile-dropdown__menu li button.active {
         background: #333333;
         color: #E9E9E4;
@@ -2486,7 +2536,7 @@ body.dark-mode .locale-switch__btn.active[data-locale="de"] {
 @media (max-width: 768px) {
     .lang-switch {
         right: auto;
-        left: 110px;
+        left: 165px;
     }
 }
 
@@ -2618,7 +2668,7 @@ body.dark-mode .nav-menu li a::after {
     background-color: #E9E9E4;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     body.dark-mode .nav-menu li a {
         color: #ff6633;
     }
@@ -2693,9 +2743,12 @@ body.dark-mode .content-box-2 p {
 body.dark-mode .image-info {
     color: #ff6633;
 }
-body.dark-mode .words-stair__line p {
-    color: #ff6633;
+@media (min-width: 769px) {
+    body.dark-mode .words-stair__line p {
+        color: #ff6633;
+    }
 }
+
 
 /* Dark mode for specific pages */
 body.dark-mode .page-title {
@@ -2937,7 +2990,7 @@ body.theme-transitioning .frame-border-right {
 }
 
 /* Non-Mobile: Nur Michael, so groß wie möglich unter dem GESICHTEN-Block */
-@media (min-width: 601px) {
+@media (min-width: 641px) {
     #marcus-image-with-info {
         display: none !important;
     }
@@ -2961,6 +3014,28 @@ body.theme-transitioning .frame-border-right {
         height: auto;
         max-height: 80vh;
     }
+}
+
+/* "Großer Michael" (hohe Desktop-Fenster): aus dem Fluss genommen wie die Textboxen,
+   damit er die Dokumenthöhe nicht aufbläht. Breite = Bildbreite (nicht volle Fensterbreite),
+   damit Gradient & Hover-Text zum Bild passen; horizontal per left:50% + Transform zentriert.
+   Vertikalposition per JS-Transform (translateX(-50%) bleibt für die Zentrierung erhalten). */
+body.michael-tall #michael-image-with-info {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: auto;
+    z-index: 1;
+    will-change: transform;
+}
+/* Großer Michael: Hover-Text 150px über und 150px links von der unteren rechten Bildecke */
+body.michael-tall #michael-image-with-info .image-info .words-stair {
+    position: absolute;
+    right: 150px;
+    bottom: 150px;
+    left: auto;
+    transform: none;
+    margin: 0;
 }
 
 /* RIVUS-Schriften 20px tiefer + 15px weiter links */
@@ -3039,8 +3114,11 @@ body.theme-transitioning .frame-border-right {
      PORTRAIT_BOX_OFFSET ......... Zusätzlicher Abstand Alex → KONZEPT-Box (Zeile ~354)
      getBoxAlexGap() .............. Addiert PORTRAIT_BOX_OFFSET wenn Portrait (Zeile ~356)
 */
-@media (max-aspect-ratio: 5/6) and (min-width: 601px) {
-    :root {
+/* Aktivierung per JS-Body-Klasse statt (max-aspect-ratio: 5/6), damit Höhen-Ziehen
+   das Layout nicht live umschaltet. JS: _updateAspectClasses() (eingefrorenes Verhältnis
+   auf Hover-Geräten, live auf Touch). */
+@media (min-width: 641px) {
+    body.aspect-portrait {
         --image-alex-width: clamp(440px, 82.5vw, 770px);    /* Alex-Bild: Breite */
         --malerei-alex-gap: calc(clamp(50px, 8vw, 100px) + 50px); /* MALEREI ↔ Alex */
         --font-size-heading-large: 108px;                    /* MALEREI Schriftgröße */
@@ -3049,53 +3127,53 @@ body.theme-transitioning .frame-border-right {
         --grid-gutter: 30px;
         --img-col-width: clamp(220px, calc((100vw - 2 * var(--spacing-container) - var(--grid-gutter)) / 2), 440px);
     }
-    .konzept-heading-container,
-    .gesichten-anchor-container,
-    .rivus-anchor-container {
+    body.aspect-portrait .konzept-heading-container,
+    body.aspect-portrait .gesichten-anchor-container,
+    body.aspect-portrait .rivus-anchor-container {
         min-height: 75vh;    /* Blockabstände (Landscape: 100vh) */
         padding-top: 51vh;   /* Blockabstände (Landscape: 68.5vh) */
     }
-    /* Ben im Portrait: Grid-Breite (--img-col-width bereits in :root überschrieben) */
-    #ben-container .image-with-info {
+    /* Ben im Portrait: Grid-Breite (--img-col-width bereits oben überschrieben) */
+    body.aspect-portrait #ben-container .image-with-info {
         right: var(--spacing-container);
     }
     /* Erster Absatz der RIVUS-Box: Zeilenumbruch weiter rechts (nur Portrait) */
-    .content-box-2:not(#gesichten-content-box) p:first-of-type {
+    body.aspect-portrait .content-box-2:not(#gesichten-content-box) p:first-of-type {
         max-width: calc(70vw - 20px - 10rem + 460px);
     }
     /* GESICHTEN-Box: Im Portrait fast Rand-zu-Rand (Box startet bei x=0 durch JS-Transform) */
     /* GESICHTEN-Box: lang-container auf volle Box-Breite zwingen */
-    #gesichten-content-box .lang-container,
-    #gesichten-content-box .lang-text,
-    #gesichten-content-box .locale-de,
-    #gesichten-content-box .locale-en,
-    #gesichten-content-box .locale-es {
+    body.aspect-portrait #gesichten-content-box .lang-container,
+    body.aspect-portrait #gesichten-content-box .lang-text,
+    body.aspect-portrait #gesichten-content-box .locale-de,
+    body.aspect-portrait #gesichten-content-box .locale-en,
+    body.aspect-portrait #gesichten-content-box .locale-es {
         width: 100%;
         margin-left: 0 !important;
     }
-    #gesichten-content-box p {
+    body.aspect-portrait #gesichten-content-box p {
         margin-left: 0 !important;
         max-width: calc(100vw - 2 * var(--spacing-box-padding)) !important;
     }
-    #gesichten-content-box p:first-child {
+    body.aspect-portrait #gesichten-content-box p:first-child {
         margin-top: 20px;
     }
     /* RIVUS-Box: Text 50px tiefer, Box nach unten verlängert */
-    .content-box-2:not(#gesichten-content-box) {
+    body.aspect-portrait .content-box-2:not(#gesichten-content-box) {
         padding-top: calc(var(--spacing-box-padding) - 10px + 50px);
     }
     /* MYTHUS-Box Text: linke Kante 30px nach rechts, Umbruch 15px nach rechts */
-    #mythus-box {
+    body.aspect-portrait #mythus-box {
         padding-left: calc(var(--spacing-box-padding) + 230px);
     }
-    #mythus-box p {
+    body.aspect-portrait #mythus-box p {
         max-width: calc(80vw - 175px - 215px);
     }
-    #michael-marcus-wrapper {
+    body.aspect-portrait #michael-marcus-wrapper {
         gap: 0px;
         transform: none;
     }
-    #marcus-image-with-info {
+    body.aspect-portrait #marcus-image-with-info {
         left: 40px;
     }
 }

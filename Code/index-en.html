@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Zanker - Painting</title>
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Theme color for browser UI -->
+    <meta name="theme-color" content="#E9E9E4" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+</head>
+<body>
+
+    <!-- Background stripes -->
+    <div class="background-stripe-top"></div>
+    <div class="background-stripe-left"></div>
+    <div class="background-stripe-right"></div>
+    <div class="background-stripe-bottom"></div>
+
+    <!-- Frame borders - split into separate elements for different z-indexes -->
+    <div class="frame-border-left"></div>
+    <div class="frame-border-right"></div>
+
+    <!-- Header backdrop - solid orange behind blur -->
+    <div class="header-backdrop"></div>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Locale-Toggle (DE/EN/ES) -->
+            <div class="locale-switch" role="group" aria-label="Sprache / Language">
+                <button class="locale-switch__btn" data-locale="de" title="Deutsch" aria-label="Deutsch">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3">
+                        <rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/>
+                        <rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/>
+                        <rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn active" data-locale="en" title="English" aria-label="English">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
+                        <rect width="60" height="30" fill="currentColor" opacity="0.4"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/>
+                        <rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/>
+                        <rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/>
+                        <rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/>
+                        <rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/>
+                    </svg>
+                </button>
+                <button class="locale-switch__btn" data-locale="es" title="Español" aria-label="Español">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2">
+                        <rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/>
+                        <rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/>
+                        <rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile: Sprache-Dropdown (nur ≤600px) -->
+            <div class="mobile-dropdown" id="mobile-locale-dropdown">
+                <button class="mobile-dropdown__trigger" id="mobile-locale-trigger" aria-label="Sprache wählen">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9"/>
+                        <ellipse cx="12" cy="12" rx="4.5" ry="9"/>
+                        <line x1="3" y1="9" x2="21" y2="9"/>
+                        <line x1="3" y1="15" x2="21" y2="15"/>
+                    </svg>
+                </button>
+                <ul class="mobile-dropdown__menu" id="mobile-locale-menu">
+                    <li><button data-locale="de"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3"><rect width="5" height="1" y="0" fill="currentColor" opacity="0.9"/><rect width="5" height="1" y="1" fill="currentColor" opacity="0.5"/><rect width="5" height="1" y="2" fill="currentColor" opacity="0.15"/></svg> Deutsch</button></li>
+                    <li><button data-locale="en"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect width="60" height="30" fill="currentColor" opacity="0.4"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="currentColor" stroke-opacity="0.8" stroke-width="6"/><rect x="0" y="11" width="60" height="8" fill="currentColor" opacity="0.85"/><rect x="26" y="0" width="8" height="30" fill="currentColor" opacity="0.85"/><rect x="0" y="13" width="60" height="4" fill="currentColor" opacity="0.5"/><rect x="28" y="0" width="4" height="30" fill="currentColor" opacity="0.5"/></svg> English</button></li>
+                    <li><button data-locale="es"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect width="3" height="0.5" y="0" fill="currentColor" opacity="0.75"/><rect width="3" height="1" y="0.5" fill="currentColor" opacity="0.2"/><rect width="3" height="0.5" y="1.5" fill="currentColor" opacity="0.75"/></svg> Español</button></li>
+                </ul>
+            </div>
+
+            <!-- Mobile: Niveau-Dropdown (nur ≤600px) -->
+            <div class="mobile-dropdown" id="mobile-lang-dropdown">
+                <button class="mobile-dropdown__trigger" id="mobile-lang-trigger" aria-label="Textniveau wählen">
+                    <span class="mobile-aa-icon">Aa</span>
+                </button>
+                <ul class="mobile-dropdown__menu" id="mobile-lang-menu">
+                    <li><button data-lang="easy"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.63 283.46" fill="currentColor"><path d="M116.81,97.14c26.83,0,48.57-21.75,48.57-48.57S143.64,0,116.81,0s-48.57,21.75-48.57,48.57,21.75,48.57,48.57,48.57"/><path d="M231.74,91.31c-10.75-.28-65.42.69-113.04,45.67-.53.5-1.2.75-1.88.75s-1.35-.25-1.88-.75C67.31,92,12.64,91.03,1.89,91.31c-1.06.03-1.89.9-1.89,1.95v141.84c0,1.07.85,1.93,1.92,1.95,10.86.2,65.77,3.36,113.04,45.7.53.47,1.19.71,1.86.71s1.33-.24,1.86-.71c47.27-42.33,102.18-45.49,113.04-45.7,1.07-.02,1.92-.89,1.92-1.95V93.26c0-1.06-.83-1.93-1.89-1.95"/></svg> Easy</button></li>
+                    <li><button data-lang="clear"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5 Q4 3 6 3 H18 Q20 3 20 5 V13 Q20 15 18 15 H13 L9 19 V15 H6 Q4 15 4 13 Z"/><line x1="7" y1="7.5" x2="17" y2="7.5"/><line x1="7" y1="10.5" x2="17" y2="10.5"/><line x1="7" y1="13.5" x2="13" y2="13.5"/></svg> Clear</button></li>
+                    <li><button data-lang="expert"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6 C9 5.5 5 5.5 3 6 V19 C5 18.5 9 18.5 12 19"/><path d="M12 6 C15 5.5 19 5.5 21 6 V19 C19 18.5 15 18.5 12 19"/><line x1="12" y1="6" x2="12" y2="19"/><line x1="5.5" y1="9" x2="9.5" y2="9"/><line x1="5.5" y1="12" x2="9.5" y2="12"/><line x1="5.5" y1="15" x2="9.5" y2="15"/><line x1="14.5" y1="9" x2="18.5" y2="9"/><line x1="14.5" y1="12" x2="18.5" y2="12"/><line x1="14.5" y1="15" x2="18.5" y2="15"/></svg> Expert</button></li>
+                </ul>
+            </div>
+
+            <label class="theme-switch">
+                <input type="checkbox" class="theme-switch__checkbox">
+                <div class="theme-switch__sun"></div>
+                <div class="theme-switch__moon"></div>
+            </label>
+            <!-- Sprachniveau-Toggle -->
+            <div class="lang-switch" role="group" aria-label="Sprachniveau">
+                <button class="lang-switch__btn" data-lang="easy" title="Leichte Sprache" aria-label="Leichte Sprache">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.63 283.46" fill="currentColor">
+                        <path d="M116.81,97.14c26.83,0,48.57-21.75,48.57-48.57S143.64,0,116.81,0s-48.57,21.75-48.57,48.57,21.75,48.57,48.57,48.57"/>
+                        <path d="M231.74,91.31c-10.75-.28-65.42.69-113.04,45.67-.53.5-1.2.75-1.88.75s-1.35-.25-1.88-.75C67.31,92,12.64,91.03,1.89,91.31c-1.06.03-1.89.9-1.89,1.95v141.84c0,1.07.85,1.93,1.92,1.95,10.86.2,65.77,3.36,113.04,45.7.53.47,1.19.71,1.86.71s1.33-.24,1.86-.71c47.27-42.33,102.18-45.49,113.04-45.7,1.07-.02,1.92-.89,1.92-1.95V93.26c0-1.06-.83-1.93-1.89-1.95"/>
+                    </svg>
+                </button>
+                <button class="lang-switch__btn" data-lang="clear" title="Verständlicher Text" aria-label="Verständlicher Text">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 5 Q4 3 6 3 H18 Q20 3 20 5 V13 Q20 15 18 15 H13 L9 19 V15 H6 Q4 15 4 13 Z"/>
+                        <line x1="7" y1="7.5" x2="17" y2="7.5"/>
+                        <line x1="7" y1="10.5" x2="17" y2="10.5"/>
+                        <line x1="7" y1="13.5" x2="13" y2="13.5"/>
+                    </svg>
+                </button>
+                <button class="lang-switch__btn active" data-lang="expert" title="Fachsprache" aria-label="Fachsprache">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 6 C9 5.5 5 5.5 3 6 V19 C5 18.5 9 18.5 12 19"/>
+                        <path d="M12 6 C15 5.5 19 5.5 21 6 V19 C19 18.5 15 18.5 12 19"/>
+                        <line x1="12" y1="6" x2="12" y2="19"/>
+                        <line x1="5.5" y1="9" x2="9.5" y2="9"/>
+                        <line x1="5.5" y1="12" x2="9.5" y2="12"/>
+                        <line x1="5.5" y1="15" x2="9.5" y2="15"/>
+                        <line x1="14.5" y1="9" x2="18.5" y2="9"/>
+                        <line x1="14.5" y1="12" x2="18.5" y2="12"/>
+                        <line x1="14.5" y1="15" x2="18.5" y2="15"/>
+                    </svg>
+                </button>
+            </div>
+
+            <button class="nav-toggle" aria-label="Navigation öffnen" onclick="event.stopPropagation()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="werke.html" data-de="Werke" data-en="Works" data-es="Obras">Works</a></li>
+                <li><a href="reden.html" data-de="Texte" data-en="Texts" data-es="Textos">Texts</a></li>
+                <li><a href="kontakt.html" data-de="Kontakt" data-en="Contact" data-es="Contacto">Contact</a></li>
+                <li><a href="impressum.html" data-de="Impressum" data-en="Imprint" data-es="Aviso legal">Imprint</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header mit Logo -->
+    <header class="shrinking-header" onclick="window.location.href='index-en.html'" style="cursor: pointer;">
+        <div class="header-content">
+            <img src="img/05_Logo_Inter.gif" alt="Martin Zanker Logo" class="logo-gif logo-gif-light">
+                        <img src="img/05_Logo_Inter_orange_Transparent.gif" alt="Martin Zanker Logo" class="logo-gif logo-gif-dark">
+        </div>
+    </header>
+
+    <!-- Main Heading -->
+    <div class="main-heading-container">
+        <h1 class="main-heading main-heading-filled" data-de="MALEREI" data-en="PAINTING" data-es="PINTURA">PAINTING</h1>
+        <div class="image-with-info">
+            <img src="img/Werke/Mythus/Alex.jpeg" alt="Alex" class="main-heading-image">
+            <div class="image-info">
+                <ul class="words-stair">
+                    <li class="words-stair__line"><p></p><p>Alex</p></li>
+                    <li class="words-stair__line"><p></p><p>(2025)</p></li>
+                    <li class="words-stair__line"><p></p><p data-de="Acryl, Bleistift" data-en="Acrylic, pencil" data-es="Acrílico, lápiz">Acrylic, pencil</p></li>
+                    <li class="words-stair__line"><p></p><p data-de="und Farbstift" data-en="and coloured pencil" data-es="y lápiz de color">and coloured pencil</p></li>
+                    <li class="words-stair__line"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">on canvas,</p></li>
+                    <li class="words-stair__line"><p></p><p>100 × 100 cm</p></li>
+                </ul>
+            </div>
+        </div>
+        <h1 class="main-heading main-heading-outline" data-de="MALEREI" data-en="PAINTING" data-es="PINTURA">PAINTING</h1>
+    </div>
+
+    <!-- KONZEPT Heading -->
+    <div class="konzept-heading-container">
+        <h2 class="konzept-heading konzept-heading-filled" data-de="KONZEPT" data-en="CONCEPT" data-es="CONCEPTO">CONCEPT</h2>
+        <h2 class="konzept-heading konzept-heading-outline" data-de="KONZEPT" data-en="CONCEPT" data-es="CONCEPTO">CONCEPT</h2>
+    </div>
+
+    <!-- Content Box -->
+    <h2 class="konzept-heading-anchor" data-de="KONZEPT" data-en="CONCEPT" data-es="CONCEPTO" data-es="CONCEPTO">CONCEPT</h2>
+    <div class="content-box-wrapper">
+        <div class="content-box">
+            <div class="content-box-grain"></div>
+            <div class="lang-container">
+                <div class="lang-text lang-easy">
+                    <p>Many people can paint like me. My pictures show how it could be done.</p>
+                    <p>Every person can be painted. The pictures do not belong to just a few people.</p>
+                    <p>The pictures show people that they are good. The pictures also show people that they can be even better.</p>
+                </div>
+                <div class="lang-text lang-clear">
+                    <p>Through traces of the painting process, my works reveal how they are made and thus forgo any attempt to appear elitist. The imitation of well-known imagery and genres makes them easier to approach. The choice of materials, partly still visible preliminary drawings, and areas left unpainted scratch at the sublimity of the image.</p>
+                    <p>The works place the painted subjects in a recoverable deficit relative to a better version of themselves. The image is a distorting mirror. It glorifies one's own life while simultaneously holding out the prospect of a better one. In this tension, the works aim at both the acceptance and the actualisation of the self.</p>
+                </div>
+                <div class="lang-text lang-expert active">
+                    <p>Through artefacts of the painting process, my works reveal their fabrication and thus forgo the elitist veneer of artistic works. The emulation and imitation of well-known subjects and pictorial genres facilitates access. The unpretentious choice of materials, partly still visible preliminary drawings, and areas left unpainted undermine the sublimity of the image.</p>
+                    <p>The works place the portrayed in a recoverable deficit relative to an idealised self. The image functions as a distortion. It glorifies one's own life while simultaneously holding out the prospect of its possible enhancement. In this tension, the works aim at self-acceptance and self-actualisation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIVUS Anchor Container (rechtsbündig) -->
+    <div id="rivus-anchor-container" class="rivus-anchor-container">
+        <h2 class="rivus-anchor-filled">RIVUS</h2>
+        <h2 class="rivus-anchor-outline">RIVUS</h2>
+    </div>
+
+    <!-- RIVUS Content Box -->
+    <div id="rivus-content-box-wrapper" class="content-box-wrapper-2">
+        <div id="rivus-content-box" class="content-box-2">
+            <div class="content-box-grain"></div>
+            <div class="lang-container">
+                <div class="lang-text lang-easy">
+                    <p>These artworks are about men. These men were important to me. Sometimes I wanted to be like them. Sometimes I wanted to be different from them.</p>
+                    <p>The word "<em>Konkurrenz</em>" comes from an old language. It means: walking together. Or: running together.</p>
+                    <p>The men in the pictures are older now. They look different from before. They have also experienced more than before.</p>
+                    <p>When I look at the pictures, I realise: I always live in connection with other people.</p>
+                    <p>The word RIVUS also comes from an old language. It means: river. Two other words come from this word: "River" means river in English. "Rival" means opponent. A rival used to be someone who lived on the same river. So: The men are my neighbours on the river.</p>
+                </div>
+                <div class="lang-text lang-clear">
+                    <p>In the work cycle RIVUS, I engage with the men who were both rivals and role models to me. "<em>Konkurrenz</em>" (competition), from "<em>concurrere</em>", originally means "running/walking together." In the competition for masculinity, the same people appeared to me at times as dazzling ideals and at other times as objects of distinction.</p>
+                    <p>In compendia of pathos formulae, the depicted find both affirmation, yet also always experience the difference that has arisen from a former self. They have both aged physically and grown richer in experience. I myself recognise that I always live in relation to others.</p>
+                    <p>"River" and "rival" both derive from RIVUS:<br>My neighbours on the river.</p>
+                </div>
+                <div class="lang-text lang-expert active">
+                    <p>In the work cycle RIVUS, I engage with the men who were both rivals and ideals to me. "<em>Konkurrenz</em>" (competition), from "<em>concurrere</em>", originally means "running/walking together." In the competition of fulfilling the shifting expectations of masculinity, the same people appeared to me at times as dazzling ideals and at other times as objects of distinction.</p>
+                    <p>In compendia of pathos formulae, the depicted find both affirmation, yet also always experience an inevitable difference from a former self. They are often confronted with a physically superior, yet less experienced state. I myself recognise that I have grown through my identification with others.</p>
+                    <p>"River" and "rival" both derive from RIVUS:<br>My neighbours on the river.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ben Image Container -->
+    <div class="unterpunkt-heading-container" id="ben-container">
+        <div class="image-with-info" id="ben-image-with-info">
+            <div class="image-clip"><img src="img/Werke/Rivus/Ben.jpg" alt="Ben" class="unterpunkt-heading-image"></div>
+            <div class="image-info">
+                <ul class="words-stair">
+                    <li class="words-stair__line"><p></p><p>Ben</p></li>
+                    <li class="words-stair__line"><p></p><p>(2015)</p></li>
+                    <li class="words-stair__line ben-desktop-3"><p></p><p data-de="Acryl, Bleistift und" data-en="Acrylic, pencil and" data-es="Acrílico, lápiz y">Acrylic, pencil and</p></li>
+                    <li class="words-stair__line ben-desktop-4"><p></p><p data-de="Farbstift auf Leinwand," data-en="coloured pencil on canvas," data-es="lápiz de color sobre lienzo,">coloured pencil on canvas,</p></li>
+                    <li class="words-stair__line ben-ipad-3"><p></p><p data-de="Acryl, Bleistift" data-en="Acrylic, pencil" data-es="Acrílico, lápiz">Acrylic, pencil</p></li>
+                    <li class="words-stair__line ben-ipad-4"><p></p><p data-de="und Farbstift" data-en="and coloured pencil" data-es="y lápiz de color">and coloured pencil</p></li>
+                    <li class="words-stair__line ben-ipad-5"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">on canvas,</p></li>
+                    <li class="words-stair__line ben-masse"><p></p><p>100 × 120 cm</p></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIVUS Anchor Gray – nach Ben, damit es per DOM-Reihenfolge über Ben liegt -->
+    <h2 class="rivus-anchor-gray">RIVUS</h2>
+
+    <!-- MYTHUS Anchor Container (linksbündig wie KONZEPT, gespiegelt) -->
+    <div id="mythus-anchor-container" class="konzept-heading-container">
+        <h2 id="mythus-filled" class="konzept-heading konzept-heading-filled">MYTHUS</h2>
+        <h2 id="mythus-outline" class="konzept-heading konzept-heading-outline">MYTHUS</h2>
+    </div>
+
+    <!-- MYTHUS Content Box -->
+    <div id="mythus-box-wrapper" class="content-box-wrapper">
+        <div id="mythus-box" class="content-box">
+            <div class="content-box-grain"></div>
+            <div class="lang-container">
+                <div class="lang-text lang-easy">
+                    <p>I have made artworks. The artworks are called together: MYTHUS.</p>
+                    <p>In these artworks I paint people as pictures. Such pictures are called: portraits.</p>
+                    <p>I look at many things. For example: How is the picture structured? What colours do I use? What does the picture show?</p>
+                    <p>I also ask myself: What role did portraits have in the past? And what role do they have today?</p>
+                    <p>In the past, important people were painted. For example, kings and queens. Or famous stories were painted.</p>
+                    <p>There were also old stories about gods and heroes. These stories are called: myths. The myths came mainly from Europe and from West Asia.</p>
+                    <p>I use these old ideas for my art. But I do not paint kings or gods. I paint people from my life.</p>
+                    <p>With this, I want to show two things: I want to give these people honour. And I want to give them courage. My message is:<br>You are good, just as you are becoming.</p>
+                </div>
+                <div class="lang-text lang-clear">
+                    <p>In the cycle MYTHUS, I am particularly concerned with compositional elements such as the structure of the image, style, or colour symbolism. I inquire into historically significant imagery and the role of the portrait in past and present.</p>
+                    <p>In doing so, I draw on models from art history: the ruler portraits and history paintings of the pre-modern era, but also myths from European and West Asian antiquity and pre-antiquity. With these references, I want to honour the people in my surroundings and encourage them at the same time:</p>
+                    <p>You are good, just as you are becoming.</p>
+                </div>
+                <div class="lang-text lang-expert active">
+                    <p>In the cycle MYTHUS, I pursue not only formal and thematic art-specific categories such as composition, style and colouring, iconography and subject matter, but also the function of the portrait in past and in my present culture.</p>
+                    <p>The recursion to art-historical models draws, among other things, on the representational art of the pre-modern era, with its ruler portraits and history paintings, but also borrows from the myths of predominantly European and West Asian antiquity and pre-antiquity. I both honour the people in my surroundings with these references and hope to encourage them at the same time: You are good, just as you are becoming.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MYTHUS Daniel Image Container (gespiegelt - links) -->
+    <div class="unterpunkt-heading-container" id="mythus-daniel-container">
+        <div class="image-with-info" id="mythus-daniel-image-with-info">
+            <div class="image-clip"><img src="img/Werke/Mythus/Daniel.jpg" alt="Daniel" class="unterpunkt-heading-image"></div>
+            <div class="image-info">
+                <ul class="words-stair">
+                    <li class="words-stair__line daniel-mobile-1"><p></p><p>Daniel</p></li>
+                    <li class="words-stair__line daniel-mobile-2"><p></p><p data-de="(als Patroklos)" data-en="(as Patroclus)" data-es="(como Patroclo)">(as Patroclus)</p></li>
+                    <li class="words-stair__line daniel-desktop-1"><p></p><p data-de="Daniel (als Patroklos)" data-en="Daniel (as Patroclus)" data-es="Daniel (como Patroclo)">Daniel (as Patroclus)</p></li>
+                    <li class="words-stair__line daniel-year"><p></p><p>(2015)</p></li>
+                    <li class="words-stair__line daniel-mobile-3"><p></p><p data-de="Acryl und" data-en="Acrylic and" data-es="Acrílico y">Acrylic and</p></li>
+                    <li class="words-stair__line daniel-desktop-3"><p></p><p data-de="Acryl und Bleistift" data-en="Acrylic and pencil" data-es="Acrílico y lápiz">Acrylic and pencil</p></li>
+                    <li class="words-stair__line daniel-mobile-4"><p></p><p data-de="Bleistift" data-en="pencil" data-es="lápiz">pencil</p></li>
+                    <li class="words-stair__line daniel-canvas"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">on canvas,</p></li>
+                    <li class="words-stair__line daniel-size"><p></p><p>100 × 100 cm</p></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- MYTHUS Anchor Gray – nach Daniel, damit es per DOM-Reihenfolge über Daniel liegt -->
+    <h2 id="mythus-anchor" class="konzept-heading-anchor">MYTHUS</h2>
+
+    <!-- GESICHTEN Section -->
+    <div id="gesichten-anchor-container" class="gesichten-anchor-container">
+        <h2 id="gesichten-anchor-filled" class="gesichten-anchor-filled">GESICHTEN</h2>
+        <h2 class="gesichten-anchor-outline">GESICHTEN</h2>
+    </div>
+
+    <!-- Second Content Box -->
+    <h2 id="gesichten-anchor-gray" class="gesichten-anchor-gray">GESICHTEN</h2>
+    <div id="gesichten-content-box-wrapper" class="content-box-wrapper-2">
+        <div id="gesichten-content-box" class="content-box-2">
+            <div class="content-box-grain"></div>
+            <div class="lang-container">
+                <div class="lang-text lang-easy">
+                    <p>Most people recognise faces.</p>
+                    <p>They can see if someone is happy or sad.</p>
+                    <p>In my paintings I only paint the face.</p>
+                    <p>I do not paint clothing.</p>
+                    <p>I do not paint hair.</p>
+                    <p>I do not paint make-up.</p>
+                    <p>This way you can feel the paintings in your own body.</p>
+                    <p>While I paint, I ask myself:</p>
+                    <p>Can the way I paint also fit the face?</p>
+                    <p>For example:</p>
+                    <p>Where I place the face in the picture.</p>
+                    <p>How I move the brush.</p>
+                    <p>Which colours I use.</p>
+                </div>
+                <div class="lang-text lang-clear">
+                    <p>Most people recognise faces and can read what they express. In my paintings I largely leave out details that say something about the time or culture of the person shown – such as clothing, hairstyle, or make-up. In this way, the paintings are meant to address the viewer physically. The question that occupies me is whether the composition, the painted gesture, the brushstroke, and the colour can also correspond to the facial expression.</p>
+                </div>
+                <div class="lang-text lang-expert active">
+                    <p>Most people recognise faces and read their expressions. Largely freed from pictorial content that documents period or culture – such as clothing, hairstyle, or make-up – my paintings offer a bodily, indeed a corporeal encounter. In them I pursue the question of how far the respective facial expression can also be matched in composition, gesture, brushwork, and colour.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Michael & Marcus Image Container -->
+    <div class="unterpunkt-heading-container" id="michael-marcus-container">
+        <div id="michael-marcus-wrapper" class="multi-image-wrapper">
+            <div id="michael-image-with-info" class="image-with-info">
+                <div class="image-clip"><img src="img/Werke/Gesichten/Michael.jpg" alt="Michael" class="unterpunkt-heading-image"></div>
+                <div class="image-info">
+                    <ul class="words-stair">
+                        <li class="words-stair__line"><p></p><p data-de="Michael (am Kreuz)" data-en="Michael (at the Cross)" data-es="Michael (en la Cruz)">Michael (at the Cross)</p></li>
+                        <li class="words-stair__line"><p></p><p>(2015)</p></li>
+                        <li class="words-stair__line michael-mobile-3"><p></p><p data-de="Acryl und" data-en="Acrylic and" data-es="Acrílico y">Acrylic and</p></li>
+                        <li class="words-stair__line michael-desktop-3"><p></p><p data-de="Acryl und Bleistift" data-en="Acrylic and pencil" data-es="Acrílico y lápiz">Acrylic and pencil</p></li>
+                        <li class="words-stair__line michael-mobile-4"><p></p><p data-de="Bleistift" data-en="pencil" data-es="lápiz">pencil</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="auf Leinwand," data-en="on canvas," data-es="sobre lienzo,">on canvas,</p></li>
+                        <li class="words-stair__line"><p></p><p>80 × 120 cm</p></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="marcus-image-with-info" class="image-with-info">
+                <div class="image-clip"><img src="img/Werke/Gesichten/Marcus.jpg" alt="Marcus" class="unterpunkt-heading-image"></div>
+                <div class="image-info">
+                    <ul class="words-stair">
+                        <li class="words-stair__line"><p></p><p>Marcus</p></li>
+                        <li class="words-stair__line"><p></p><p>(2017)</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="Acryl, Blei- und Holzstift" data-en="Acrylic, graphite and wood pencil" data-es="Acrílico, lápiz grafito y lápiz de madera">Acrylic, graphite and wood pencil</p></li>
+                        <li class="words-stair__line"><p></p><p data-de="auf Leinwand, 100 × 140 cm" data-en="on canvas, 100 × 140 cm" data-es="sobre lienzo, 100 × 140 cm">on canvas, 100 × 140 cm</p></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spacer: Höhe wird per JS dynamisch gesetzt (letzter Snap-Punkt + Puffer) -->
+    <div id="scroll-spacer"></div>
+
+    <div class="bottom-bar-fix"></div>
+
+    <!-- Copyright: Vertikalposition wird per JS gesetzt (80px unter Michael) -->
+    <p id="page-copyright" style="text-align: right; padding: 0 var(--spacing-container) 1.5rem; color: var(--color-dark); font-size: var(--font-size-body); font-weight: bold;">&copy; 2026 Martin Zanker</p>
+
+    <div id="slide-overlay"></div>
+    <script src="js/script.js"></script>
+    <script src="js/image-transition.js"></script>
+</body>
+</html>

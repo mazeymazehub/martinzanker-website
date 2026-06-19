@@ -3,6 +3,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const BASE_PARALLAX_SPEED = 0.35; // Feste Geschwindigkeit für Boxen, Anchors, Bilder
     const BASE_UNTERPUNKT_SPEED = 0.50; // Feste Geschwindigkeit für Unterpunkt-Bilder (Ben, Daniel, Michael, Marcus)
 
+    // narrowHover (Desktop-Browser < 640px, hover-fähig): feste Snap-Viewport-Positionen,
+    // genutzt in calculateMeetingPoints UND den Speed-Berechnungen der filled/outline-Schriften
+    const NH_MEET_RIVUS = 675;   // 35px höher
+    const NH_MEET_MYTHUS = 635;  // 35px höher, dann 50px tiefer
+    const NH_MEET_GESICHTEN = 760;
+
+    // narrowHover (schmales Desktop-Fenster): sichtbarer Abstand zwischen den Blöcken (Box-UK → nächste Box-OK).
+    // Der Doc-Abstand wird je Übergang um die hoverOffset-Differenz (300/500/700) erhöht, damit visuell überall
+    // der jeweilige Abstand steht.
+    const NH_BLOCK_GAP = 600;        // MYTHUS→GESICHTEN
+    const NH_BLOCK_GAP_UPPER = 520;  // KONZEPT→RIVUS und RIVUS→MYTHUS (80px enger)
+
+    // Desktop-Browser (Landscape): fester Abstand zwischen den OBERKANTEN der Textblöcke
+    // (KONZEPT→RIVUS→MYTHUS→GESICHTEN). Blockhöhen (z. B. Sprachniveau-Wechsel) verändern
+    // die Positionen der Folgeblöcke damit nicht (Parsons-Prinzip: ein Block pro Screen).
+    const BLOCK_PITCH_DESKTOP = 900;
+
+    // Feste Referenzhöhe für Desktop-Landscape (≈ Browser-Viewport eines 11"-MacBook,
+    // 1366×768): Layout, Snaplinien und Bildgrößen sind damit unabhängig von der
+    // Fenstergröße beim Laden — die Seite lädt immer im selben Zustand.
+    const DESKTOP_REF_HEIGHT = 670;
+
+    // Desktop: Michael-Bild höher. Es wächst nach oben (Unterkante bleibt fix), indem
+    // die Oberkante um denselben Betrag angehoben wird (positionMichaelAndMarcus).
+    const MICHAEL_DESKTOP_GROW = 150;
+
+    // Desktop-Landscape: Abstand Michael-Unterkante ↔ untere Fensterkante am Seitenende.
+    // Das Ende wird "von unten" berechnet → Michael sitzt bei jeder Fensterhöhe unten.
+    const MICHAEL_END_GAP = 50;
+
+    // Desktop-Landscape: Seitenende = GESICHTEN-Snap + dieser feste Scrollweg.
+    const END_AFTER_GESICHTEN = 150;
+
+    // "Großer Michael"-Modus: ab dieser Fensterhöhe wird Michael groß (Höhe = innerHeight
+    // − MICHAEL_TALL_MARGIN) und scrollt mit Box-Geschwindigkeit (bleibt tiefer im Bild,
+    // füllt die untere Hälfte hoher Fenster). Darunter: normaler Modus (feste Größe, Speed 0,5).
+    const MICHAEL_TALL_THRESHOLD = 950;
+    const MICHAEL_TALL_MARGIN = 280;   // Höhen-Obergrenze: Fensterhöhe − dieser Wert
+    const MICHAEL_TALL_SIDE = 40;      // seitlicher Rand pro Seite (Breite = innerWidth − 2×)
+    const MICHAEL_ASPECT_HW = 120 / 80; // Michael 80×120 cm → Höhe/Breite = 1,5 (Hochformat)
+    const MICHAEL_TALL_GAP = 230;       // Abstand GESICHTEN-Box-Unterkante → Michael-Oberkante
+    const MICHAEL_TALL_END_GAP = 150;   // freier Raum unter Michael am Seitenende
+
     // =============== KONZEPT A (filled/outline) PARALLAX-BERECHNUNG ===============
     // A scrollt mit berechneter Geschwindigkeit, um Anchor bei MEETING_POINT zu treffen
 
@@ -25,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /* =============== PORTRAIT-MODUS (height/width > 1.2) ===============
-       Erkennung: window.innerHeight / window.innerWidth > 1.2
+       Erkennung: _isPortraitLayout()
        (entspricht CSS: @media (max-aspect-ratio: 5/6) in styles.css)
 
        Seitenstruktur (von oben nach unten):
@@ -46,13 +89,50 @@ document.addEventListener('DOMContentLoaded', function() {
          #ben-container ............... Größe des Ben-Bildes
     */
 
+    // Layout-Referenzhöhe: auf Hover-Geräten die eingefrorene Höhe (siehe
+    // applyFrozenViewportMetrics), auf Touch-Geräten live. Für alle Höhen-METRIKEN
+    // (meetY, Bild-Offsets, Fade-Schwellen). Modus-Checks (h/w > 1.2) bleiben live.
+    function _layoutH() {
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return window.innerHeight;
+        // Hover-Geräte (Desktop-Browser): feste Referenzhöhen, völlig unabhängig von der
+        // Fenstergröße beim Laden. Das Portrait-/iPad-Layout greift damit auf Desktop nie
+        // (670/Breite ist nie > 1,2 bei >=640px) — es bleibt echten Touch-Geräten vorbehalten.
+        return window.innerWidth < 640 ? 700 : DESKTOP_REF_HEIGHT;
+    }
+
+    // Portrait-Layout (ehemals h/w > 1.2 live bzw. CSS max-aspect-ratio: 5/6):
+    // auf Hover-Geräten mit eingefrorener Höhe → Höhen-Ziehen wechselt den Modus nicht.
+    // narrowHover (schmales Desktop-Fenster, < 640) IST das Mobile-/Portrait-Layout und zählt
+    // daher immer als Portrait — sonst greifen bei Breite 583–640 die Portrait-Zuschläge nicht
+    // (z. B. +230 in getBox2LogicalTop) und die Blöcke rücken fälschlich zusammen.
+    function _isPortraitLayout() {
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640) return true;
+        return _layoutH() / window.innerWidth > 1.2;
+    }
+
+    // "Großer Michael"-Modus (Desktop-Landscape, sehr hohe Fenster): Michael groß + Box-Speed.
+    function _michaelTall() {
+        return window.matchMedia('(hover: hover) and (pointer: fine)').matches
+            && window.innerWidth >= BREAKPOINT_MOBILE && !_isPortraitLayout()
+            && window.innerHeight > MICHAEL_TALL_THRESHOLD;
+    }
+
+    // Body-Klassen als Ersatz für aspect-ratio/orientation-Media-Queries.
+    // aspect-portrait: eingefroren (layout-relevant, darf beim Höhen-Ziehen nicht kippen).
+    // orient-landscape: LIVE wie die ursprüngliche Media-Query (orientation: landscape) —
+    // betrifft nur Bild-Beschriftungen (words-stair), keine Layout-Abstände.
+    function _updateAspectClasses() {
+        document.body.classList.toggle('aspect-portrait', _isPortraitLayout());
+        document.body.classList.toggle('orient-landscape', window.innerWidth > window.innerHeight);
+    }
+
     // Hilfsfunktion: Dynamischen Treffpunkt-Ratio berechnen
     function getMeetingRatio() {
-        const aspectRatio = window.innerHeight / window.innerWidth;
+        const aspectRatio = _layoutH() / window.innerWidth;
         // Portrait-Modus: fester Treffpunkt (siehe Kommentarblock oben)
         if (aspectRatio > 1.2) {
             if (window.innerWidth < BREAKPOINT_MOBILE) {
-                return Math.max(0, 0.13 - 100 / window.innerHeight); // Original Smartphone-Wert
+                return Math.max(0, 0.13 - 100 / _layoutH()); // Original Smartphone-Wert
             }
             return 0.13; // Fester Wert für Portrait (~160px höher als 0.29)
         }
@@ -70,9 +150,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Treffpunkt dynamisch berechnen
         const meetingRatio = getMeetingRatio();
-        let meetY = window.innerHeight * meetingRatio;
+        let meetY = _layoutH() * meetingRatio;
         // Portrait-Modus: Treffpunkt 80px tiefer
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        if (_isPortraitLayout()) {
             meetY += 80;
         }
 
@@ -153,9 +233,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
         mythusContainer.style.marginTop = '0px';
 
+        // Desktop (Landscape): fester Oberkanten-Abstand RIVUS-Box → MYTHUS-Box
+        // (+400px: RIVUS→MYTHUS wirkt sonst optisch zu eng)
+        if (!_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) {
+            const box2TopP = getBox2LogicalTop();
+            const mythusBaseTopP = getDocumentTop(mythusContainer);
+            const deltaP = getMythusBoxLogicalTop() - mythusBaseTopP; // Container-OK → Box-OK
+            mythusContainer.style.marginTop = `${(box2TopP + BLOCK_PITCH_DESKTOP + 400 - deltaP) - mythusBaseTopP}px`;
+            return;
+        }
+
+        // fester sichtbarer Abstand RIVUS→MYTHUS (+500 kompensiert hoverOffset-Differenz)
+        const _isNarrowHover_mb = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
+        if (_isNarrowHover_mb) {
+            const rivusBoxBottom = _box2WrapperDocTop + box2.offsetHeight; // tatsächliche RIVUS-Box-Unterkante
+            const mythusBaseTop = getDocumentTop(mythusContainer);
+            const offset = (rivusBoxBottom + NH_BLOCK_GAP_UPPER + 500 - 100) - mythusBaseTop; // RIVUS→MYTHUS 100px enger
+            mythusContainer.style.marginTop = `${offset}px`;
+            return;
+        }
+
         let minGap = getBoxGap();
-        // Portrait-Modus: MYTHUS-Block 350px tiefer (200 + 150)
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        // Portrait-Modus: MYTHUS-Block 350px tiefer (200 + 150) — fester Wert, gilt auch in narrowHover
+        if (_isPortraitLayout()) {
             minGap += 350;
         }
         // Mobile: MYTHUS-Block 2px tiefer (war 68, um 70px angehoben)
@@ -163,9 +263,10 @@ document.addEventListener('DOMContentLoaded', function() {
             minGap -= 2;
         }
         // Desktop (Landscape): MYTHUS-Position angepasst (verhindert Doppel-Snap mit RIVUS)
-        const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+        const isPortrait = _isPortraitLayout();
+        const _mythusDiff = (window.__debug && window.__debug.mythusDiff !== undefined) ? window.__debug.mythusDiff : -400;
         if (!isPortrait && window.innerWidth >= 1025) {
-            minGap -= 100;
+            minGap += _mythusDiff;
         }
 
         const box2LogicalTop = getBox2LogicalTop();
@@ -175,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const mythusBaseTop = getDocumentTop(mythusContainer);
 
         const naturalGap = mythusBaseTop - box2LogicalBottom;
-        const offset = minGap - naturalGap - 300;
+        const offset = minGap - naturalGap;
         mythusContainer.style.marginTop = `${offset}px`;
     }
 
@@ -194,11 +295,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!mythusFilled || !mythusBox || !mythusAnchor) return;
 
+        // narrowHover: Speed so, dass filled/outline den grauen Anker exakt an der Snaplinie treffen
+        const _isNarrowHover_mas = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
+        if (_isNarrowHover_mas) {
+            const _st = mythusFilled.style.transform;
+            mythusFilled.style.transform = '';
+            const aStartNH = mythusFilled.getBoundingClientRect().top + window.scrollY;
+            mythusFilled.style.transform = _st;
+            const anchorHeightNH = mythusAnchor.offsetHeight;
+            const anchorGapNH = getKonzeptAnchorGap();
+            const wrapTopNH = getDocumentTop(document.getElementById('mythus-box-wrapper'));
+            const anchorStartNH = wrapTopNH - anchorGapNH - anchorHeightNH + 33 - 800; // wie calculateMeetingPoints (MYTHUS)
+            const sMeetNH = (anchorStartNH - NH_MEET_MYTHUS) / (1 - BASE_PARALLAX_SPEED);
+            if (sMeetNH > 100) {
+                // Gray-Anker-Position bei sMeet (Runtime: wrapperVisualTop - height - gap + 17)
+                const grayAtSnap = wrapTopNH - 800 - anchorHeightNH - anchorGapNH + 17 - sMeetNH * (1 - BASE_PARALLAX_SPEED);
+                const aEff = aStartNH + 8 - 800; // Transform: +8 + mythusHoverOffset
+                mythusAParallaxSpeed = Math.min(1, 1 - (aEff - grayAtSnap) / sMeetNH);
+                return;
+            }
+        }
+
         const meetingRatio = getMeetingRatio();
-        let meetY = window.innerHeight * meetingRatio;
+        let meetY = _layoutH() * meetingRatio;
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            meetY = window.innerHeight * 0.80 - 200;
-        } else if (window.innerHeight / window.innerWidth > 1.2) {
+            meetY = _layoutH() * 0.80 - 200;
+        } else if (_isPortraitLayout()) {
             meetY += 80;
         }
 
@@ -233,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Ben-Bild: horizontale Position als rechte Grenze für RIVUS-Text
         const benEl = document.getElementById('ben-image-with-info');
-        const benRect = (benEl && window.innerWidth >= 601) ? benEl.getBoundingClientRect() : null;
+        const benRect = (benEl && window.innerWidth >= 641) ? benEl.getBoundingClientRect() : null;
         const rivusTextRightLimit = benRect ? benRect.left - 40 : rightLimit; // 40px Gutter
 
         // Inline-Stile zuerst zurücksetzen, damit CSS-Werte bei Orientierungswechsel wieder greifen
@@ -244,21 +366,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Neu berechnen basierend auf aktuellem Layout
         paragraphs.forEach(p => {
-            // GESICHTEN-Box: Breite separat gesetzt, hier überspringen
+            // GESICHTEN-Box + RIVUS-Box: separat behandelt, hier überspringen
             if (rivusBox && rivusBox.contains(p)) return;
+            if (rivusTextBox && rivusTextBox.contains(p)) return;
             const left = p.getBoundingClientRect().left;
-            // RIVUS-Textbox: Grenze an Bens linker Kante (Grid-Gutter)
-            const limit = (rivusTextBox && rivusTextBox.contains(p)) ? rivusTextRightLimit : rightLimit;
-            const available = limit - left;
+            const available = rightLimit - left;
             const computed = parseFloat(getComputedStyle(p).maxWidth);
             if (isNaN(computed) || computed > available) {
                 p.style.maxWidth = Math.max(50, available) + 'px';
             }
         });
 
+        // RIVUS-Text: feste lesbare Breite, zentriert zwischen linkem Rand und Ben.
+        // Beim Verbreitern bleibt der Text mittig stehen; links/rechts wird mehr Box-
+        // Hintergrund sichtbar (statt dass der Text mit der vw-Box nach links wandert).
+        if (rivusTextBox && benRect && window.innerWidth >= 641) {
+            const RIVUS_TEXT_MAX = 600;        // feste lesbare Zeilenbreite
+            const areaLeft = 40;               // linker Rand-Abstand
+            const areaRight = benRect.left - 40; // Bens linke Kante minus Gutter
+            const areaWidth = Math.max(50, areaRight - areaLeft);
+            const textWidth = Math.min(RIVUS_TEXT_MAX, areaWidth);
+            const targetLeft = areaLeft + (areaWidth - textWidth) / 2; // mittig im Bereich
+            rivusTextBox.querySelectorAll('p').forEach(p => {
+                p.style.maxWidth = textWidth + 'px';
+                // Zentrierung per translateX (statt margin) → per CSS-Transition smooth animierbar.
+                // Verschiebung relativ zur aktuellen Position berechnen (kein Layout-Reset nötig).
+                const prevShift = parseFloat(p.dataset.cx || '0');
+                const curLeft = p.getBoundingClientRect().left; // inkl. aktuellem translateX
+                const newShift = prevShift + (targetLeft - curLeft);
+                p.dataset.cx = newShift;
+                p.style.transform = `translateX(${newShift}px)`;
+            });
+        }
+
         // GESICHTEN-Box: Breite immer explizit per JS setzen
         if (rivusBox) {
-            const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+            const isPortrait = _isPortraitLayout();
             const padding = parseFloat(getComputedStyle(rivusBox).paddingLeft) || 24;
             const targetWidth = isPortrait
                 ? window.innerWidth - padding * 2          // Portrait: Rand zu Rand
@@ -280,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!mythusBox || !danielEl) return;
 
         // Portrait: CSS übernimmt, JS-Werte zurücksetzen
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        if (_isPortraitLayout()) {
             mythusBox.style.paddingLeft = '';
             const p = mythusBox.querySelector('p');
             if (p) p.style.maxWidth = '';
@@ -342,12 +485,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const anchorHeight = mythusAnchor.offsetHeight;
 
         const meetingRatio = getMeetingRatio();
-        let meetY = window.innerHeight * meetingRatio - 75;
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        let meetY = _layoutH() * meetingRatio - 75;
+        if (_isPortraitLayout()) {
             meetY += 60;
         } else {
             meetY -= 8;
-            meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
+            meetY = Math.max(meetY, _layoutH() * 0.07 + 50);
         }
 
         const S_meet_numerator = naturalTop_Box - anchorGap - anchorHeight - meetY;
@@ -364,8 +507,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const parallaxCorrection_Daniel = S_meet * (speed_Box - speed_Daniel);
         let finalOffset = alignmentOffset_Daniel + parallaxCorrection_Daniel;
 
-        const isPortraitDaniel = window.innerHeight / window.innerWidth > 1.2;
-        if (window.innerWidth >= 1025 && !isPortraitDaniel) finalOffset += -15;
+        const isPortraitDaniel = _isPortraitLayout();
+        if (window.innerWidth >= 1025 && !isPortraitDaniel) finalOffset += 0;
 
         mythusDaniel.style.top = `${finalOffset}px`;
     }
@@ -396,13 +539,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!gesichtenFilled || !contentBox2 || !gesichtenAnchor) return;
 
+        // narrowHover: Speed so, dass filled/outline den grauen Anker exakt an der Snaplinie treffen.
+        // Spiegelt calculateMeetingPoints (sMeet) und die Runtime-Formeln aus applyParallaxEffect.
+        const _isNarrowHover_gas = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
+        if (_isNarrowHover_gas) {
+            const _st = gesichtenFilled.style.transform;
+            gesichtenFilled.style.transform = '';
+            const aStartNH = gesichtenFilled.getBoundingClientRect().top + window.scrollY;
+            gesichtenFilled.style.transform = _st;
+            const anchorHeightNH = gesichtenAnchor.offsetHeight;
+            const anchorGapNH = getGesichtenAnchorGap();
+            const anchorStartNH = _box2WrapperDocTop + 50 - anchorGapNH - anchorHeightNH - 300; // wie calculateMeetingPoints (RIVUS)
+            const sMeetNH = (anchorStartNH - NH_MEET_RIVUS) / (1 - BASE_PARALLAX_SPEED);
+            if (sMeetNH > 100) {
+                // Gray-Anker-Position bei sMeet (Runtime: wrapperVisualTop - height - gap + 28)
+                const grayAtSnap = _box2WrapperDocTop - 300 - anchorHeightNH - anchorGapNH + 28 - sMeetNH * (1 - BASE_PARALLAX_SPEED);
+                const aEff = aStartNH - 300; // rivusHoverOffset im Transform
+                gesichtenAParallaxSpeed = Math.min(1, 1 - (aEff - grayAtSnap) / sMeetNH);
+                return;
+            }
+        }
+
         // Treffpunkt dynamisch berechnen (gleich wie KONZEPT, 75px höher)
         const meetingRatio = getMeetingRatio();
-        let meetY = window.innerHeight * meetingRatio - 75;
+        let meetY = _layoutH() * meetingRatio - 75;
         if (window.innerWidth < BREAKPOINT_MOBILE) {
             // Smartphone: RIVUS-Treffpunkt bei 80% der Bildschirmhöhe
-            meetY = window.innerHeight * 0.80 - 170;
-        } else if (window.innerHeight / window.innerWidth > 1.2) {
+            meetY = _layoutH() * 0.80 - 170;
+        } else if (_isPortraitLayout()) {
             // Portrait-Modus: Treffpunkt 60px tiefer
             meetY += 60;
         } else {
@@ -410,7 +574,7 @@ document.addEventListener('DOMContentLoaded', function() {
             meetY -= 8;
             // Sicherstellen, dass Snap erst passiert wenn RIVUS-Filled noch sichtbar ist
             // fadeThreshold = 0.07 * vh → meetY muss deutlich darüber liegen
-            meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
+            meetY = Math.max(meetY, _layoutH() * 0.07 + 50);
         }
 
         // A's Startposition: Dokumentposition ohne Transforms
@@ -454,11 +618,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!rivusFilled || !rivusContentBox || !rivusAnchor) return;
 
+        // narrowHover: Speed so, dass filled/outline den grauen Anker exakt an der Snaplinie treffen
+        const _isNarrowHover_ras = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
+        if (_isNarrowHover_ras) {
+            const _st = rivusFilled.style.transform;
+            rivusFilled.style.transform = '';
+            const aStartNH = rivusFilled.getBoundingClientRect().top + window.scrollY;
+            rivusFilled.style.transform = _st;
+            const anchorHeightNH = rivusAnchor.offsetHeight;
+            const anchorGapNH = getGesichtenAnchorGap();
+            const anchorStartNH = _gesichtenWrapperDocTop + 50 - anchorHeightNH - anchorGapNH - 1500; // wie calculateMeetingPoints (GESICHTEN)
+            const sMeetNH = (anchorStartNH - NH_MEET_GESICHTEN) / (1 - BASE_PARALLAX_SPEED);
+            if (sMeetNH > 100) {
+                // Gray-Anker-Position bei sMeet (Runtime: wrapperVisualTop - height - gap + 28 + 4)
+                const grayAtSnap = _gesichtenWrapperDocTop - 1500 - anchorHeightNH - anchorGapNH + 32 - sMeetNH * (1 - BASE_PARALLAX_SPEED);
+                const aEff = aStartNH - 26 - 1500; // Transform: gesichtenFilledOffset(-26) + gesichtenHoverOffset
+                rivusAParallaxSpeed = Math.min(1, 1 - (aEff - grayAtSnap) / sMeetNH);
+                return;
+            }
+        }
+
         const meetingRatio = getMeetingRatio();
-        let meetY = window.innerHeight * meetingRatio;
+        let meetY = _layoutH() * meetingRatio;
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            meetY = window.innerHeight * 0.70 - 75; // Mobile: 30% vom unteren Bildschirmrand, filled/outline höher
-        } else if (window.innerHeight / window.innerWidth > 1.2) {
+            meetY = _layoutH() * 0.70 - 75; // Mobile: 30% vom unteren Bildschirmrand, filled/outline höher
+        } else if (_isPortraitLayout()) {
             meetY += 80; // Portrait (Tablet)
         } else {
             meetY += 70; // Landscape/Desktop
@@ -471,7 +655,8 @@ document.addEventListener('DOMContentLoaded', function() {
             : getDocumentTop(document.getElementById('gesichten-content-box-wrapper'));
         const anchorHeight = rivusAnchor.offsetHeight;
         const anchorGap = getGesichtenAnchorGap();
-        const anchorStart = box3Start + 50 - anchorGap - anchorHeight;
+        const deskAnchorOffsetG_sp = (!_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) ? 40 : 0; // Desktop: Anchor 40px tiefer
+        const anchorStart = box3Start + 50 - anchorGap - anchorHeight + deskAnchorOffsetG_sp;
 
         const anchorEffectiveSpeed = BASE_PARALLAX_SPEED;
 
@@ -494,21 +679,48 @@ document.addEventListener('DOMContentLoaded', function() {
     let meetingPoints = [];
     let meetingPointNames = [];
     let meetingPointZoneOverrides = new Map();
+    // Seitenende-Caches (Hover-Desktop): für sofortige Spacer-Anpassung beim Resize.
+    // _michaelEndBase (= michaelDocBottom + GAP) ist höhenunabhängig; sEnd = max(
+    //   (_michaelEndBase − innerHeight)/0,5  [Michael von unten],  _endFloor [GESICHTEN erreichbar] ).
+    let _endSEnd = 0, _endContentHeight = 0, _michaelEndBase = 0, _endFloor = 0;
     let isSnapping = false;
+    let isResizing = false; // true während eines Resize-Bursts → Snap-Mechanik pausiert
     let scrollEndTimer;
     let magnetAnimFrame = null;
+
+    // Setzt den Scroll-Spacer so, dass das echte Seitenende (maxScroll) == sEnd ist.
+    // Zwei Durchgänge: Pass 1 schätzt den Spacer aus der gemessenen Dokumenthöhe; Pass 2
+    // korrigiert anhand des TATSÄCHLICHEN maxScroll (robust gegen Messfehler durch
+    // body-vs-documentElement, Transforms, scrollY-abhängige Höhen etc.).
+    // Gibt das resultierende echte maxScroll zurück (Quelle der Wahrheit für die End-Logik).
+    function _applyEndSpacer(sEnd) {
+        const spacer = document.getElementById('scroll-spacer');
+        if (!spacer) return 0;
+        const docEl = document.documentElement;
+        spacer.style.height = '0px';
+        const contentH = docEl.scrollHeight; // Höhe ohne Spacer
+        _endContentHeight = contentH;
+        let sp = Math.max(0, sEnd + window.innerHeight - contentH);
+        spacer.style.height = sp + 'px';
+        // Korrektur: tatsächliches maxScroll messen und Differenz ausgleichen.
+        const err = sEnd - (docEl.scrollHeight - window.innerHeight);
+        if (err > 0) spacer.style.height = (sp + err) + 'px';
+        return docEl.scrollHeight - window.innerHeight;
+    }
 
     function calculateMeetingPoints() {
         const _namedPoints = []; // { s, name, zone? }
         meetingPointZoneOverrides = new Map();
+        const _narrowHoverSnap = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
+
 
         // KONZEPT
         const konzeptAnchorEl = document.querySelector('.konzept-heading-anchor');
         const alexImg = document.querySelector('.main-heading-image');
         if (konzeptAnchorEl && alexImg) {
             const meetingRatio = getMeetingRatio();
-            let meetY = window.innerHeight * meetingRatio;
-            if (window.innerHeight / window.innerWidth > 1.2) meetY += 80;
+            let meetY = _layoutH() * meetingRatio;
+            if (_isPortraitLayout()) meetY += 80;
             const anchorHeight = konzeptAnchorEl.offsetHeight;
             const anchorGap = getKonzeptAnchorGap();
             const anchorStart = getDocumentTop(alexImg) + alexImg.offsetHeight + getBoxAlexGap() - anchorGap - anchorHeight;
@@ -520,80 +732,114 @@ document.addEventListener('DOMContentLoaded', function() {
         const contentBoxWrapper2El = document.getElementById('rivus-content-box-wrapper');
         const gesichtenAnchorEl = document.querySelector('.rivus-anchor-gray');
         if (contentBoxWrapper2El && gesichtenAnchorEl) {
-            const meetingRatio = getMeetingRatio();
-            let meetY = window.innerHeight * meetingRatio - 75;
-            if (window.innerWidth < BREAKPOINT_MOBILE) {
-                meetY = window.innerHeight * 0.80 - 170;
-            } else if (window.innerHeight / window.innerWidth > 1.2) {
-                meetY += 60;
+            const anchorHeightR = gesichtenAnchorEl.offsetHeight;
+            const anchorGapR = getGesichtenAnchorGap();
+            const narrowRivusShift = _narrowHoverSnap ? -300 : 0;
+            const anchorStartR = _box2WrapperDocTop + 50 - anchorGapR - anchorHeightR + narrowRivusShift;
+            let meetYR;
+            if (_narrowHoverSnap) {
+                meetYR = NH_MEET_RIVUS; // Fester Pixel-Wert → unabhängig von Fensterhöhe
             } else {
-                meetY -= 8;
-                // Sicherstellen, dass Snap erst passiert wenn RIVUS-Filled noch sichtbar ist
-                meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
+                meetYR = _layoutH() * getMeetingRatio() - 75;
+                if (_isPortraitLayout()) { meetYR += 60; } else { meetYR -= 8; meetYR = Math.max(meetYR, _layoutH() * 0.07 + 50); }
+                meetYR -= 24;
             }
-            meetY -= 24;
-            const anchorHeight = gesichtenAnchorEl.offsetHeight;
-            const anchorGap = getGesichtenAnchorGap();
-            // _box2WrapperDocTop nutzen: fixed Wrapper → getDocumentTop() liefert 0
-            const anchorStart = _box2WrapperDocTop + 50 - anchorGap - anchorHeight;
-            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 100) _namedPoints.push({ s: sMeet, name: 'RIVUS' });
+            const sMeetRivus = (anchorStartR - meetYR) / (1 - BASE_PARALLAX_SPEED);
+            if (sMeetRivus > 100) _namedPoints.push({ s: sMeetRivus, name: 'RIVUS' });
         }
 
         // MYTHUS
         const mythusAnchorEl = document.getElementById('mythus-anchor');
         if (mythusAnchorEl) {
-            const meetingRatio = getMeetingRatio();
-            let meetY = window.innerHeight * meetingRatio - 75;
-            if (window.innerWidth < BREAKPOINT_MOBILE) {
-                meetY = window.innerHeight * 0.80 - 220;
-            } else if (window.innerHeight / window.innerWidth > 1.2) {
-                meetY += 60;
+            const anchorHeightM = mythusAnchorEl.offsetHeight;
+            const anchorGapM = getKonzeptAnchorGap();
+            const mobileAnchorOffsetM = window.innerWidth < BREAKPOINT_MOBILE ? 33 : 0;
+            const narrowMythusShift = _narrowHoverSnap ? -800 : 0;
+            const anchorStartM = getDocumentTop(document.getElementById('mythus-box-wrapper')) - anchorGapM - anchorHeightM + mobileAnchorOffsetM + narrowMythusShift;
+            let meetYM;
+            if (_narrowHoverSnap) {
+                meetYM = NH_MEET_MYTHUS; // Fester Pixel-Wert → unabhängig von Fensterhöhe
             } else {
-                meetY -= 8;
-                meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
+                meetYM = _layoutH() * getMeetingRatio() - 75;
+                if (_isPortraitLayout()) { meetYM += 60; } else { meetYM -= 8; meetYM = Math.max(meetYM, _layoutH() * 0.07 + 50); }
+                meetYM -= 20;
             }
-            meetY -= 20;
-            const anchorHeight = mythusAnchorEl.offsetHeight;
-            const anchorGap = getKonzeptAnchorGap();
-            const mobileAnchorOffset = window.innerWidth < BREAKPOINT_MOBILE ? 33 : 0;
-            const anchorStart = getDocumentTop(document.getElementById('mythus-box-wrapper')) - anchorGap - anchorHeight + mobileAnchorOffset;
-            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 100) {
-                _namedPoints.push({ s: sMeet, name: 'MYTHUS', zone: { before: 500, after: 180 } });
+            const sMeetMythusRaw = (anchorStartM - meetYM) / (1 - BASE_PARALLAX_SPEED);
+            const sMeetRivusPrev = _namedPoints.find(p => p.name === 'RIVUS')?.s ?? 0;
+            const sMeetMythus = (_narrowHoverSnap && sMeetRivusPrev > 0) ? Math.max(sMeetMythusRaw, sMeetRivusPrev + 150) : sMeetMythusRaw;
+
+            if (sMeetMythus > 100) {
+                const _mythusBefore = _narrowHoverSnap ? 250 : (window.innerWidth < BREAKPOINT_MOBILE ? 500 : 700); // Touch-Mobile bleibt 500 (eingefroren), Desktop 700
+                _namedPoints.push({ s: sMeetMythus, name: 'MYTHUS', zone: { before: _mythusBefore, after: _narrowHoverSnap ? 220 : 180 } });
             }
         }
 
         // GESICHTEN
         const rivusAnchorEl = document.getElementById('gesichten-anchor-gray');
         if (rivusAnchorEl) {
-            const meetingRatio = getMeetingRatio();
-            let meetY = window.innerHeight * meetingRatio;
-            if (window.innerWidth < BREAKPOINT_MOBILE) {
-                meetY = window.innerHeight * 0.70; // Mobile: 30% vom unteren Bildschirmrand
-            } else if (window.innerHeight / window.innerWidth > 1.2 && window.innerWidth >= BREAKPOINT_MOBILE) {
-                meetY += 80; // Portrait (Tablet): Treffpunkt 80px tiefer
+            const anchorHeightG = rivusAnchorEl.offsetHeight;
+            const anchorGapG = getGesichtenAnchorGap();
+            const narrowGesichtenShift = _narrowHoverSnap ? -1500 : 0;
+            const deskAnchorOffsetG_mp = (!_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) ? 40 : 0; // Desktop: Anchor 40px tiefer
+            const anchorStartG = _gesichtenWrapperDocTop + 50 - anchorHeightG - anchorGapG + narrowGesichtenShift + deskAnchorOffsetG_mp;
+            let meetYG;
+            if (_narrowHoverSnap) {
+                meetYG = NH_MEET_GESICHTEN; // Fester Pixel-Wert → unabhängig von Fensterhöhe
+            } else {
+                meetYG = _layoutH() * getMeetingRatio();
+                if (_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) meetYG += 80;
             }
-            const anchorHeight = rivusAnchorEl.offsetHeight;
-            const anchorGap = getGesichtenAnchorGap();
-            const anchorStart = _gesichtenWrapperDocTop + 50 - anchorGap - anchorHeight;
-            const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            const gesichtenZone = window.innerWidth < BREAKPOINT_MOBILE ? { before: 700, after: 840 } : undefined;
-            if (sMeet > 100) _namedPoints.push({ s: sMeet, name: 'GESICHTEN', zone: gesichtenZone });
+            const sMeetGesichtenRaw = (anchorStartG - meetYG) / (1 - BASE_PARALLAX_SPEED);
+            const sMeetMythusPrev = _namedPoints.find(p => p.name === 'MYTHUS')?.s ?? 0;
+            const sMeetGesichten = (_narrowHoverSnap && sMeetMythusPrev > 0) ? Math.max(sMeetGesichtenRaw, sMeetMythusPrev + 150) : sMeetGesichtenRaw;
+            // narrowHover: kleine After-Zone, sonst bleibt man am Seitenende in der Zone gefangen
+            // und bounct zurück auf den Snap. Echtes Mobile (Touch) behält 840 (eingefroren).
+            const gesichtenZone = window.innerWidth < BREAKPOINT_MOBILE
+                ? { before: 700, after: (_narrowHoverSnap ? 250 : 840) }
+                : { before: 700, after: 50 }; // Desktop: before 700, after wie bisher (50)
+            if (sMeetGesichten > 100) _namedPoints.push({ s: sMeetGesichten, name: 'GESICHTEN', zone: gesichtenZone });
         }
 
-        // MICHAEL (Non-Mobile): Snap so dass Bildmitte = Viewport-Mitte
-        // _michaelVisualDocTop wird in positionMichaelAndMarcus() mit style.top='0px' gemessen
-        // und ist daher unabhängig davon, ob das Element position:relative oder :absolute hat.
-        if (window.innerWidth >= 601 && _michaelVisualDocTop > 0) {
+        // Seitenende & MICHAEL-Snap.
+        let _sMichaelForEnd = 0;
+        _michaelEndBase = 0;
+        _endFloor = 0;
+        if (window.innerWidth >= 641 && !_isPortraitLayout()) {
+            // Desktop-Landscape: Seitenende = GESICHTEN-Snap + Scrollweg (normaler Modus).
+            const gesPt = _namedPoints.find(p => p.name === 'GESICHTEN');
+            if (gesPt && gesPt.s + END_AFTER_GESICHTEN > 100) {
+                _endFloor = gesPt.s + END_AFTER_GESICHTEN;
+                // "Großer Michael": Ende so, dass Michaels Unterkante MICHAEL_TALL_END_GAP über
+                // der Fensterkante sitzt. Michael ist fixed an die GESICHTEN-Box gekoppelt:
+                //   Michael-Unterkante(s) = _gesichtenWrapperDocTop − s·0,65 + boxH + GAP + michaelH
+                // Lösen für Michael-Unterkante = innerHeight − END_GAP. Nicht vor dem GESICHTEN-Snap.
+                if (_michaelTall()) {
+                    const michaelEl = document.getElementById('michael-image-with-info');
+                    const mh = michaelEl ? michaelEl.offsetHeight : 0;
+                    const michaelEnd = (_gesichtenWrapperDocTop + _cachedRivusBoxHeight + MICHAEL_TALL_GAP
+                        + mh - window.innerHeight + MICHAEL_TALL_END_GAP) / (1 - BASE_PARALLAX_SPEED);
+                    _endFloor = Math.max(_endFloor, michaelEnd);
+                } else {
+                    // Normaler Michael (Fensterhöhe ≤ Schwelle, Laptop/MacBook): Unterpunkt-Bild
+                    // mit Speed 0,5. Visuelle Oberkante(s) = _michaelVisualDocTop − s·(1−0,5).
+                    const michaelEl = document.getElementById('michael-image-with-info');
+                    const mh = michaelEl ? michaelEl.offsetHeight : 0;
+                    // Mittiger MICHAEL-Snap: Bildmitte = Fenstermitte (echte Fensterhöhe, nicht Referenz).
+                    const sMichaelCenter = (_michaelVisualDocTop + mh / 2 - window.innerHeight / 2) / (1 - BASE_UNTERPUNKT_SPEED);
+                    if (sMichaelCenter > 100) _namedPoints.push({ s: sMichaelCenter, name: 'MICHAEL' });
+                    // Ende: bis Michaels Unterkante MICHAEL_TALL_END_GAP über der Kante steht, etwas
+                    // über die Bildmitte hinaus, damit sich ein Stück höher scrollen lässt.
+                    const michaelEnd = (_michaelVisualDocTop + mh - window.innerHeight + MICHAEL_TALL_END_GAP) / (1 - BASE_UNTERPUNKT_SPEED);
+                    _endFloor = Math.max(_endFloor, michaelEnd + 200, sMichaelCenter + 200);
+                }
+                _sMichaelForEnd = _endFloor;
+            }
+        } else if (_isPortraitLayout() && window.innerWidth >= 641 && _michaelVisualDocTop > 0) {
+            // Portrait/Tablet: Michael-Snap mittig (Bildmitte = Viewport-Mitte), mit Magnet.
             const michaelEl = document.getElementById('michael-image-with-info');
             if (michaelEl) {
-                const michaelHeight = michaelEl.offsetHeight;
-                const sMichael = (_michaelVisualDocTop + michaelHeight / 2 - window.innerHeight / 2) / (1 - BASE_UNTERPUNKT_SPEED);
-                if (sMichael > 100) {
-                    const isDesktop = window.innerWidth >= 1025 && window.innerHeight / window.innerWidth <= 1.2;
-                    _namedPoints.push({ s: sMichael, name: 'MICHAEL', zone: isDesktop ? 600 : undefined });
-                }
+                const sMichaelCenter = (_michaelVisualDocTop + michaelEl.offsetHeight / 2 - _layoutH() / 2) / (1 - BASE_UNTERPUNKT_SPEED);
+                if (sMichaelCenter > 100) _namedPoints.push({ s: sMichaelCenter, name: 'MICHAEL' });
             }
         }
 
@@ -602,46 +848,43 @@ document.addEventListener('DOMContentLoaded', function() {
         meetingPointNames = _namedPoints.map(p => p.name);
         _namedPoints.forEach(p => { if (p.zone !== undefined) meetingPointZoneOverrides.set(p.s, p.zone); });
 
-        const copyrightEl = document.getElementById('page-copyright');
         const spacer = document.getElementById('scroll-spacer');
-
-        // 1. Copyright zurücksetzen für saubere Messung
-        if (copyrightEl) copyrightEl.style.marginTop = '0';
         if (spacer) spacer.style.height = '0px';
 
-        // 2. Copyright-Position: beim MICHAEL-Snap sichtbar am unteren Viewport-Rand.
-        // Ziel-Viewport-Y: 80px unter Michaels Unterkante, maximal jedoch 20px über Viewport-Unterkante.
-        // So ist Copyright immer sichtbar wenn Michael einrastet, auch bei kleinen Viewports.
-        const michaelElForCp = document.getElementById('michael-image-with-info');
-        let copyrightBottom = 0;
-        if (copyrightEl && michaelElForCp && meetingPoints.length > 0 && _michaelVisualDocTop > 0) {
-            const michaelHeight = michaelElForCp.offsetHeight;
-            const lastSnap = meetingPoints[meetingPoints.length - 1];
-            const copyrightHeight = copyrightEl.offsetHeight;
-            const vh = window.innerHeight;
-            // Michaels Unterkante bei Snap: viewport Y = vh/2 + michaelH/2
-            const michaelBottomViewport = vh / 2 + michaelHeight / 2;
-            // Gewünschte Position: 80px unter Michaels Unterkante, aber nicht unterhalb des Viewports
-            const copyrightViewportY = Math.min(michaelBottomViewport + 80, vh - copyrightHeight - 8);
-            const requiredDocTop = lastSnap + copyrightViewportY;
-            const baseDocTop = getDocumentTop(copyrightEl);
-            copyrightEl.style.marginTop = Math.max(0, requiredDocTop - baseDocTop) + 'px';
-            copyrightBottom = Math.max(requiredDocTop, baseDocTop) + copyrightHeight;
+        // Hover-Desktop (Landscape): Seitenende "von unten" (Michael GAP über der Kante),
+        // OHNE Magnet dort. Spacer per _applyEndSpacer() so setzen, dass maxScroll == sEnd
+        // (zweistufig, robust gegen Mess-Ungenauigkeiten der Dokumenthöhe).
+        const _hoverEnd = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth >= BREAKPOINT_MOBILE;
+        if (_hoverEnd && spacer && !_isPortraitLayout() && _sMichaelForEnd > 0) {
+            _endSEnd = _applyEndSpacer(Math.round(_sMichaelForEnd));
+            return;
         }
+        _endSEnd = 0;
 
-        // 3. Spacer: Seite muss bis zum letzten Snap UND bis unter das Copyright scrollbar sein
+        // Mobile/Fallback-Spacer: Seite bis zum letzten Snap scrollbar machen
         if (spacer && meetingPoints.length > 0) {
             const lastSnap = meetingPoints[meetingPoints.length - 1];
-            let needed = Math.max(lastSnap, copyrightBottom > 0 ? copyrightBottom - window.innerHeight : 0);
-            // Mobile: GESICHTEN-Text scrollt über Michael-Position hinaus bis Copyright sichtbar
-            if (window.innerWidth < BREAKPOINT_MOBILE) {
+            let vhRef = _layoutH();
+            let needed = lastSnap;
+            if (_narrowHoverSnap) {
+                // narrowHover: Seitenende so, dass die GESICHTEN-Box vollständig über die Viewport-
+                // Oberkante scrollt. Box-Visual-Unterkante = _gesichtenWrapperDocTop − scrollY·0,65
+                // + 46 (mobileGesichtenOffset) − 1500 (gesichtenHoverOffset) + Boxhöhe. Für < 0 lösen,
+                // plus Leerraum. vhRef = echte Fensterhöhe → maxScroll == needed (sonst bei hohem
+                // Fenster zu kurz, weil _layoutH() fest 700 ist).
+                const gesichtenBox = document.getElementById('gesichten-content-box-wrapper');
+                const gesH = gesichtenBox ? gesichtenBox.offsetHeight : 0;
+                needed = (_gesichtenWrapperDocTop + 46 - 1500 + gesH) / (1 - BASE_PARALLAX_SPEED) + 120;
+                vhRef = window.innerHeight;
+            } else if (window.innerWidth < BREAKPOINT_MOBILE) {
+                // Mobile (Touch): GESICHTEN-Text scrollt über die Michael-Position hinaus
                 const gesichtenBox = document.getElementById('gesichten-content-box-wrapper');
                 const gesichtenHeight = gesichtenBox ? gesichtenBox.offsetHeight : 0;
-                const meetY = window.innerHeight * 0.70;
+                const meetY = _layoutH() * 0.70;
                 needed = Math.max(needed, lastSnap + (meetY + gesichtenHeight) / (1 - BASE_PARALLAX_SPEED));
             }
             const contentHeight = document.body.scrollHeight; // spacer ist bereits 0
-            spacer.style.height = Math.max(0, needed - contentHeight + window.innerHeight) + 'px';
+            spacer.style.height = Math.max(0, needed - contentHeight + vhRef) + 'px';
         }
     }
 
@@ -701,7 +944,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
         let gap = BOX_ALEX_GAP_NARROW + widthFactor * (BOX_ALEX_GAP_WIDE - BOX_ALEX_GAP_NARROW);
         // Portrait-Modus: KONZEPT-Block weiter von Alex entfernt (aspectRatio > 1.2)
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        // narrowHover: immer anwenden, damit der Abstand fensterhöhen-unabhängig bleibt
+        const _isNarrowHover_bag = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
+        if (_isPortraitLayout() || _isNarrowHover_bag) {
             gap += PORTRAIT_BOX_OFFSET;
         }
         // Smartphone: extra Abstand
@@ -723,9 +968,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const BOX_GAP_WIDE = 370;     // Bei 1400px Viewport (positiv = tiefer)
 
     // Breakpoint für Mobile/Desktop
-    const BREAKPOINT_MOBILE = 600;
+    const BREAKPOINT_MOBILE = 640;
 
     function getBoxGap() {
+        if (window.innerWidth >= BREAKPOINT_MOBILE && window.__debug && window.__debug.mode === 'vh' && window.__debug.boxGapFactor !== undefined) {
+            return window.innerHeight * window.__debug.boxGapFactor;
+        }
         const widthFactor = Math.max(0, Math.min(1, (window.innerWidth - NARROW_WIDTH) / (WIDE_WIDTH - NARROW_WIDTH)));
         let gap = BOX_GAP_NARROW + widthFactor * (BOX_GAP_WIDE - BOX_GAP_NARROW);
         // Smartphone: alles ab RIVUS 300px tiefer
@@ -733,6 +981,128 @@ document.addEventListener('DOMContentLoaded', function() {
             gap += 300;
         }
         return gap;
+    }
+
+    // vh-basierte Fluss-Maße einfrieren, damit Fensterhöhen-Änderungen den Content nur
+    // offenlegen/verstecken statt die Textblöcke neu anzuordnen.
+    // - narrowHover (<640, hover): feste 700px-Referenz (getunte Werte)
+    // - Desktop/iPad-Layout im Browser (>=640, hover): Referenz = Höhe beim Laden;
+    //   wird nur bei Breiten- oder Moduswechsel (Portrait-Schwelle 1,2) neu erfasst.
+    // - Touch-Geräte: unverändert (CSS gilt; echte iPads ändern ihre Höhe nicht stufenlos)
+    _updateAspectClasses(); // initiale Body-Klassen (Ersatz für aspect/orientation-Media-Queries)
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        // Scroll-Anchoring aus: Browser darf scrollY beim Resize-Relayout nicht selbst nachjustieren
+        document.documentElement.style.overflowAnchor = 'none';
+    }
+
+    function applyFrozenViewportMetrics() {
+        const isHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        const nh = isHover && window.innerWidth < 640;
+        const wide = isHover && window.innerWidth >= 640;
+
+        const refH = _layoutH(); // Hover: feste Referenzhöhe (700 / DESKTOP_REF_HEIGHT), Touch: live
+        const portrait = _isPortraitLayout();
+        _updateAspectClasses();
+
+        const containers = document.querySelectorAll('.konzept-heading-container, .rivus-anchor-container, .gesichten-anchor-container');
+        containers.forEach(c => {
+            if (nh) {
+                c.style.minHeight = '700px';  // 100vh bei 700px Referenzhöhe
+                c.style.paddingTop = '480px'; // 68.5vh bei 700px Referenzhöhe
+            } else if (wide) {
+                // Landscape: 100vh / 68.5vh — Portrait-Media (>=641): 75vh / 51vh
+                c.style.minHeight = `${Math.round(portrait ? refH * 0.75 : refH)}px`;
+                c.style.paddingTop = `${Math.round(portrait ? refH * 0.51 : refH * 0.685)}px`;
+            } else {
+                c.style.minHeight = '';
+                c.style.paddingTop = '';
+            }
+        });
+        // Box-Wrapper: margin-top clamp(-500px, -74vh, -350px) einfrieren.
+        // Wird beim Fixieren ohnehin auf 0 gesetzt — relevant nur für die Fluss-Messung der DocTops.
+        document.querySelectorAll('.content-box-wrapper-2').forEach(w => {
+            if (w.style.position === 'fixed') return;
+            if (nh) w.style.marginTop = '-500px'; // clamp-Wert bei 700px
+            else if (wide) w.style.marginTop = `${Math.round(Math.min(-350, Math.max(-500, -0.74 * refH)))}px`;
+            else w.style.marginTop = '';
+        });
+        // Bild-Container (Ben/Daniel/Michael) + MALEREI-Container: vh-Maße einfrieren.
+        // Sie liegen im Fluss VOR dem MYTHUS-Wrapper (der nicht fixed ist) — ohne feste
+        // Höhen wandert die MYTHUS-Box live mit, während das Fenster gezogen wird.
+        document.querySelectorAll('.unterpunkt-heading-container').forEach(c => {
+            if (nh) {
+                c.style.minHeight = '700px';   // 100vh bei 700px Referenzhöhe
+                c.style.paddingTop = '1085px'; // 50vh + 735px bei 700px Referenzhöhe
+            } else if (wide) {
+                c.style.minHeight = `${refH}px`;
+                c.style.paddingTop = `${Math.round(refH * 0.5 + 735)}px`;
+            } else {
+                c.style.minHeight = '';
+                c.style.paddingTop = '';
+            }
+        });
+        const mainHeadingContainer = document.querySelector('.main-heading-container');
+        if (mainHeadingContainer) {
+            if (nh) {
+                mainHeadingContainer.style.minHeight = '700px'; // padding bleibt CSS (mobile: px-fix)
+                mainHeadingContainer.style.paddingTop = '';
+            } else if (wide) {
+                mainHeadingContainer.style.minHeight = `${refH}px`;
+                // --heading-top-offset: clamp(100px, 18vh, 200px), im Portrait-Media -50px
+                const pt = Math.min(200, Math.max(100, 0.18 * refH)) - (portrait ? 50 : 0);
+                mainHeadingContainer.style.paddingTop = `${Math.round(pt)}px`;
+            } else {
+                mainHeadingContainer.style.minHeight = '';
+                mainHeadingContainer.style.paddingTop = '';
+            }
+        }
+        // vh-basierte :root-Variablen einfrieren (Ben-Bildhöhe, filled/outline-Offsets).
+        // Auf Touch-Geräten entfernt → Original-CSS gilt.
+        const rootStyle = document.documentElement.style;
+        if (nh) {
+            // Werte der Mobile-Media (<640) bei 700px Referenzhöhe; Bildhöhe bleibt CSS (80vh)
+            rootStyle.setProperty('--konzept-offset', '280px');   // clamp(200px, 40vh, 350px)
+            rootStyle.setProperty('--gesichten-offset', '245px'); // clamp(180px, 35vh, 300px)
+            rootStyle.removeProperty('--image-ben-height');
+        } else if (wide) {
+            rootStyle.setProperty('--konzept-offset', `${Math.round(Math.min(600, Math.max(300, 0.53 * refH)))}px`);
+            rootStyle.setProperty('--gesichten-offset', `${Math.round(Math.min(550, Math.max(250, 0.47 * refH)))}px`);
+            const benH = window.innerWidth <= 1024
+                ? Math.min(400, Math.max(180, 0.35 * refH))   // @media (max-width: 1024px)
+                : Math.min(500, Math.max(200, 0.40 * refH));  // Basis
+            rootStyle.setProperty('--image-ben-height', `${Math.round(benH)}px`);
+        } else {
+            rootStyle.removeProperty('--konzept-offset');
+            rootStyle.removeProperty('--gesichten-offset');
+            rootStyle.removeProperty('--image-ben-height');
+        }
+        // Michael-Bild: CSS max-height 80vh (>=641) einfrieren; Desktop zusätzlich vergrößern.
+        // "Großer Michael" (hohe Fenster): Größe EXPLIZIT setzen — Breite = Fensterbreite − Ränder
+        // bestimmt, Höhe folgt dem Hochformat, gedeckelt auf Fensterhöhe − MARGIN (kein Verzerren).
+        // (width:100% allein vergrößert das Bild nicht über seine intrinsische Größe hinaus.)
+        const michaelImg = document.querySelector('#michael-image-with-info .unterpunkt-heading-image');
+        if (michaelImg) {
+            if (_michaelTall()) {
+                let w = window.innerWidth - 2 * MICHAEL_TALL_SIDE;
+                let h = w * MICHAEL_ASPECT_HW;
+                const hMax = window.innerHeight - MICHAEL_TALL_MARGIN;
+                if (h > hMax) { h = hMax; w = h / MICHAEL_ASPECT_HW; }
+                michaelImg.style.width = `${Math.round(w)}px`;
+                michaelImg.style.height = `${Math.round(h)}px`;
+                michaelImg.style.maxWidth = 'none';
+                michaelImg.style.maxHeight = 'none';
+            } else if (wide) {
+                michaelImg.style.width = '';
+                michaelImg.style.height = '';
+                michaelImg.style.maxWidth = '';
+                michaelImg.style.maxHeight = `${Math.round(0.8 * refH) + MICHAEL_DESKTOP_GROW}px`;
+            } else {
+                michaelImg.style.width = '';
+                michaelImg.style.height = '';
+                michaelImg.style.maxWidth = '';
+                michaelImg.style.maxHeight = '';
+            }
+        }
     }
 
     function positionGesichtenAndBox2() {
@@ -752,6 +1122,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const box1LogicalBottom = box1LogicalTop + box1Height;
         const gesichtenBaseTop = getDocumentTop(gesichtenContainer);
 
+        // narrowHover: feste Referenzhöhe statt 80vh → snap-Abstände unabhängig von Fensterhöhe
+        const _isNarrowHover_gab2 = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
+        if (_isNarrowHover_gab2) {
+            // fester sichtbarer Abstand KONZEPT→RIVUS (+300 kompensiert rivusHoverOffset)
+            const targetTop = box1LogicalBottom + NH_BLOCK_GAP_UPPER + 300;
+            const offset = targetTop - gesichtenBaseTop;
+            gesichtenContainer.style.marginTop = `${offset}px`;
+            return;
+        }
+
         // Smartphone: RIVUS nach Ben positionieren
         // Ben ist position:fixed, daher Höhe aus CSS (80vh) manuell berechnen
         if (window.innerWidth < BREAKPOINT_MOBILE) {
@@ -763,15 +1143,28 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Desktop (Landscape): fester Oberkanten-Abstand KONZEPT-Box → RIVUS-Box.
+        // Unabhängig von Blockhöhen → Sprachniveau-Wechsel verschiebt keine Folgeblöcke.
+        if (!_isPortraitLayout()) {
+            const box2Wrapper = document.getElementById('rivus-content-box-wrapper');
+            if (box2Wrapper && box2Wrapper.style.position !== 'fixed') {
+                const delta = getDocumentTop(box2Wrapper) - gesichtenBaseTop; // Container-OK → Box-OK
+                const targetContainerTop = box1LogicalTop + BLOCK_PITCH_DESKTOP - delta;
+                gesichtenContainer.style.marginTop = `${targetContainerTop - gesichtenBaseTop}px`;
+                return;
+            }
+        }
+
         // Dynamischer Mindestabstand (- 150px: alle Blöcke ab Block 2 höher)
-        let minGap = getBoxGap() - 165;
+        const _krDiff = (window.__debug && window.__debug.konzeptRivusDiff !== undefined) ? window.__debug.konzeptRivusDiff : -165;
+        let minGap = getBoxGap() + _krDiff;
         // Portrait-Modus: RIVUS-Anchor + Textbox 230px tiefer (80 + 150)
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        if (_isPortraitLayout()) {
             minGap += 230;
         }
 
         const naturalGap = gesichtenBaseTop - box1LogicalBottom;
-        const offset = minGap - naturalGap - 190;
+        const offset = minGap - naturalGap;
         gesichtenContainer.style.marginTop = `${offset}px`;
     }
 
@@ -783,9 +1176,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
         rivusContainer.style.marginTop = '0px';
 
+        // Desktop (Landscape): fester Oberkanten-Abstand MYTHUS-Box → GESICHTEN-Box
+        if (!_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) {
+            const box3Wrapper = document.getElementById('gesichten-content-box-wrapper');
+            if (box3Wrapper && box3Wrapper.style.position !== 'fixed') {
+                const mythusBoxTopP = getMythusBoxLogicalTop();
+                const rivusBaseTopP = getDocumentTop(rivusContainer);
+                const deltaP = getDocumentTop(box3Wrapper) - rivusBaseTopP; // Container-OK → Box-OK
+                rivusContainer.style.marginTop = `${(mythusBoxTopP + BLOCK_PITCH_DESKTOP - deltaP) - rivusBaseTopP}px`;
+                return;
+            }
+        }
+
+        const _isNarrowHover_r3 = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
+        if (_isNarrowHover_r3) {
+            // testweise: fester sichtbarer Abstand MYTHUS→GESICHTEN (+700 kompensiert hoverOffset-Differenz)
+            const mythusBoxBottom = getMythusBoxLogicalTop() + mythusBox.offsetHeight; // tatsächliche MYTHUS-Box-Unterkante
+            const rivusBaseTop = getDocumentTop(rivusContainer);
+            const offset = (mythusBoxBottom + NH_BLOCK_GAP + 700) - rivusBaseTop;
+            rivusContainer.style.marginTop = `${offset}px`;
+            return;
+        }
         let minGap = getBoxGap();
-        // Portrait-Modus: GESICHTEN-Block 20px tiefer
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        // Portrait-Modus: GESICHTEN-Block 20px tiefer — fester Wert, gilt auch in narrowHover
+        if (_isPortraitLayout()) {
             minGap += 20;
         }
 
@@ -797,12 +1211,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const naturalGap = rivusBaseTop - mythusBoxLogicalBottom;
         let offset = minGap - naturalGap - 20;
-        const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+        const isPortrait = _isPortraitLayout();
         const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
-        if (!isPortrait && !isMobile) offset -= 510;
-        if (isMobile) offset += Math.round(window.innerHeight * 0.9);
-        if (isMobile) offset -= 450;
-        else offset -= 250;
+        const _rgExtra = (window.__debug && window.__debug.gesichtenExtraOffset !== undefined) ? window.__debug.gesichtenExtraOffset : -100;
+        if (!isPortrait && !isMobile) offset += _rgExtra;
+        // Mobile: fester Offset statt 0.9*vh damit narrowHover fensterhöhen-unabhängig bleibt
+        if (isMobile && _isNarrowHover_r3) { offset += 180; } // ≈ 0.9*700 - 450, fester Referenzwert
+        else if (isMobile) { offset += Math.round(window.innerHeight * 0.9); offset -= 450; }
         rivusContainer.style.marginTop = `${offset}px`;
     }
 
@@ -817,7 +1232,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let benMobileParallaxSpeed = BASE_UNTERPUNKT_SPEED;
 
     function calculateBenMobileParallaxSpeed() {
-        if (window.innerWidth >= 600) return; // Nur für schmale Fenster
+        if (window.innerWidth >= BREAKPOINT_MOBILE) return; // Nur für schmale Fenster
 
         const benContainer = document.getElementById('ben-image-with-info');
         const contentBox2 = document.getElementById('rivus-content-box');
@@ -826,7 +1241,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Treffpunkt: Ben soll bei diesem Viewport-Anteil erscheinen
         const meetingRatio = getMeetingRatio();
-        const meetY = window.innerHeight * meetingRatio;
+        const meetY = _layoutH() * meetingRatio;
 
         // Ben's Startposition
         const benStart = getDocumentTop(benContainer);
@@ -896,10 +1311,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const box1Height = box1.offsetHeight;
         const box1LogicalBottom = box1LogicalTop + box1Height;
 
+        // Desktop (Landscape): Pitch-Logik — Box2-Oberkante = Box1-Oberkante + BLOCK_PITCH_DESKTOP
+        if (!_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) {
+            if (box2Wrapper.style.position === 'fixed') {
+                return _box2WrapperDocTop;
+            }
+            return box1LogicalTop + BLOCK_PITCH_DESKTOP;
+        }
+
         // RIVUS-Container startet nach dem dynamischen Gap (- 150px: alle Blöcke ab Block 2 höher)
         let minGap = getBoxGap() - 165;
         // Portrait-Modus: gleicher +230px-Offset wie in positionGesichtenAndBox2()
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        if (_isPortraitLayout()) {
             minGap += 230;
         }
         const gesichtenLogicalTop = box1LogicalBottom + minGap;
@@ -965,12 +1388,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 2. Treffpunkt 'meetY' berechnen — identische Formel wie positionMythusDaniel + calculateMeetingPoints (RIVUS)
         const meetingRatio = getMeetingRatio();
-        let meetY = window.innerHeight * meetingRatio - 75;
-        if (window.innerHeight / window.innerWidth > 1.2) {
+        let meetY = _layoutH() * meetingRatio - 75;
+        if (_isPortraitLayout()) {
             meetY += 60;
         } else {
             meetY -= 8;
-            meetY = Math.max(meetY, window.innerHeight * 0.07 + 50);
+            meetY = Math.max(meetY, _layoutH() * 0.07 + 50);
         }
 
         // 3. Den Scroll-Punkt 'S_meet' berechnen, an dem der Anchor den Treffpunkt erreicht
@@ -987,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', function() {
             : (parseFloat(getComputedStyle(contentBox2).paddingTop) || 0);
         const alignmentOffset_Ben = (naturalTop_Box - naturalTop_Ben) + textTopOffsetBen;
         const parallaxCorrection_Ben = S_meet * (speed_Box - speed_Ben);
-        const isPortraitBen = window.innerHeight / window.innerWidth > 1.2;
+        const isPortraitBen = _isPortraitLayout();
         const desktopOffsetBen = (window.innerWidth >= 1025 && !isPortraitBen) ? 15 : 0;
         const finalOffset = alignmentOffset_Ben + parallaxCorrection_Ben + desktopOffsetBen;
         benContainer.style.top = `${finalOffset}px`;
@@ -996,7 +1419,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let michaelMobileParallaxSpeed = BASE_UNTERPUNKT_SPEED;
 
     function calculateMichaelMobileParallaxSpeed() {
-        if (window.innerWidth >= 600) return;
+        if (window.innerWidth >= BREAKPOINT_MOBILE) return;
 
         const michaelContainer = document.getElementById('michael-image-with-info');
         const rivusContentBox = document.getElementById('gesichten-content-box');
@@ -1004,7 +1427,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!michaelContainer || !rivusContentBox) return;
 
         const meetingRatio = getMeetingRatio();
-        const meetY = window.innerHeight * meetingRatio;
+        const meetY = _layoutH() * meetingRatio;
 
         const michaelStart = getDocumentTop(michaelContainer);
 
@@ -1041,6 +1464,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!michaelImage || !rivusContentBox || !unterpunktContainerForMichael || !rivusContainer || !rivusAnchor) return;
 
+        // "Großer Michael": aus dem Fluss (position:fixed via Body-Klasse). Trägt nicht zur
+        // Dokumenthöhe bei → kein Aufblähen, Seitenende = GESICHTEN + Scrollweg wie gehabt.
+        // Vertikalposition: in applyParallaxEffect fest unter die GESICHTEN-Box gekoppelt.
+        if (_michaelTall()) {
+            document.body.classList.add('michael-tall');
+            michaelContainer.style.top = '';
+            const outer = document.getElementById('michael-marcus-container');
+            if (outer) { outer.style.minHeight = `${_layoutH()}px`; outer.style.marginBottom = ''; }
+            return;
+        }
+        document.body.classList.remove('michael-tall');
+
         michaelContainer.style.top = '0px';
         if (marcusContainer) {
             marcusContainer.style.top = '0px';
@@ -1052,7 +1487,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const michaelNaturalTop = getDocumentTop(michaelContainer);
 
         // Mobile: Michael + Marcus statisch 15px unter Logo-Unterkante
-        if (window.innerWidth < 600) {
+        if (window.innerWidth < BREAKPOINT_MOBILE) {
             const headerEl = document.querySelector('header');
             const topPos = headerEl ? headerEl.offsetHeight + 15 : 50;
             michaelContainer.style.top = `${topPos}px`;
@@ -1068,12 +1503,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const boxHeight = rivusContentBox.offsetHeight;
         const michaelHeight = michaelImage.offsetHeight;
         const speed_Box = BASE_PARALLAX_SPEED;
-        const speed_Michael = BASE_UNTERPUNKT_SPEED;
+        // "Großer Michael": Box-Geschwindigkeit → parallaxCorrection = 0, Michael sitzt fest
+        // (mitscrollend) direkt unter der GESICHTEN-Box.
+        const speed_Michael = _michaelTall() ? BASE_PARALLAX_SPEED : BASE_UNTERPUNKT_SPEED;
         const anchorGap = getGesichtenAnchorGap();
         const anchorHeight = rivusAnchor.offsetHeight;
 
         const meetingRatio = getMeetingRatio();
-        const meetY = window.innerHeight * meetingRatio;
+        const meetY = _layoutH() * meetingRatio;
 
         const S_meet_numerator = naturalTop_Box - anchorGap - anchorHeight - meetY;
         const S_meet_denominator = (1 - speed_Box);
@@ -1086,19 +1523,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const parallaxCorrection_Michael = S_meet * (speed_Box - speed_Michael);
         const finalOffset = alignmentOffset_Michael + parallaxCorrection_Michael;
 
-        const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+        const isPortrait = _isPortraitLayout();
         const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
-        const desktopOffset = (!isPortrait && !isMobile) ? -200 : 0;
-        const imageTop = finalOffset + desktopOffset;
+        const desktopOffset = (!isPortrait && !isMobile) ? -100 : 0; // 20px tiefer (war -120)
+        // Bild wuchs um MICHAEL_DESKTOP_GROW (max-height): Oberkante um denselben Betrag
+        // anheben → Bild wächst nach oben, Unterkante bleibt fix. Im "großen Michael"-Modus
+        // entfällt das (Bild ist per Höhe groß, sitzt fest unter der Box).
+        const michaelGrowShift = (!isPortrait && !isMobile && !_michaelTall()) ? -MICHAEL_DESKTOP_GROW : 0;
+        const imageTop = finalOffset + desktopOffset + michaelGrowShift;
         // naturalTop wurde mit style.top='0px' gemessen → sicher positions-unabhängig
         _michaelVisualDocTop = michaelNaturalTop + imageTop;
         michaelContainer.style.top = `${imageTop}px`;
 
-        // Container-Mindesthöhe: sicherstellen, dass Michael vollständig sichtbar ist
+        // Container-Mindesthöhe: sicherstellen, dass Michael vollständig sichtbar ist.
         const outerContainer = document.getElementById('michael-marcus-container');
         if (outerContainer && michaelImage) {
-            const required = imageTop + michaelImage.offsetHeight + 120; // 120px Abstand am Ende
-            outerContainer.style.minHeight = `${Math.max(required, window.innerHeight)}px`;
+            const required = _michaelTall()
+                ? _layoutH()
+                : imageTop + michaelImage.offsetHeight + 120; // 120px Abstand am Ende
+            outerContainer.style.minHeight = `${Math.max(required, _layoutH())}px`;
+            // "Großer Michael" nimmt als Flex-Kind vollen Fluss-Platz und bläht den Container
+            // (und damit body > html) auf. Den Überstand gegenüber der normalen Bildhöhe per
+            // negativem margin-bottom kompensieren → Dokumenthöhe bleibt korrekt, Bild sichtbar.
+            if (_michaelTall()) {
+                const normalH = 0.8 * _layoutH() + MICHAEL_DESKTOP_GROW;
+                const extra = michaelImage.offsetHeight - normalH;
+                outerContainer.style.marginBottom = `${-Math.max(0, Math.round(extra))}px`;
+            } else {
+                outerContainer.style.marginBottom = '';
+            }
         }
         // Marcus wird per CSS auf Non-Mobile versteckt
     }
@@ -1260,10 +1713,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         _stairGhost.innerHTML = '';
         _stairGhost.appendChild(clone);
-        const isAlex   = !!container.closest('.main-heading-container');
-        const isDaniel = container.id === 'mythus-daniel-image-with-info';
-        const leftOffset = isAlex ? -10 : isDaniel ? 50 : 0;
-        _stairGhost.style.top        = (r.top + 10) + 'px';
+        const isAlex    = !!container.closest('.main-heading-container');
+        const isDaniel  = container.id === 'mythus-daniel-image-with-info';
+        const isBen     = container.id === 'ben-image-with-info';
+        const isMichael = container.id === 'michael-image-with-info';
+        const isDesktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        const isNarrowHover = isDesktopPointer && window.innerWidth < 640;
+        const leftOffset = isAlex ? -10 : isDaniel ? 50 : (isBen && isDesktopPointer) ? 40
+                         : (isMichael && isNarrowHover) ? 90 : 0; // Ben: 40 (120-80), Michael narrowHover: 90 (40+50)
+        const topOffset = (isBen && isDesktopPointer) ? -130        // Ben: 130px höher (200-70 tiefer)
+                        : (isMichael && isNarrowHover) ? -35        // Michael narrowHover: 35px höher
+                        : (isDaniel && isNarrowHover) ? -60 : 0;    // Daniel narrowHover: 60px höher
+        _stairGhost.style.top        = (r.top + 10 + topOffset) + 'px';
         _stairGhost.style.left       = (r.left + leftOffset) + 'px';
         _stairGhost.style.width      = r.width + 'px';
         _stairGhost.style.transition = 'none';
@@ -1282,6 +1743,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     allInfoImages.forEach(container => {
         container.addEventListener('click', function(e) {
+            if (window.innerWidth >= BREAKPOINT_MOBILE) return;
             const isActive = this.classList.contains('info-active');
             document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
             if (!isActive) {
@@ -1291,8 +1753,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
         });
     });
-    // Tap außerhalb schließt Info
+    // Tap außerhalb schließt Info (nur Mobile)
     document.addEventListener('click', () => {
+        if (window.innerWidth >= BREAKPOINT_MOBILE) return;
         document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
     });
 
@@ -1374,11 +1837,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const _localeUrls = { de: 'index.html', en: 'index-en.html', es: 'index-es.html' };
-    let currentLocale = document.documentElement.lang || 'de';
+    const _isSubPage = document.body.classList.contains('sub-page');
+    let currentLocale = (_isSubPage ? localStorage.getItem('locale') : null) || document.documentElement.lang || 'de';
     localeBtns.forEach(btn => btn.addEventListener('click', () => {
         const locale = btn.dataset.locale;
         if (locale === currentLocale) return;
-        if (_localeUrls[locale]) window.location.href = _localeUrls[locale];
+        currentLocale = locale;
+        if (_isSubPage) {
+            setLocale(locale);
+        } else if (_localeUrls[locale]) {
+            window.location.href = _localeUrls[locale];
+        }
     }));
     setLocale(currentLocale);
 
@@ -1464,8 +1933,13 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.addEventListener('click', () => {
                 const locale = btn.dataset.locale;
                 closeMobileDropdowns();
-                if (locale !== currentLocale && _localeUrls[locale]) {
-                    window.location.href = _localeUrls[locale];
+                if (locale !== currentLocale) {
+                    currentLocale = locale;
+                    if (_isSubPage) {
+                        setLocale(locale);
+                    } else if (_localeUrls[locale]) {
+                        window.location.href = _localeUrls[locale];
+                    }
                 }
             });
         });
@@ -1526,8 +2000,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let latestScroll = 0;
     let ticking = false;
 
-    const fadeOutThreshold = window.innerHeight * 0.09;
-    const fadeInThreshold = window.innerHeight * 0.30;
+    const fadeOutThreshold = _layoutH() * 0.09;
+    const fadeInThreshold = _layoutH() * 0.30;
 
     // Header shrinking setup (only for landing page)
     const header = document.querySelector('header');
@@ -1577,6 +2051,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cached anchor positioning data (computed in positionAnchors, used per frame)
     let _michaelVisualDocTop = 0; // gesetzt in positionMichaelAndMarcus(), genutzt in calculateMeetingPoints()
+    let _michaelTallDocTop = 0;   // statische Dokument-Oberkante des "großen Michael" (position:fixed)
     let _anchorsReady = false;
     let _alexDocTop = 0, _alexHeight = 0, _boxAlexGap = 0;
     let _konzeptAnchorHeight = 0, _konzeptAnchorGap = 0, _konzeptAnchorLeft = 0;
@@ -1621,8 +2096,9 @@ document.addEventListener('DOMContentLoaded', function() {
             ticking = true;
         }
 
-        // Magnet Snap: Timer nur starten wenn User nicht aktiv scrollt
-        if (!isSnapping && !isTouching && !isScrollbarHeld) {
+        // Magnet Snap: Timer nur starten wenn User nicht aktiv scrollt (und kein Resize läuft —
+        // sonst snappt die durch Clamp/scrollTo ausgelöste Scroll-Bewegung → Springen am Ende)
+        if (!isSnapping && !isTouching && !isScrollbarHeld && !isResizing) {
             scheduleSnapCheck();
         }
     });
@@ -1640,11 +2116,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const distPrev = i > 0 ? point - meetingPoints[i - 1] : point;
                 const distNext = i < meetingPoints.length - 1 ? meetingPoints[i + 1] - point : Infinity;
                 const override = meetingPointZoneOverrides.get(point);
-                const zone = override
-                    ? (typeof override === 'object'
-                        ? (s < point ? override.before : override.after)
-                        : override)
-                    : Math.min(distPrev, distNext) * 0.24;
+                const isLast = i === meetingPoints.length - 1;
+                let zone;
+                if (override) {
+                    zone = (typeof override === 'object') ? (s < point ? override.before : override.after) : override;
+                } else if (isLast && _endSEnd > 0) {
+                    // Letzter Snap (GESICHTEN am Ende): von oben einrasten (before, begrenzt
+                    // damit man nicht festklebt), Richtung Ende nur kurz (after).
+                    zone = s < point ? Math.min(distPrev * 0.24, 250) : 50;
+                } else {
+                    zone = Math.min(distPrev, distNext) * 0.24;
+                }
                 if (dist <= zone && dist < minDist) { minDist = dist; target = point; }
             }
             if (target !== null) slowScrollTo(target);
@@ -1654,10 +2136,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateScene() {
         // Phase 1: Alle Transforms schreiben (WRITE, kein Layout-Reflow)
         applyParallaxEffect(latestScroll);
+        // Bild-Übergänge (narrowHover) direkt nach den Box-Transforms im selben Frame → kein Versatz.
+        if (window.__imageTransitionUpdate) window.__imageTransitionUpdate();
 
         // Phase 2: Alle Layout-Reads gebatcht (ein einziger Reflow)
-        const fadeThreshold = window.innerHeight * 0.07;
-        const fadeThresholdEarly = window.innerHeight * 0.23; // RIVUS/MYTHUS/GESICHTEN früher ausblenden (nur Mobile)
+        const fadeThreshold = _layoutH() * 0.07;
+        const fadeThresholdEarly = _layoutH() * 0.23; // RIVUS/MYTHUS/GESICHTEN früher ausblenden (nur Mobile)
         const visRects = [];
         for (let i = 0; i < _visHeadings.length; i++) {
             visRects.push(_visHeadings[i] ? _visHeadings[i].getBoundingClientRect().top : Infinity);
@@ -1781,7 +2265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
 
         // Calculate 7% from top of viewport as the trigger point
-        const fadeThreshold = window.innerHeight * 0.07;
+        const fadeThreshold = _layoutH() * 0.07;
 
         headings.forEach(heading => {
             if (heading) {
@@ -1863,7 +2347,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function applyParallaxEffect(scrollY) {
         const textSpeed = scrollY * 0.25;
         const imageSpeed = scrollY * 0.5;
-        const isMobile = window.innerWidth < 600;
+        const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
 
         // Main heading image
         if (_mainImageContainer) {
@@ -1871,7 +2355,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Mobile: Sichtbarkeit der Bilder per Scroll steuern (statisch, kein transform)
-        if (isMobile) {
+        // Auf Hover-Geräten (< 640px) übernimmt image-transition.js die Bildsteuerung.
+        const isHoverDevice = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        if (isMobile && !isHoverDevice) {
             updateMobileImageVisibility();
         } else {
             if (_benImage) {
@@ -1881,7 +2367,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 _mythusDaniel.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
             }
             if (_michaelImage) {
-                _michaelImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
+                if (_michaelTall()) {
+                    // position:fixed, fest unter die GESICHTEN-Box gekoppelt (gleiche Speed).
+                    // gesichtenHoverOffset ist auf Desktop 0 (nur narrowHover), daher hier weggelassen.
+                    // translateX(-50%) zentriert horizontal (zusammen mit CSS left:50%).
+                    const gesVisualTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
+                    const michaelTopY = gesVisualTop + _cachedRivusBoxHeight + MICHAEL_TALL_GAP;
+                    _michaelImage.style.transform = `translate3d(-50%, ${michaelTopY}px, 0)`;
+                } else {
+                    _michaelImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
+                }
             }
             if (_marcusImage) {
                 _marcusImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;
@@ -1897,6 +2392,12 @@ document.addEventListener('DOMContentLoaded', function() {
             _contentBoxWrapper.style.transform = `translate3d(0, ${boxTop}px, 0)`;
         }
 
+        // Schmalmodus Hover-Gerät: Blöcke visuell nach oben verschieben (Snap-Trigger wird in calculateMeetingPoints kompensiert)
+        const narrowHover = isHoverDevice && window.innerWidth < 640;
+        const rivusHoverOffset     = narrowHover ? -300 : 0;
+        const mythusHoverOffset    = narrowHover ? -800 : 0;
+        const gesichtenHoverOffset = narrowHover ? -1500 : 0;
+
         // =============== ANCHOR TRANSFORMS (position:fixed + translate3d) ===============
         if (_anchorsReady) {
             // KONZEPT Anchor – folgt Box 1 (position:fixed, transform-basiert)
@@ -1908,14 +2409,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // RIVUS Anchor – folgt RIVUS Box 2 Wrapper
             if (_rivusAnchor) {
-                const wrapperVisualTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
+                const wrapperVisualTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset;
                 const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28;
                 _rivusAnchor.style.transform = `translate3d(${_rivusAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
 
             // MYTHUS Anchor – folgt MYTHUS Box Wrapper
             if (_mythusAnchor) {
-                const wrapperVisualTop = _mythusWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
+                const wrapperVisualTop = _mythusWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mythusHoverOffset;
                 const mobileOffset = window.innerWidth < BREAKPOINT_MOBILE ? 17 : 0;
                 const anchorTop = wrapperVisualTop - _mythusAnchorHeight2 - _mythusAnchorGap2 + mobileOffset;
                 _mythusAnchor.style.transform = `translate3d(${_mythusAnchorLeft}px, ${anchorTop}px, 0) rotate(4deg)`;
@@ -1923,16 +2424,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // GESICHTEN Anchor – folgt GESICHTEN Box Wrapper
             if (_gesichtenAnchorGray) {
-                const wrapperVisualTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
+                const wrapperVisualTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + gesichtenHoverOffset;
                 const mobileAnchorOffset = isMobile ? 4 : 0;
-                const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 28 + mobileAnchorOffset;
+                const deskAnchorOffsetG = (!isMobile && !_isPortraitLayout()) ? 40 : 0; // Desktop: Anchor 40px tiefer
+                const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 28 + mobileAnchorOffset + deskAnchorOffsetG;
                 _gesichtenAnchorGray.style.transform = `translate3d(${_gesichtenAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
         }
 
         // MYTHUS box - vertikal auf Wrapper, horizontal auf Box
         if (_mythusBoxWrapper) {
-            _mythusBoxWrapper.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED}px, 0)`;
+            _mythusBoxWrapper.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED + mythusHoverOffset}px, 0)`;
         }
         if (_mythusBox) {
             const mythusShift = window.innerWidth < BREAKPOINT_MOBILE ? '0%' : '20%';
@@ -1949,53 +2451,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // MYTHUS filled & outline
-        if (_mythusFilled) {
-            _mythusFilled.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8}px, 0) rotate(2deg)`;
-        }
-        if (_mythusOutline) {
-            _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8}px, 0) rotate(2deg)`;
-        }
+        if (_mythusFilled)  _mythusFilled.style.transform  = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset}px, 0) rotate(2deg)`;
+        if (_mythusOutline) _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset}px, 0) rotate(2deg)`;
 
         // RIVUS content box (links) - position:fixed wie KONZEPT, Transform: docTop - scrollY*(1-speed)
         if (_anchorsReady && _rivusContentBoxWrapper2) {
-            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED);
+            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset;
             _rivusContentBoxWrapper2.style.transform = `translate3d(0, ${rivusTop}px, 0)`;
         }
         if (_rivusContentBox2) {
-            const rightOffset = getGesichtenRightOffset();
-            const totalXOffset = -window.innerWidth * 0.2 + rightOffset + 61;
-            _rivusContentBox2.style.transform = `translate3d(${totalXOffset}px, 0, 0)`;
+            const xOffset = isMobile ? 0 : (-window.innerWidth * 0.2 + getGesichtenRightOffset() + 61);
+            _rivusContentBox2.style.transform = `translate3d(${xOffset}px, 0, 0)`;
         }
 
         // GESICHTEN content box - position:fixed wie RIVUS, transform analog zu _box2WrapperDocTop
         if (_anchorsReady && _gesichtenContentBoxWrapper) {
             const mobileGesichtenOffset = isMobile ? 46 : 0;
-            const gesichtenTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mobileGesichtenOffset;
+            // Desktop: nur die Textbox 30px tiefer (Anchor + Snaplinie nutzen _gesichtenWrapperDocTop, bleiben)
+            const desktopGesichtenTextOffset = (!isMobile && !_isPortraitLayout()) ? 30 : 0;
+            const gesichtenTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mobileGesichtenOffset + gesichtenHoverOffset + desktopGesichtenTextOffset;
             _gesichtenContentBoxWrapper.style.transform = `translate3d(0, ${gesichtenTop}px, 0)`;
         }
         if (_gesichtenContentBox) {
-            const isPortrait = window.innerHeight / window.innerWidth > 1.2;
+            const isPortrait = _isPortraitLayout();
             const totalXOffset = (isMobile || isPortrait) ? 0 : window.innerWidth * 0.2;
             const yOffset = (!isPortrait && !isMobile) ? 50 : 0;
             _gesichtenContentBox.style.transform = `translate3d(${totalXOffset}px, ${yOffset}px, 0)`;
         }
 
         // RIVUS filled & outline
-        if (_rivusFilled) {
-            _rivusFilled.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed}px, 0) rotate(-2deg)`;
-        }
-        if (_rivusOutline) {
-            _rivusOutline.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed}px, 0) rotate(-2deg)`;
-        }
+        if (_rivusFilled)  _rivusFilled.style.transform  = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed + rivusHoverOffset}px, 0) rotate(-2deg)`;
+        if (_rivusOutline) _rivusOutline.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed + rivusHoverOffset}px, 0) rotate(-2deg)`;
 
         // GESICHTEN filled & outline
         const gesichtenFilledOffset = isMobile ? -26 : 0;
-        if (_gesichtenAnchorFilled) {
-            _gesichtenAnchorFilled.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset}px, 0) rotate(-2deg)`;
-        }
-        if (_gesichtenAnchorOutline) {
-            _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset}px, 0) rotate(-2deg)`;
-        }
+        if (_gesichtenAnchorFilled)  _gesichtenAnchorFilled.style.transform  = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset}px, 0) rotate(-2deg)`;
+        if (_gesichtenAnchorOutline) _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset}px, 0) rotate(-2deg)`;
 
         // Text-Layer
         for (let i = 0; i < _allTextBehinds.length; i++) {
@@ -2073,6 +2564,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function recalculateLayout() {
         _anchorsReady = false; // Zurücksetzen damit updateScene den Fallback nutzt
 
+        // Bei Wechsel von Mobile → Desktop: Inline-Opacity/-PointerEvents der Bilder zurücksetzen,
+        // die updateMobileImageVisibility() gesetzt hat und die sonst bestehen bleiben.
+        if (window.innerWidth >= BREAKPOINT_MOBILE) {
+            [_benImage, _mythusDaniel, _michaelImage, _marcusImage].forEach(el => {
+                if (!el) return;
+                el.style.opacity = '';
+                el.style.pointerEvents = '';
+            });
+        }
+
         // Fixed Wrapper zurücksetzen, bevor DOM-Messungen stattfinden.
         // Browser rendert nicht zwischen synchronen Anweisungen → kein Flicker.
         // Ohne Reset liefert getDocumentTop() für Kindelemente fixed-positionierter
@@ -2099,6 +2600,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_gesichtenBoxEl) _cachedRivusBoxHeight = _gesichtenBoxEl.offsetHeight;
 
         updateScene();
+        applyFrozenViewportMetrics(); // vor allen Messungen: vh-Maße einfrieren (narrowHover + Desktop/iPad-Browser)
         calculateKonzeptAParallaxSpeed();
         positionGesichtenAndBox2();
         // _box2WrapperDocTop direkt aus DOM messen (gleicher Wert wie in positionAnchors und Parallax).
@@ -2139,8 +2641,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const benList = document.querySelector('#ben-container .words-stair');
         if (!benList) return;
 
-        const isSplit = window.innerWidth <= 600
-                     || (window.innerWidth <= 1024 && window.innerHeight > window.innerWidth);
+        const isSplit = window.innerWidth <= BREAKPOINT_MOBILE
+                     || (window.innerWidth <= 1024 && _layoutH() > window.innerWidth);
 
         const d3    = benList.querySelector('.ben-desktop-3');
         const d4    = benList.querySelector('.ben-desktop-4');
@@ -2186,7 +2688,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const danielList = document.querySelector('#mythus-daniel-image-with-info .words-stair');
         if (!danielList) return;
 
-        const isMobile = window.innerWidth <= 600;
+        const isMobile = window.innerWidth <= BREAKPOINT_MOBILE;
         const step = 16;
         const oddT  = 'skew(60deg, -30deg) scaleY(0.66667)';
         const evenT = 'skew(0deg, -30deg) scaleY(1.33333)';
@@ -2235,7 +2737,20 @@ document.addEventListener('DOMContentLoaded', function() {
     updateBenStaircase();
     updateDanielStaircase();
 
+    // Snap-Erhalt über Resize hinweg: War die Seite beim Resize-Beginn auf einem Snap-Punkt,
+    // wird sie nach dem Recalc exakt dorthin zurückgesetzt (Browser kann scrollY beim
+    // Resize verschieben → gesnappte Blöcke rutschen sonst sichtbar aus der Snaplinie).
     window.addEventListener('resize', () => {
+        const _hoverDev = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        isResizing = true; // Snap-Mechanik pausieren (keine Snaps durch Resize-Scroll-Events)
+        _updateAspectClasses(); // sofort (Media-Query-Ersatz); auf Hover-Geräten eingefroren → kein Flip beim Höhen-Ziehen
+        if (_hoverDev && _endFloor > 0) {
+            // Ende = GESICHTEN-Snap + fester Scrollweg (höhenunabhängig). Spacer zweistufig
+            // setzen → maxScroll == _endFloor (robust gegen Messfehler).
+            _endSEnd = _applyEndSpacer(Math.round(_endFloor));
+            // Synchron neu zeichnen → pro Frame nur der finale, konsistente Zustand (kein Ruckeln).
+            applyParallaxEffect(window.scrollY);
+        }
         clearTimeout(resizeTimer);
         // Transition während Resize deaktivieren
         document.body.classList.add('no-image-transition');
@@ -2243,6 +2758,8 @@ document.addEventListener('DOMContentLoaded', function() {
             recalculateLayout();
             updateBenStaircase();
             updateDanielStaircase();
+            // Snap-Mechanik erst nach kurzem Nachlauf wieder aktivieren (Trailing-Scroll-Events)
+            setTimeout(() => { isResizing = false; }, 250);
             requestAnimationFrame(() => document.body.classList.remove('no-image-transition'));
         }, 150);
     });
@@ -2265,6 +2782,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (themeSwitch) themeSwitch.checked = false;
         }
     };
+
+    // Debug-Interface: recalculateLayout zugänglich machen
+    window.__debug = window.__debug || {};
+    window.__debug._recalculate = recalculateLayout;
 
     // Theme aus localStorage oder OS-Präferenz laden
     const savedTheme = localStorage.getItem('theme');
