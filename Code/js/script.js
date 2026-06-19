@@ -741,7 +741,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYR = NH_MEET_RIVUS; // Fester Pixel-Wert → unabhängig von Fensterhöhe
             } else {
                 meetYR = _layoutH() * getMeetingRatio() - 75;
-                if (_isPortraitLayout()) { meetYR += 60; } else { meetYR -= 8; meetYR = Math.max(meetYR, _layoutH() * 0.07 + 50); }
+                if (_isPortraitLayout()) { meetYR += 60; } else { meetYR -= 8; }
+                // Floor für beide Ausrichtungen: auf Mobile-Portrait ist getMeetingRatio() ≈ 0,
+                // sonst würde meetYR negativ → Snap oberhalb des sichtbaren Bereichs.
+                meetYR = Math.max(meetYR, _layoutH() * 0.07 + 50);
                 meetYR -= 24;
             }
             const sMeetRivus = (anchorStartR - meetYR) / (1 - BASE_PARALLAX_SPEED);
@@ -761,7 +764,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYM = NH_MEET_MYTHUS; // Fester Pixel-Wert → unabhängig von Fensterhöhe
             } else {
                 meetYM = _layoutH() * getMeetingRatio() - 75;
-                if (_isPortraitLayout()) { meetYM += 60; } else { meetYM -= 8; meetYM = Math.max(meetYM, _layoutH() * 0.07 + 50); }
+                if (_isPortraitLayout()) { meetYM += 60; } else { meetYM -= 8; }
+                meetYM = Math.max(meetYM, _layoutH() * 0.07 + 50); // Floor gegen negative meetY (s. RIVUS)
                 meetYM -= 20;
             }
             const sMeetMythusRaw = (anchorStartM - meetYM) / (1 - BASE_PARALLAX_SPEED);
@@ -788,6 +792,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 meetYG = _layoutH() * getMeetingRatio();
                 if (_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) meetYG += 80;
+                else if (window.innerWidth < BREAKPOINT_MOBILE) meetYG = Math.max(meetYG, _layoutH() * 0.07 + 26); // Floor gegen ~0/negative meetY (s. RIVUS)
             }
             const sMeetGesichtenRaw = (anchorStartG - meetYG) / (1 - BASE_PARALLAX_SPEED);
             const sMeetMythusPrev = _namedPoints.find(p => p.name === 'MYTHUS')?.s ?? 0;
