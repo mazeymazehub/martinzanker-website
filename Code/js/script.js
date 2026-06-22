@@ -365,14 +365,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Neu berechnen basierend auf aktuellem Layout
+        // MYTHUS-Text bekommt auf üblichen Laptop-Breiten 20px mehr Abstand zum rechten Rahmen.
+        const mythusBox = document.getElementById('mythus-box');
+        const isLaptopWidth = window.innerWidth >= 1200 && window.innerWidth <= 1600;
         paragraphs.forEach(p => {
             // GESICHTEN-Box + RIVUS-Box: separat behandelt, hier überspringen
             if (rivusBox && rivusBox.contains(p)) return;
             if (rivusTextBox && rivusTextBox.contains(p)) return;
+            const isMythus = mythusBox && mythusBox.contains(p);
+            const limit = (isMythus && isLaptopWidth) ? rightLimit - 20 : rightLimit;
             const left = p.getBoundingClientRect().left;
-            const available = rightLimit - left;
+            const available = limit - left;
             const computed = parseFloat(getComputedStyle(p).maxWidth);
-            if (isNaN(computed) || computed > available) {
+            if (isNaN(computed) || computed > available || (isMythus && isLaptopWidth)) {
                 p.style.maxWidth = Math.max(50, available) + 'px';
             }
         });
@@ -1009,6 +1014,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Scroll-Anchoring aus: Browser darf scrollY beim Resize-Relayout nicht selbst nachjustieren
         document.documentElement.style.overflowAnchor = 'none';
     }
+
+    // iOS Safe Areas: viewport-fit=cover aktivieren und zwei Rahmenfarb-Flächen einsetzen,
+    // die Notch (oben) und Home-Indicator (unten) abdecken, damit dort keine Inhalte hinter
+    // den durchscheinenden Safari-Balken sichtbar bleiben (iOS 26). CSS: #safe-area-top/-bottom.
+    (function initSafeAreaFrame() {
+        const vp = document.querySelector('meta[name="viewport"]');
+        if (vp && !/viewport-fit/.test(vp.getAttribute('content') || '')) {
+            vp.setAttribute('content', vp.getAttribute('content') + ', viewport-fit=cover');
+        }
+        if (!document.getElementById('safe-area-top')) {
+            const top = document.createElement('div');    top.id = 'safe-area-top';
+            const bottom = document.createElement('div'); bottom.id = 'safe-area-bottom';
+            document.body.appendChild(top);
+            document.body.appendChild(bottom);
+        }
+    })();
 
     function applyFrozenViewportMetrics() {
         const isHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -1804,8 +1825,17 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         overlay.style.transform = 'translateX(0)';
-        overlay.addEventListener('transitionend', function onIn() {
+
+        // iOS-Safari feuert transitionend nicht zuverlässig (Compositing/pointer-events:none).
+        // Ohne Fallback würde applyFn nie laufen UND _isSliding hängenbleiben → der Niveau-Switch
+        // reagiert danach gar nicht mehr. Daher beide Phasen zusätzlich per Timeout absichern.
+        let _inFired = false;
+        let _inFallback;
+        const onIn = () => {
+            if (_inFired) return;
+            _inFired = true;
             overlay.removeEventListener('transitionend', onIn);
+            clearTimeout(_inFallback);
 
             // Section-Name des nächsten Snaps vor dem Wechsel merken
             const sBefore = window.scrollY;
@@ -1840,15 +1870,24 @@ document.addEventListener('DOMContentLoaded', function() {
             requestAnimationFrame(() => requestAnimationFrame(() => {
                 document.body.classList.remove('no-image-transition');
                 overlay.style.transform = 'translateX(-100%)';
-                overlay.addEventListener('transitionend', function onOut() {
+                let _outFired = false;
+                let _outFallback;
+                const onOut = () => {
+                    if (_outFired) return;
+                    _outFired = true;
                     overlay.removeEventListener('transitionend', onOut);
+                    clearTimeout(_outFallback);
                     overlay.style.transition = 'none';
                     overlay.style.transform = 'translateX(100%)';
                     requestAnimationFrame(() => { overlay.style.transition = ''; });
                     _isSliding = false;
-                }, { once: true });
+                };
+                overlay.addEventListener('transitionend', onOut);
+                _outFallback = setTimeout(onOut, 320);
             }));
-        }, { once: true });
+        };
+        overlay.addEventListener('transitionend', onIn);
+        _inFallback = setTimeout(onIn, 320);
     }
 
     const _localeUrls = { de: 'index.html', en: 'index-en.html', es: 'index-es.html' };
