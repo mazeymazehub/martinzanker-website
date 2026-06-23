@@ -82,7 +82,7 @@
 html {
     scroll-behavior: smooth;
     overflow-x: hidden; /* Verhindert horizontalen Viewport-Overflow durch 120vw-Boxen (v.a. Portrait) */
-    background-color: #E9E9E4; /* Light frame color for overscroll */
+    background-color: #ff6633; /* orange Rahmenfarbe für Overscroll/Safe-Area-Ränder */
     overscroll-behavior-y: none;
 }
 
@@ -430,6 +430,20 @@ header {
 }
 
 .faded-out {
+    opacity: 0;
+}
+
+/* FOUC vermeiden: Anchor-Schriften (KONZEPT/RIVUS/MYTHUS/GESICHTEN) erst zeigen, wenn JS
+   sie positioniert hat — vorher stehen sie per transform:0 oben links übereinander.
+   body.layout-ready wird nach dem ersten recalculateLayout() gesetzt. */
+.konzept-heading-container,
+#rivus-anchor-container,
+#gesichten-anchor-container {
+    transition: opacity 0.25s ease;
+}
+body:not(.layout-ready) .konzept-heading-container,
+body:not(.layout-ready) #rivus-anchor-container,
+body:not(.layout-ready) #gesichten-anchor-container {
     opacity: 0;
 }
 

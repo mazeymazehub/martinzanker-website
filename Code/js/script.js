@@ -1688,6 +1688,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_gesichtenBoxEl) _cachedRivusBoxHeight = _gesichtenBoxEl.offsetHeight;
 
         recalculateLayout();
+        // Anchors sind jetzt positioniert → einblenden (verhindert FOUC oben links).
+        document.body.classList.add('layout-ready');
 
         // Sanfte Theme-Transitions erst nach initialem Rendern aktivieren
         requestAnimationFrame(() => {
@@ -1695,6 +1697,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.documentElement.classList.add('theme-transitioning');
         });
     });
+    // Sicherheitsnetz: falls das load-Event ausbleibt, Anchors trotzdem nach 4s zeigen.
+    setTimeout(() => document.body.classList.add('layout-ready'), 4000);
 
     // Tap-to-Toggle für Bild-Info (Mobile: alle Bilder inkl. Alex; Desktop: nur Klick)
     const allInfoImages = document.querySelectorAll(
