@@ -172,7 +172,10 @@ body.dark-mode::after {
 
 /* ===== Performance auf Mobile (iOS-Hitze reduzieren) ===== */
 @media (max-width: 640px) {
-    /* Hinweis: Grain-Overlay (body::after) bleibt erhalten (vom Nutzer gewünscht). */
+    /* Grain-Overlay (body::after, fixed über allem) macht die Seite auf dem iPhone
+       zusammen mit Parallax + viewport-fit=cover quasi unbenutzbar (sehr langsames
+       Laden). Daher auf Mobile aus. Für eine leichtere Körnung gibt es Alternativen. */
+    body::after { display: none !important; }
 
     /* Header: opakes Orange statt backdrop-filter:blur — das Neu-Blurren des
        durchscrollenden Inhalts pro Frame ist auf iOS eine der größten Heizquellen. */
@@ -3235,8 +3238,8 @@ body.michael-tall #michael-image-with-info .image-info .words-stair {
     /* Über ALLEN Ebenen (auch Grain z10000 und Slide-Overlay z9999), damit kein
        Seiteninhalt in die Safe Areas durchscheint. Die Bars liegen räumlich außerhalb
        von Nav/Inhalt (nur Notch- bzw. Home-Indicator-Bereich), verdecken also nichts Klickbares. */
-    #safe-area-top    { top: 0;    height: env(safe-area-inset-top);    z-index: 2147483647; }
-    #safe-area-bottom { bottom: 0; height: env(safe-area-inset-bottom); z-index: 2147483647; }
+    #safe-area-top    { top: 0;    height: env(safe-area-inset-top);    z-index: 99999; }
+    #safe-area-bottom { bottom: 0; height: env(safe-area-inset-bottom); z-index: 99999; }
     body.dark-mode #safe-area-top,
     body.dark-mode #safe-area-bottom { background-color: #1a1a1a; } /* dunkle Rahmenfarbe */
 }
