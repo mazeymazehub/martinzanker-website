@@ -730,7 +730,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const anchorGap = getKonzeptAnchorGap();
             const anchorStart = getDocumentTop(alexImg) + alexImg.offsetHeight + getBoxAlexGap() - anchorGap - anchorHeight;
             const sMeet = (anchorStart - meetY) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeet > 100) _namedPoints.push({ s: sMeet, name: 'KONZEPT' });
+            if (sMeet > 100) _namedPoints.push({ s: sMeet, name: 'KONZEPT', meetY, anchorStart });
         }
 
         // RIVUS
@@ -753,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYR -= 24;
             }
             const sMeetRivus = (anchorStartR - meetYR) / (1 - BASE_PARALLAX_SPEED);
-            if (sMeetRivus > 100) _namedPoints.push({ s: sMeetRivus, name: 'RIVUS' });
+            if (sMeetRivus > 100) _namedPoints.push({ s: sMeetRivus, name: 'RIVUS', meetY: meetYR, anchorStart: anchorStartR });
         }
 
         // MYTHUS
@@ -779,7 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (sMeetMythus > 100) {
                 const _mythusBefore = _narrowHoverSnap ? 250 : (window.innerWidth < BREAKPOINT_MOBILE ? 500 : 700); // Touch-Mobile bleibt 500 (eingefroren), Desktop 700
-                _namedPoints.push({ s: sMeetMythus, name: 'MYTHUS', zone: { before: _mythusBefore, after: _narrowHoverSnap ? 220 : 180 } });
+                _namedPoints.push({ s: sMeetMythus, name: 'MYTHUS', zone: { before: _mythusBefore, after: _narrowHoverSnap ? 220 : 180 }, meetY: meetYM, anchorStart: anchorStartM });
             }
         }
 
@@ -807,7 +807,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const gesichtenZone = window.innerWidth < BREAKPOINT_MOBILE
                 ? { before: 700, after: (_narrowHoverSnap ? 250 : 840) }
                 : { before: 700, after: 50 }; // Desktop: before 700, after wie bisher (50)
-            if (sMeetGesichten > 100) _namedPoints.push({ s: sMeetGesichten, name: 'GESICHTEN', zone: gesichtenZone });
+            if (sMeetGesichten > 100) _namedPoints.push({ s: sMeetGesichten, name: 'GESICHTEN', zone: gesichtenZone, meetY: meetYG, anchorStart: anchorStartG });
         }
 
         // Seitenende & MICHAEL-Snap.
@@ -857,6 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
         meetingPoints = _namedPoints.map(p => p.s);
         meetingPointNames = _namedPoints.map(p => p.name);
         _namedPoints.forEach(p => { if (p.zone !== undefined) meetingPointZoneOverrides.set(p.s, p.zone); });
+        window.__snapInfo = _namedPoints.map(p => ({ name: p.name, s: Math.round(p.s), meetY: Math.round(p.meetY || 0), anchorStart: Math.round(p.anchorStart || 0) }));
 
         const spacer = document.getElementById('scroll-spacer');
         if (spacer) spacer.style.height = '0px';
@@ -1030,6 +1031,35 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.appendChild(bottom);
         }
     })();
+
+    // ===== Snap-Debug-Overlay (nur bei URL-Hash #debug) =====
+    // Zeigt live: Fenster-/Layouthöhe, scrollY und je Snap: sMeet (s), meetY (mY),
+    // tatsächliche Anchor-Oberkante (top) und rechnerische Anchor-Oberkante (vc).
+    // Diagnose: bei Snap ist sY≈s; dann sollte top≈mY sein. top≠vc ⇒ anchorStart passt
+    // nicht zur Sichtposition; top≪mY ⇒ Anchor sitzt über der gewünschten Linie.
+    if (/debug/i.test(location.hash)) {
+        const dbg = document.createElement('div');
+        dbg.id = 'snap-debug';
+        dbg.style.cssText = 'position:fixed;left:0;top:0;padding:env(safe-area-inset-top,4px) 8px 6px;'
+            + 'z-index:2147483646;background:rgba(0,0,0,.82);color:#0f0;'
+            + 'font:11px/1.3 ui-monospace,monospace;white-space:pre;pointer-events:none;max-width:82vw;';
+        document.body.appendChild(dbg);
+        const sel = { KONZEPT: '.konzept-heading-anchor', RIVUS: '.rivus-anchor-gray', MYTHUS: '#mythus-anchor', GESICHTEN: '#gesichten-anchor-gray' };
+        const renderDbg = () => {
+            const sY = window.scrollY;
+            const L = ['iH=' + window.innerHeight + ' lH=' + Math.round(_layoutH()) + ' sY=' + Math.round(sY) + ' port=' + (_isPortraitLayout() ? 1 : 0)];
+            (window.__snapInfo || []).forEach(p => {
+                const el = document.querySelector(sel[p.name] || '');
+                const top = el ? Math.round(el.getBoundingClientRect().top) : '-';
+                const vc = Math.round(p.anchorStart - sY * (1 - BASE_PARALLAX_SPEED));
+                L.push(p.name.slice(0, 4) + ' s=' + p.s + ' mY=' + p.meetY + ' top=' + top + ' vc=' + vc);
+            });
+            dbg.textContent = L.join('\n');
+        };
+        window.addEventListener('scroll', renderDbg, { passive: true });
+        setInterval(renderDbg, 400);
+        renderDbg();
+    }
 
     function applyFrozenViewportMetrics() {
         const isHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;

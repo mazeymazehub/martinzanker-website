@@ -172,9 +172,7 @@ body.dark-mode::after {
 
 /* ===== Performance auf Mobile (iOS-Hitze reduzieren) ===== */
 @media (max-width: 640px) {
-    /* Ganzflächiges Grain-Overlay (fixed, z10000) wird sonst pro Scroll-Frame über den
-       gesamten bewegten Inhalt geblendet → teure GPU-Komposition. Auf Mobile entfernen. */
-    body::after { display: none !important; }
+    /* Hinweis: Grain-Overlay (body::after) bleibt erhalten (vom Nutzer gewünscht). */
 
     /* Header: opakes Orange statt backdrop-filter:blur — das Neu-Blurren des
        durchscrollenden Inhalts pro Frame ist auf iOS eine der größten Heizquellen. */
