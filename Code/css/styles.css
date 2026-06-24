@@ -399,7 +399,7 @@ header {
     letter-spacing: -0.08em; /* Same tight spacing as MALEREI */
     text-transform: uppercase;
     margin: 0;
-    color: #1a1a1a;
+    color: var(--color-dark); /* exakt wie »MALEREI« (main-heading-filled) */
     will-change: transform, font-size;
     transition: none;
     position: absolute;

@@ -722,6 +722,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // 28px zu hoch. Korrektur nur hier (narrowHover/Desktop nutzen ihre eigene Abstimmung).
         const _touchMobile = !_narrowHoverSnap && window.innerWidth < BREAKPOINT_MOBILE;
         const _touchAnchorFix = _touchMobile ? -28 : 0;
+        // Touch-Mobile: Überschriften tiefer im Bild landen lassen (größere meetY = tiefer).
+        // Tunbar – bei Bedarf erhöhen/verringern.
+        const _touchMeetDown = _touchMobile ? 140 : 0;
 
         // KONZEPT
         const konzeptAnchorEl = document.querySelector('.konzept-heading-anchor');
@@ -756,6 +759,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYR = Math.max(meetYR, _layoutH() * 0.07 + 50);
                 meetYR -= 24;
             }
+            meetYR += _touchMeetDown;
             const sMeetRivus = (anchorStartR - meetYR) / (1 - BASE_PARALLAX_SPEED);
             if (sMeetRivus > 100) _namedPoints.push({ s: sMeetRivus, name: 'RIVUS', meetY: meetYR, anchorStart: anchorStartR });
         }
@@ -777,6 +781,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYM = Math.max(meetYM, _layoutH() * 0.07 + 50); // Floor gegen negative meetY (s. RIVUS)
                 meetYM -= 20;
             }
+            meetYM += _touchMeetDown;
             const sMeetMythusRaw = (anchorStartM - meetYM) / (1 - BASE_PARALLAX_SPEED);
             const sMeetRivusPrev = _namedPoints.find(p => p.name === 'RIVUS')?.s ?? 0;
             const sMeetMythus = (_narrowHoverSnap && sMeetRivusPrev > 0) ? Math.max(sMeetMythusRaw, sMeetRivusPrev + 150) : sMeetMythusRaw;
@@ -803,6 +808,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) meetYG += 80;
                 else if (window.innerWidth < BREAKPOINT_MOBILE) meetYG = Math.max(meetYG, _layoutH() * 0.07 + 26); // Floor gegen ~0/negative meetY (s. RIVUS)
             }
+            meetYG += _touchMeetDown;
             const sMeetGesichtenRaw = (anchorStartG - meetYG) / (1 - BASE_PARALLAX_SPEED);
             const sMeetMythusPrev = _namedPoints.find(p => p.name === 'MYTHUS')?.s ?? 0;
             const sMeetGesichten = (_narrowHoverSnap && sMeetMythusPrev > 0) ? Math.max(sMeetGesichtenRaw, sMeetMythusPrev + 150) : sMeetGesichtenRaw;
