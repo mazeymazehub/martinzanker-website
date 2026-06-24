@@ -2299,6 +2299,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let i = 0; i < _headerLogos.length; i++) {
                 _headerLogos[i].style.height = `${startTextSize}px`;
             }
+            if (_headerLogoText) _headerLogoText.style.fontSize = `${startTextSize}px`;
             if (_heroSection) _heroSection.style.marginTop = `${30 + newHeight + introOffset}px`;
             if (_headerBackdrop) _headerBackdrop.style.height = `${30 + newHeight}px`;
             return;

@@ -389,15 +389,17 @@ header {
     display: block;
 }
 
-/* Logo text - simple dark gray text like MALEREI (kept for fallback) */
+/* Logo text »MARTIN ZANKER« (ersetzt das frühere Logo-GIF). Auf der Landingpage
+   skaliert die Shrink-Animation (updateHeaderSize) die font-size; der Clamp hier ist
+   nur der initiale Wert vor dem ersten JS-Frame. Subseiten: feste Größe (s. unten). */
 .logo-text {
     font-family: 'Inter', sans-serif;
-    font-size: 108px; /* Same as MALEREI */
-    font-weight: 700;
+    font-size: clamp(34px, 6vw, 86px);
+    font-weight: 800;
     letter-spacing: -0.08em; /* Same tight spacing as MALEREI */
     text-transform: uppercase;
     margin: 0;
-    color: #333333; /* Dark gray like MALEREI */
+    color: #1a1a1a;
     will-change: transform, font-size;
     transition: none;
     position: absolute;
@@ -405,6 +407,13 @@ header {
     left: 50%;
     transform: translate(-50%, -50%);
     white-space: nowrap;
+}
+body.dark-mode .logo-text {
+    color: #ff6633; /* orange im Dark-Mode (wie das frühere dunkle Logo) */
+}
+/* Subseiten haben einen fixen (nicht schrumpfenden) Header → feste Logo-Größe */
+.fixed-header .logo-text {
+    font-size: 28px;
 }
 
 /* =============== MAIN HEADING =============== */
