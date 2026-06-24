@@ -2147,6 +2147,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const _headerLogoText = header ? header.querySelector('.logo-text') : null;
     const _headerBackdrop = document.querySelector('.header-backdrop');
 
+    // Echtes Smartphone (Text-Logo mit Intro). Desktop/iPad zeigen das animierte Bild.
+    function _isPhone() {
+        return window.matchMedia('(hover: none) and (pointer: coarse)').matches && window.innerWidth <= 600;
+    }
+    // Frame-zu-Frame-Startgröße des Text-Logos messen (nur wenn der Text sichtbar ist = Smartphone).
+    let _logoFillSize = 0;
+    function computeLogoFillSize() {
+        _logoFillSize = 0;
+        if (!_headerLogoText || window.getComputedStyle(_headerLogoText).display === 'none') return;
+        const avail = Math.max(120, window.innerWidth - 48); // zwischen den Rahmen, kleiner Puffer
+        const prevFS = _headerLogoText.style.fontSize;
+        const prevTr = _headerLogoText.style.transform;
+        _headerLogoText.style.transform = 'none';
+        _headerLogoText.style.fontSize = '100px';
+        const w = _headerLogoText.getBoundingClientRect().width;
+        _headerLogoText.style.fontSize = prevFS;
+        _headerLogoText.style.transform = prevTr;
+        if (w > 0) _logoFillSize = Math.floor(100 * avail / w);
+    }
+    // Animiertes Logo-Bild nur auf Nicht-Smartphones laden (Smartphones zeigen den Text → spart MB).
+    function ensureLogoSrc() {
+        if (_isPhone()) return;
+        _headerLogos.forEach(img => { if (img.dataset.src && !img.getAttribute('src')) img.setAttribute('src', img.dataset.src); });
+    }
+    ensureLogoSrc();
+
     // Cached anchor positioning data (computed in positionAnchors, used per frame)
     let _michaelVisualDocTop = 0; // gesetzt in positionMichaelAndMarcus(), genutzt in calculateMeetingPoints()
     let _michaelTallDocTop = 0;   // statische Dokument-Oberkante des "großen Michael" (position:fixed)
@@ -2287,25 +2313,29 @@ document.addEventListener('DOMContentLoaded', function() {
         const windowWidth = window.innerWidth;
 
         if (windowWidth <= 480) {
-            // Smallest mobile
+            // Smallest mobile / Smartphone
             startHeight = 46;
             endHeight = 46; // No shrinking on smallest mobile
             navHeight = 25;
-            startTextSize = 34; // 20% smaller than 42px (42 × 0.8 = 33.6)
             endTextSize = 34;
+            // Smartphone: Text-Logo startet Rahmen-zu-Rahmen und schrumpft beim Scrollen auf 34px.
+            const phone = _isPhone();
+            startTextSize = (phone && _logoFillSize) ? _logoFillSize : 34;
 
-            // Intro-Animation: Logo startet 200px tiefer, bewegt sich beim Scrollen hoch
+            // Intro-Animation: Logo startet tiefer, bewegt sich beim Scrollen hoch.
             const INTRO_OFFSET = 100;
             const introOffset = Math.max(0, INTRO_OFFSET - scrollY);
             const clampedScroll = Math.max(scrollY, 0);
             const progress = Math.min(clampedScroll / maxScroll, 1);
             const newHeight = startHeight;
+            const newTextSize = startTextSize - (startTextSize - endTextSize) * progress;
             const header = document.querySelector('header');
             if (header) header.style.top = `${30 + introOffset}px`; // stripe-top (30px) + Intro-Offset
-            for (let i = 0; i < _headerLogos.length; i++) {
-                _headerLogos[i].style.height = `${startTextSize}px`;
+            if (phone && _headerLogoText) {
+                _headerLogoText.style.fontSize = `${newTextSize}px`;
+            } else {
+                for (let i = 0; i < _headerLogos.length; i++) _headerLogos[i].style.height = `${newTextSize}px`;
             }
-            if (_headerLogoText) _headerLogoText.style.fontSize = `${startTextSize}px`;
             if (_heroSection) _heroSection.style.marginTop = `${30 + newHeight + introOffset}px`;
             if (_headerBackdrop) _headerBackdrop.style.height = `${30 + newHeight}px`;
             return;
@@ -2325,6 +2355,10 @@ document.addEventListener('DOMContentLoaded', function() {
             endTextSize = 32;
         }
 
+        // Smartphone (480–600px): Text-Logo Rahmen-zu-Rahmen starten lassen.
+        const _phone = _isPhone();
+        if (_phone && _logoFillSize) startTextSize = _logoFillSize;
+
         // Clamp scrollY to prevent negative values (rubber band effect when scrolling up)
         let clampedScrollY = Math.max(scrollY, 0);
         let progress = Math.min(clampedScrollY / maxScroll, 1);
@@ -2334,7 +2368,10 @@ document.addEventListener('DOMContentLoaded', function() {
         header.style.height = `${newHeight}px`;
 
         const tx = progress === 1 ? 'translate(-50%, calc(-50% - 2px))' : 'translate(-50%, -50%)';
-        if (_headerLogos.length > 0) {
+        if (_phone && _headerLogoText) {
+            _headerLogoText.style.fontSize = `${newTextSize}px`;
+            _headerLogoText.style.transform = tx;
+        } else if (_headerLogos.length > 0) {
             for (let i = 0; i < _headerLogos.length; i++) {
                 _headerLogos[i].style.height = `${newTextSize}px`;
                 _headerLogos[i].style.transform = tx;
@@ -2732,6 +2769,8 @@ document.addEventListener('DOMContentLoaded', function() {
         applyParallaxEffect(window.scrollY); // Anchors mit korrekten DocTops aktualisieren
         calculateRivusAParallaxSpeed();
         calculateMeetingPoints();
+        ensureLogoSrc();       // Bild-Logo bei Bedarf laden (Nicht-Smartphone)
+        computeLogoFillSize(); // Frame-Füllgröße des Text-Logos (Smartphone-Intro) neu messen
         updateScene(); // faded-out nach korrekter Positionierung neu auswerten
     }
 

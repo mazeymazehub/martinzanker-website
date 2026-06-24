@@ -407,6 +407,7 @@ header {
     left: 50%;
     transform: translate(-50%, -50%);
     white-space: nowrap;
+    display: none; /* Standard (Desktop/iPad): animiertes Logo-Bild; Text nur auf Smartphones */
 }
 body.dark-mode .logo-text {
     color: #ff6633; /* orange im Dark-Mode (wie das frühere dunkle Logo) */
@@ -414,6 +415,11 @@ body.dark-mode .logo-text {
 /* Subseiten haben einen fixen (nicht schrumpfenden) Header → feste Logo-Größe */
 .fixed-header .logo-text {
     font-size: 28px;
+}
+/* Echte Smartphones: Text-Logo (mit Intro-Animation) statt animiertem Bild */
+@media (hover: none) and (pointer: coarse) and (max-width: 600px) {
+    .logo-gif { display: none !important; }
+    .logo-text { display: block; }
 }
 
 /* =============== MAIN HEADING =============== */
