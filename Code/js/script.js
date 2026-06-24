@@ -724,7 +724,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const _touchAnchorFix = _touchMobile ? -28 : 0;
         // Touch-Mobile: Überschriften tiefer im Bild landen lassen (größere meetY = tiefer).
         // Tunbar – bei Bedarf erhöhen/verringern.
-        const _touchMeetDown = _touchMobile ? 140 : 0;
+        const _touchMeetDown = _touchMobile ? 350 : 0;
 
         // KONZEPT
         const konzeptAnchorEl = document.querySelector('.konzept-heading-anchor');

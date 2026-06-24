@@ -1585,11 +1585,12 @@ section {
         display: flex;
         align-items: center;
         position: relative;
+        margin-left: 20px; /* doppelter Abstand zwischen den rechten Buttons */
     }
 
-    /* Kleiner Abstand zwischen Aa-Button und Hamburger */
+    /* Abstand zwischen Aa-Button und Hamburger (doppelt: 10px → 20px) */
     .nav-toggle {
-        margin-left: 10px;
+        margin-left: 20px;
     }
 
     /* KONZEPT: Text zentriert — Box bei wrapper-padding(16px) + box-padding(20px) = 36px
