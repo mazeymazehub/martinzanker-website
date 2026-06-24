@@ -170,6 +170,24 @@ body.dark-mode::after {
     opacity: 0.20;
 }
 
+/* ===== Performance auf Mobile (iOS-Hitze reduzieren) ===== */
+@media (max-width: 640px) {
+    /* Ganzflächiges Grain-Overlay (fixed, z10000) wird sonst pro Scroll-Frame über den
+       gesamten bewegten Inhalt geblendet → teure GPU-Komposition. Auf Mobile entfernen. */
+    body::after { display: none !important; }
+
+    /* Header: opakes Orange statt backdrop-filter:blur — das Neu-Blurren des
+       durchscrollenden Inhalts pro Frame ist auf iOS eine der größten Heizquellen. */
+    header {
+        background-color: #ff6633 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    body.dark-mode header {
+        background-color: #1a1a1a !important;
+    }
+}
+
 /* Background stripes - dark gray frame behind navigation */
 .background-stripe-top,
 .background-stripe-bottom,
@@ -3216,10 +3234,11 @@ body.michael-tall #michael-image-with-info .image-info .words-stair {
         background-color: #ff6633; /* orange Rahmenfarbe */
         pointer-events: none;
     }
-    /* oben: über allem (kein Nav am oberen Rand auf Mobile) */
-    #safe-area-top    { top: 0;    height: env(safe-area-inset-top); z-index: 1100; }
-    /* unten: hinter der (angehobenen) Nav, aber über dem Inhalt */
-    #safe-area-bottom { bottom: 0; height: env(safe-area-inset-bottom); z-index: 998; }
+    /* Über ALLEN Ebenen (auch Grain z10000 und Slide-Overlay z9999), damit kein
+       Seiteninhalt in die Safe Areas durchscheint. Die Bars liegen räumlich außerhalb
+       von Nav/Inhalt (nur Notch- bzw. Home-Indicator-Bereich), verdecken also nichts Klickbares. */
+    #safe-area-top    { top: 0;    height: env(safe-area-inset-top);    z-index: 2147483647; }
+    #safe-area-bottom { bottom: 0; height: env(safe-area-inset-bottom); z-index: 2147483647; }
     body.dark-mode #safe-area-top,
     body.dark-mode #safe-area-bottom { background-color: #1a1a1a; } /* dunkle Rahmenfarbe */
 }
