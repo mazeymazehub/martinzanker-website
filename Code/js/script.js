@@ -717,7 +717,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const _namedPoints = []; // { s, name, zone? }
         meetingPointZoneOverrides = new Map();
         const _narrowHoverSnap = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth < 640;
-
+        // Touch-Mobile (echtes iPhone): die für den Snap genutzte anchorStart-Formel (+50) liegt
+        // ~28px höher als die echte Render-Position der Anchors → RIVUS/MYTHUS/GESICHTEN snappen
+        // 28px zu hoch. Korrektur nur hier (narrowHover/Desktop nutzen ihre eigene Abstimmung).
+        const _touchMobile = !_narrowHoverSnap && window.innerWidth < BREAKPOINT_MOBILE;
+        const _touchAnchorFix = _touchMobile ? -28 : 0;
 
         // KONZEPT
         const konzeptAnchorEl = document.querySelector('.konzept-heading-anchor');
@@ -740,7 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const anchorHeightR = gesichtenAnchorEl.offsetHeight;
             const anchorGapR = getGesichtenAnchorGap();
             const narrowRivusShift = _narrowHoverSnap ? -300 : 0;
-            const anchorStartR = _box2WrapperDocTop + 50 - anchorGapR - anchorHeightR + narrowRivusShift;
+            const anchorStartR = _box2WrapperDocTop + 50 - anchorGapR - anchorHeightR + narrowRivusShift + _touchAnchorFix;
             let meetYR;
             if (_narrowHoverSnap) {
                 meetYR = NH_MEET_RIVUS; // Fester Pixel-Wert → unabhängig von Fensterhöhe
@@ -763,7 +767,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const anchorGapM = getKonzeptAnchorGap();
             const mobileAnchorOffsetM = window.innerWidth < BREAKPOINT_MOBILE ? 33 : 0;
             const narrowMythusShift = _narrowHoverSnap ? -800 : 0;
-            const anchorStartM = getDocumentTop(document.getElementById('mythus-box-wrapper')) - anchorGapM - anchorHeightM + mobileAnchorOffsetM + narrowMythusShift;
+            const anchorStartM = getDocumentTop(document.getElementById('mythus-box-wrapper')) - anchorGapM - anchorHeightM + mobileAnchorOffsetM + narrowMythusShift + _touchAnchorFix;
             let meetYM;
             if (_narrowHoverSnap) {
                 meetYM = NH_MEET_MYTHUS; // Fester Pixel-Wert → unabhängig von Fensterhöhe
@@ -790,7 +794,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const anchorGapG = getGesichtenAnchorGap();
             const narrowGesichtenShift = _narrowHoverSnap ? -1500 : 0;
             const deskAnchorOffsetG_mp = (!_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) ? 40 : 0; // Desktop: Anchor 40px tiefer
-            const anchorStartG = _gesichtenWrapperDocTop + 50 - anchorHeightG - anchorGapG + narrowGesichtenShift + deskAnchorOffsetG_mp;
+            const anchorStartG = _gesichtenWrapperDocTop + 50 - anchorHeightG - anchorGapG + narrowGesichtenShift + deskAnchorOffsetG_mp + _touchAnchorFix;
             let meetYG;
             if (_narrowHoverSnap) {
                 meetYG = NH_MEET_GESICHTEN; // Fester Pixel-Wert → unabhängig von Fensterhöhe
