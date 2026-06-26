@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYR = Math.max(meetYR, _layoutH() * 0.07 + 50);
                 meetYR -= 24;
             }
-            meetYR += _touchMeetDown + (_touchMobile ? 35 : 0); // Touch-Mobile: RIVUS-Snaplinie 35px tiefer (60 − 25)
+            meetYR += _touchMeetDown + (_touchMobile ? 135 : 0); // Touch-Mobile: RIVUS-Snaplinie 135px tiefer (35 + 100)
             const sMeetRivus = (anchorStartR - meetYR) / (1 - BASE_PARALLAX_SPEED);
             if (sMeetRivus > 100) _namedPoints.push({ s: sMeetRivus, name: 'RIVUS', meetY: meetYR, anchorStart: anchorStartR });
         }
@@ -813,7 +813,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) meetYG += 80;
                 else if (window.innerWidth < BREAKPOINT_MOBILE) meetYG = Math.max(meetYG, _layoutH() * 0.07 + 26); // Floor gegen ~0/negative meetY (s. RIVUS)
             }
-            meetYG += _touchMeetDown + (_touchMobile ? 40 - 300 : 0); // GESICHTEN auf Smartphone: 40 tiefer, dann netto 300px höher (vorige 100 + neue 200)
+            meetYG += _touchMeetDown + (_touchMobile ? 40 : 0); // GESICHTEN On-Screen-Snap (bestätigt); Abstand läuft über margin-top im CSS
             const sMeetGesichtenRaw = (anchorStartG - meetYG) / (1 - BASE_PARALLAX_SPEED);
             const sMeetMythusPrev = _namedPoints.find(p => p.name === 'MYTHUS')?.s ?? 0;
             const sMeetGesichten = (_narrowHoverSnap && sMeetMythusPrev > 0) ? Math.max(sMeetGesichtenRaw, sMeetMythusPrev + 150) : sMeetGesichtenRaw;
