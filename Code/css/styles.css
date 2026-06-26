@@ -2732,11 +2732,11 @@ body.dark-mode .logo-gif {
 
 /* Dark mode header */
 body.dark-mode header {
-    background-color: rgba(204, 204, 204, 0.55); /* hellgraues Frosted Glass (Dark-Mode) */
+    background-color: rgba(26, 26, 26, 0.55); /* Frosted Glass mit #1a1a1a-Ton → verschmilzt mit der Seite */
 }
 
 body.dark-mode .header-backdrop {
-    background-color: #cccccc; /* hellgraue Header-Fläche im Dark-Mode (wie gewünscht) */
+    background-color: #1a1a1a; /* exakt der Dark-Mode-Hintergrund (wie gewünscht) */
 }
 
 /* Dark mode headings */
