@@ -1055,14 +1055,16 @@ document.addEventListener('DOMContentLoaded', function() {
             + 'font:11px/1.3 ui-monospace,monospace;white-space:pre;pointer-events:none;max-width:82vw;';
         document.body.appendChild(dbg);
         const sel = { KONZEPT: '.konzept-heading-anchor', RIVUS: '.rivus-anchor-gray', MYTHUS: '#mythus-anchor', GESICHTEN: '#gesichten-anchor-gray' };
+        const selFill = { KONZEPT: '.konzept-heading-filled', RIVUS: '.rivus-anchor-filled', MYTHUS: '#mythus-filled', GESICHTEN: '#gesichten-anchor-filled' };
         const renderDbg = () => {
             const sY = window.scrollY;
             const L = ['iH=' + window.innerHeight + ' lH=' + Math.round(_layoutH()) + ' sY=' + Math.round(sY) + ' port=' + (_isPortraitLayout() ? 1 : 0)];
             (window.__snapInfo || []).forEach(p => {
                 const el = document.querySelector(sel[p.name] || '');
+                const elF = document.querySelector(selFill[p.name] || '');
                 const top = el ? Math.round(el.getBoundingClientRect().top) : '-';
-                const vc = Math.round(p.anchorStart - sY * (1 - BASE_PARALLAX_SPEED));
-                L.push(p.name.slice(0, 4) + ' s=' + p.s + ' mY=' + p.meetY + ' top=' + top + ' vc=' + vc);
+                const fil = elF ? Math.round(elF.getBoundingClientRect().top) : '-';
+                L.push(p.name.slice(0, 4) + ' s=' + p.s + ' mY=' + p.meetY + ' gray=' + top + ' fill=' + fil);
             });
             dbg.textContent = L.join('\n');
         };
