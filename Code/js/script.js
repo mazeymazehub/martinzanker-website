@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const BASE_PARALLAX_SPEED = 0.35; // Feste Geschwindigkeit für Boxen, Anchors, Bilder
     const BASE_UNTERPUNKT_SPEED = 0.50; // Feste Geschwindigkeit für Unterpunkt-Bilder (Ben, Daniel, Michael, Marcus)
 
+    // Snap-Magnet auf echten Smartphones (_isPhone()) deaktiviert; Tablet/Desktop behalten Snaps.
+    // Die Snaplinien werden weiterhin berechnet (für Scroll-Spacer/Ende), nur das Einrasten ist aus.
+    // Zum Reaktivieren der Smartphone-Snaplinien: auf true setzen.
+    const ENABLE_SNAP_ON_PHONE = false;
+
     // narrowHover (Desktop-Browser < 640px, hover-fähig): feste Snap-Viewport-Positionen,
     // genutzt in calculateMeetingPoints UND den Speed-Berechnungen der filled/outline-Schriften
     const NH_MEET_RIVUS = 675;   // 35px höher
@@ -2242,6 +2247,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function scheduleSnapCheck() {
+        // Smartphone: Snaplinien inaktiv (Flag ENABLE_SNAP_ON_PHONE). Tablet/Desktop weiterhin aktiv.
+        if (_isPhone() && !ENABLE_SNAP_ON_PHONE) return;
         clearTimeout(scrollEndTimer);
         scrollEndTimer = setTimeout(() => {
             if (isSnapping || isTouching || isScrollbarHeld) return;
