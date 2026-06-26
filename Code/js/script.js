@@ -1693,7 +1693,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 _box2WrapperDocTop = getDocumentTop(_rivusContentBoxWrapper2);
                 // Touch-Mobile: RIVUS im Dokument tiefer setzen → größerer Konzept→RIVUS-Abstand,
                 // kleinerer RIVUS→MYTHUS-Abstand. Verschiebt Snap UND Render konsistent (kein Sprung). Tunbar.
-                if (_isPhone()) _box2WrapperDocTop += 170;
+                if (_isPhone()) _box2WrapperDocTop += 235;
             }
             _rivusContentBoxWrapper2.style.position = 'fixed';
             _rivusContentBoxWrapper2.style.top = '0';
@@ -2757,6 +2757,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Direkte DOM-Messung verhindert Abweichungen durch Formel-Approximation (anchorTop+height+margin).
         if (_rivusContentBoxWrapper2) {
             _box2WrapperDocTop = getDocumentTop(_rivusContentBoxWrapper2);
+            // Gleicher Touch-Offset wie in positionAnchons, damit filled/outline-Speed
+            // (calculateGesichtenAParallaxSpeed) denselben docTop sieht wie der graue Anker.
+            if (_isPhone()) _box2WrapperDocTop += 235;
         }
         calculateGesichtenAParallaxSpeed();
         positionAnchors(); // fixiert Wrapper; ab hier ist der DOM im Runtime-Zustand
