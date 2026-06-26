@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYR = Math.max(meetYR, _layoutH() * 0.07 + 50);
                 meetYR -= 24;
             }
-            meetYR += _touchMeetDown + (_touchMobile ? 20 : 0); // Touch-Mobile: RIVUS-Snaplinie 20px tiefer
+            meetYR += _touchMeetDown + (_touchMobile ? 60 : 0); // Touch-Mobile: RIVUS-Snaplinie 60px tiefer (20 + 40)
             const sMeetRivus = (anchorStartR - meetYR) / (1 - BASE_PARALLAX_SPEED);
             if (sMeetRivus > 100) _namedPoints.push({ s: sMeetRivus, name: 'RIVUS', meetY: meetYR, anchorStart: anchorStartR });
         }
