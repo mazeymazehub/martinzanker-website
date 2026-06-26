@@ -174,11 +174,19 @@ body.dark-mode::after {
 
 /* ===== Mobile ===== */
 @media (max-width: 640px) {
-    /* Grain-Overlay aus: das ganzflächige fixed-Overlay verdrängt auf iOS die orangen
-       Safe-Area-Flächen (Konflikt mehrfach bestätigt, auch mit ausgesparten Insets).
-       → Flächen haben Vorrang; für eine Körnung bräuchte es eine Nicht-Overlay-Lösung.
-       Der Header bekommt dadurch wieder seinen Frosted-Glass-Effekt (Basis-Regel). */
-    body::after { display: none !important; }
+    /* Grain als absolute-Layer statt fixed-Overlay: Das ganzflächige FIXED-Overlay
+       verdrängte auf iOS die orangen Safe-Area-Flächen (Konflikt mehrfach bestätigt).
+       Als absolute-Layer (body ist position:relative, #scroll-spacer streckt die volle
+       Höhe) scrollt der Grain mit dem Inhalt → kein fixed-Geschwister mehr, die
+       Safe-Area-Flächen bleiben erhalten. Bonus: absolute repaintet beim Scrollen nicht. */
+    body::after {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: block;
+    }
 }
 
 /* Background stripes - dark gray frame behind navigation */
@@ -1534,6 +1542,13 @@ section {
         color: #E9E9E4;
     }
 
+    /* Dark-Mode-Tap-Gradient für ALLE Bilder. Zuvor global definiert; ging beim
+       Refactor auf .image-info::after verloren (das ::after-Fade greift erst ab 641px,
+       Mobile nutzt aber sein eigenes background-System). */
+    body.dark-mode .info-active .image-info,
+    body.dark-mode #ben-image-with-info.info-active .image-info,
+    body.dark-mode #mythus-daniel-image-with-info.info-active .image-info,
+    body.dark-mode .main-heading-container .info-active .image-info,
     body.dark-mode #michael-image-with-info.info-active .image-info {
         background: linear-gradient(to bottom, transparent 15%, rgba(0,0,0,0.72) 100%);
     }
