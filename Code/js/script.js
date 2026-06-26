@@ -1050,8 +1050,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (/debug/i.test(location.hash)) {
         const dbg = document.createElement('div');
         dbg.id = 'snap-debug';
-        dbg.style.cssText = 'position:fixed;left:0;top:0;padding:env(safe-area-inset-top,4px) 8px 6px;'
-            + 'z-index:2147483646;background:rgba(0,0,0,.82);color:#0f0;'
+        dbg.style.cssText = 'position:fixed;left:0;top:env(safe-area-inset-top,0);padding:4px 8px 6px;'
+            + 'z-index:90000;background:rgba(0,0,0,.82);color:#0f0;'
             + 'font:11px/1.3 ui-monospace,monospace;white-space:pre;pointer-events:none;max-width:82vw;';
         document.body.appendChild(dbg);
         const sel = { KONZEPT: '.konzept-heading-anchor', RIVUS: '.rivus-anchor-gray', MYTHUS: '#mythus-anchor', GESICHTEN: '#gesichten-anchor-gray' };
