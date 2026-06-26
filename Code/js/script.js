@@ -2689,6 +2689,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Alle Positionen werden bei jedem Resize neu berechnet
     // Die Berechnungen sind idempotent (OFFSET-basiert, ohne Transform/Scroll-Einfluss)
     let resizeTimer;
+    let _lastResizeWidth = window.innerWidth; // Touch: reine Höhen-Resizes (iOS URL-Leiste) ignorieren
     // =============== AKTIVES-SCROLLEN ERKENNUNG ===============
     let isTouching = false;
     let isScrollbarHeld = false;
@@ -2904,6 +2905,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Resize verschieben → gesnappte Blöcke rutschen sonst sichtbar aus der Snaplinie).
     window.addEventListener('resize', () => {
         const _hoverDev = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        // Touch-Geräte: reine Höhenänderung (iOS Safari URL-Leiste ein/aus) NICHT neu berechnen.
+        // recalculateLayout() setzt den Scroll-Spacer kurz auf 0 → maxScroll bricht ein → Browser
+        // klemmt scrollY nach oben (Sprung „zu Mythus" am Seitenende). Layout nutzt feste _layoutH().
+        if (!_hoverDev && window.innerWidth === _lastResizeWidth) return;
+        _lastResizeWidth = window.innerWidth;
         isResizing = true; // Snap-Mechanik pausieren (keine Snaps durch Resize-Scroll-Events)
         _updateAspectClasses(); // sofort (Media-Query-Ersatz); auf Hover-Geräten eingefroren → kein Flip beim Höhen-Ziehen
         if (_hoverDev && _endFloor > 0) {
