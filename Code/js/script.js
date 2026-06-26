@@ -808,7 +808,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) meetYG += 80;
                 else if (window.innerWidth < BREAKPOINT_MOBILE) meetYG = Math.max(meetYG, _layoutH() * 0.07 + 26); // Floor gegen ~0/negative meetY (s. RIVUS)
             }
-            meetYG += _touchMeetDown;
+            meetYG += _touchMeetDown + (_touchMobile ? 40 : 0); // GESICHTEN auf Smartphone 40px tiefer
             const sMeetGesichtenRaw = (anchorStartG - meetYG) / (1 - BASE_PARALLAX_SPEED);
             const sMeetMythusPrev = _namedPoints.find(p => p.name === 'MYTHUS')?.s ?? 0;
             const sMeetGesichten = (_narrowHoverSnap && sMeetMythusPrev > 0) ? Math.max(sMeetGesichtenRaw, sMeetMythusPrev + 150) : sMeetGesichtenRaw;
