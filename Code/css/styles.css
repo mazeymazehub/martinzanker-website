@@ -172,21 +172,13 @@ body.dark-mode::after {
     opacity: 0.20;
 }
 
-/* ===== Performance auf Mobile (iOS-Hitze reduzieren) ===== */
+/* ===== Mobile ===== */
 @media (max-width: 640px) {
-    /* Grain wieder aktiv, spart aber die Safe Areas aus (top/bottom = env-Insets oben),
-       damit die orangen Safe-Area-Flächen erhalten bleiben. */
-
-    /* Header: opakes Orange statt backdrop-filter:blur — das Neu-Blurren des
-       durchscrollenden Inhalts pro Frame ist auf iOS eine der größten Heizquellen. */
-    header {
-        background-color: #ff6633 !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-    }
-    body.dark-mode header {
-        background-color: #1a1a1a !important;
-    }
+    /* Grain-Overlay aus: das ganzflächige fixed-Overlay verdrängt auf iOS die orangen
+       Safe-Area-Flächen (Konflikt mehrfach bestätigt, auch mit ausgesparten Insets).
+       → Flächen haben Vorrang; für eine Körnung bräuchte es eine Nicht-Overlay-Lösung.
+       Der Header bekommt dadurch wieder seinen Frosted-Glass-Effekt (Basis-Regel). */
+    body::after { display: none !important; }
 }
 
 /* Background stripes - dark gray frame behind navigation */
@@ -2740,11 +2732,11 @@ body.dark-mode .logo-gif {
 
 /* Dark mode header */
 body.dark-mode header {
-    background-color: rgba(51, 51, 51, 0.75); /* Darker semi-transparent */
+    background-color: rgba(204, 204, 204, 0.55); /* hellgraues Frosted Glass (Dark-Mode) */
 }
 
 body.dark-mode .header-backdrop {
-    background-color: #1a1a1a; /* exakt wie der Dark-Mode-Rahmen → Logo steht frei (kein Kasten) */
+    background-color: #cccccc; /* hellgraue Header-Fläche im Dark-Mode (wie gewünscht) */
 }
 
 /* Dark mode headings */
