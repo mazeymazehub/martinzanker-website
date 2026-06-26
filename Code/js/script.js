@@ -782,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYM = Math.max(meetYM, _layoutH() * 0.07 + 50); // Floor gegen negative meetY (s. RIVUS)
                 meetYM -= 20;
             }
-            meetYM += _touchMeetDown - (_touchMobile ? 100 : 0); // Touch-Mobile: MYTHUS-Block 100px höher
+            meetYM += _touchMeetDown - (_touchMobile ? 220 : 0); // Touch-Mobile: MYTHUS-Block netto 220px höher (200 höher, 80 tiefer snappen, vorige 100)
             const sMeetMythusRaw = (anchorStartM - meetYM) / (1 - BASE_PARALLAX_SPEED);
             const sMeetRivusPrev = _namedPoints.find(p => p.name === 'RIVUS')?.s ?? 0;
             const sMeetMythus = (_narrowHoverSnap && sMeetRivusPrev > 0) ? Math.max(sMeetMythusRaw, sMeetRivusPrev + 150) : sMeetMythusRaw;
@@ -809,7 +809,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) meetYG += 80;
                 else if (window.innerWidth < BREAKPOINT_MOBILE) meetYG = Math.max(meetYG, _layoutH() * 0.07 + 26); // Floor gegen ~0/negative meetY (s. RIVUS)
             }
-            meetYG += _touchMeetDown + (_touchMobile ? 40 - 100 : 0); // GESICHTEN auf Smartphone 40px tiefer, Block dann 100px höher
+            meetYG += _touchMeetDown + (_touchMobile ? 40 - 300 : 0); // GESICHTEN auf Smartphone: 40 tiefer, dann netto 300px höher (vorige 100 + neue 200)
             const sMeetGesichtenRaw = (anchorStartG - meetYG) / (1 - BASE_PARALLAX_SPEED);
             const sMeetMythusPrev = _namedPoints.find(p => p.name === 'MYTHUS')?.s ?? 0;
             const sMeetGesichten = (_narrowHoverSnap && sMeetMythusPrev > 0) ? Math.max(sMeetGesichtenRaw, sMeetMythusPrev + 150) : sMeetGesichtenRaw;
