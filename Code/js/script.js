@@ -325,7 +325,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const aStart = getDocumentTop(mythusFilled);
-        const schriftenMeetY = window.innerWidth < BREAKPOINT_MOBILE ? meetY + 50 : meetY;
+        // Mobile: invers zu RIVUS/GESICHTEN — größerer Wert = filled tiefer. Aktuell kein Offset.
+        const schriftenMeetY = meetY;
 
         const mythusBoxStart = getMythusBoxLogicalTop();
         const anchorHeight = mythusAnchor.offsetHeight;
@@ -570,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let meetY = _layoutH() * meetingRatio - 75;
         if (window.innerWidth < BREAKPOINT_MOBILE) {
             // Smartphone: RIVUS-Treffpunkt bei 80% der Bildschirmhöhe (filled/outline 20px höher)
-            meetY = _layoutH() * 0.80 - 110;
+            meetY = _layoutH() * 0.80 - 130;
         } else if (_isPortraitLayout()) {
             // Portrait-Modus: Treffpunkt 60px tiefer
             meetY += 60;
@@ -646,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const meetingRatio = getMeetingRatio();
         let meetY = _layoutH() * meetingRatio;
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            meetY = _layoutH() * 0.70 - 15; // Mobile: 30% vom unteren Bildschirmrand, filled/outline höher (+60 ggü. Ursprung)
+            meetY = _layoutH() * 0.70 - 35; // Mobile: filled/outline 20px tiefer als zuvor
         } else if (_isPortraitLayout()) {
             meetY += 80; // Portrait (Tablet)
         } else {
@@ -781,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYM = Math.max(meetYM, _layoutH() * 0.07 + 50); // Floor gegen negative meetY (s. RIVUS)
                 meetYM -= 20;
             }
-            meetYM += _touchMeetDown;
+            meetYM += _touchMeetDown - (_touchMobile ? 100 : 0); // Touch-Mobile: MYTHUS-Block 100px höher
             const sMeetMythusRaw = (anchorStartM - meetYM) / (1 - BASE_PARALLAX_SPEED);
             const sMeetRivusPrev = _namedPoints.find(p => p.name === 'RIVUS')?.s ?? 0;
             const sMeetMythus = (_narrowHoverSnap && sMeetRivusPrev > 0) ? Math.max(sMeetMythusRaw, sMeetRivusPrev + 150) : sMeetMythusRaw;
@@ -808,7 +809,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (_isPortraitLayout() && window.innerWidth >= BREAKPOINT_MOBILE) meetYG += 80;
                 else if (window.innerWidth < BREAKPOINT_MOBILE) meetYG = Math.max(meetYG, _layoutH() * 0.07 + 26); // Floor gegen ~0/negative meetY (s. RIVUS)
             }
-            meetYG += _touchMeetDown + (_touchMobile ? 40 : 0); // GESICHTEN auf Smartphone 40px tiefer
+            meetYG += _touchMeetDown + (_touchMobile ? 40 - 100 : 0); // GESICHTEN auf Smartphone 40px tiefer, Block dann 100px höher
             const sMeetGesichtenRaw = (anchorStartG - meetYG) / (1 - BASE_PARALLAX_SPEED);
             const sMeetMythusPrev = _namedPoints.find(p => p.name === 'MYTHUS')?.s ?? 0;
             const sMeetGesichten = (_narrowHoverSnap && sMeetMythusPrev > 0) ? Math.max(sMeetGesichtenRaw, sMeetMythusPrev + 150) : sMeetGesichtenRaw;
