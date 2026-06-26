@@ -1059,6 +1059,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const renderDbg = () => {
             const sY = window.scrollY;
             const L = ['iH=' + window.innerHeight + ' lH=' + Math.round(_layoutH()) + ' sY=' + Math.round(sY) + ' port=' + (_isPortraitLayout() ? 1 : 0)];
+            const _sat = document.getElementById('safe-area-top');
+            const _sab = document.getElementById('safe-area-bottom');
+            L.push('SAT h=' + (_sat ? _sat.offsetHeight : 'MISSING') + ' z=' + (_sat ? getComputedStyle(_sat).zIndex : '-') +
+                   ' | SAB h=' + (_sab ? _sab.offsetHeight : 'MISSING'));
             (window.__snapInfo || []).forEach(p => {
                 const el = document.querySelector(sel[p.name] || '');
                 const elF = document.querySelector(selFill[p.name] || '');

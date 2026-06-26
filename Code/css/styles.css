@@ -172,8 +172,10 @@ body.dark-mode::after {
 
 /* ===== Performance auf Mobile (iOS-Hitze reduzieren) ===== */
 @media (max-width: 640px) {
-    /* Grain-Overlay testweise wieder aktiv (Nutzer prüft, ob es die Hitze verursacht).
-       Die eigentliche Hauptursache waren die 41-MB-Logo-GIFs. */
+    /* TEST: Grain wieder aus — Verdacht, dass das ganzflächige Overlay die Safe-Area-
+       Flächen auf iOS verdeckt/unterdrückt. Wenn die Flächen damit zurückkommen,
+       ist der Grain die Ursache und ich baue eine konfliktfreie Variante. */
+    body::after { display: none !important; }
 
     /* Header: opakes Orange statt backdrop-filter:blur — das Neu-Blurren des
        durchscrollenden Inhalts pro Frame ist auf iOS eine der größten Heizquellen. */
