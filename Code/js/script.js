@@ -820,7 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // narrowHover: kleine After-Zone, sonst bleibt man am Seitenende in der Zone gefangen
             // und bounct zurück auf den Snap. Echtes Mobile (Touch) behält 840 (eingefroren).
             const gesichtenZone = window.innerWidth < BREAKPOINT_MOBILE
-                ? { before: 700, after: (_narrowHoverSnap ? 250 : 840) }
+                ? { before: 700, after: (_narrowHoverSnap ? 250 : 50) } // Touch: kleines after, sonst Snap-Back vom Seitenende (Ruckler + GESICHTEN 2×)
                 : { before: 700, after: 50 }; // Desktop: before 700, after wie bisher (50)
             if (sMeetGesichten > 100) _namedPoints.push({ s: sMeetGesichten, name: 'GESICHTEN', zone: gesichtenZone, meetY: meetYG, anchorStart: anchorStartG });
         }
