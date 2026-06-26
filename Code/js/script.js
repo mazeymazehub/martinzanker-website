@@ -782,7 +782,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYM = Math.max(meetYM, _layoutH() * 0.07 + 50); // Floor gegen negative meetY (s. RIVUS)
                 meetYM -= 20;
             }
-            meetYM += _touchMeetDown - (_touchMobile ? 220 : 0); // Touch-Mobile: MYTHUS-Block netto 220px höher (200 höher, 80 tiefer snappen, vorige 100)
+            // Touch-Mobile: MYTHUS-Snaplinie um die halbe (gerenderte) Daniel-Bildhöhe tiefer.
+            const danielHalf = _touchMobile
+                ? (document.querySelector('#mythus-daniel-image-with-info .unterpunkt-heading-image')?.offsetHeight || 0) / 2
+                : 0;
+            meetYM += _touchMeetDown - (_touchMobile ? 220 : 0) + danielHalf; // netto 220px höher, dann halbe Daniel-Höhe tiefer
             const sMeetMythusRaw = (anchorStartM - meetYM) / (1 - BASE_PARALLAX_SPEED);
             const sMeetRivusPrev = _namedPoints.find(p => p.name === 'RIVUS')?.s ?? 0;
             const sMeetMythus = (_narrowHoverSnap && sMeetRivusPrev > 0) ? Math.max(sMeetMythusRaw, sMeetRivusPrev + 150) : sMeetMythusRaw;
