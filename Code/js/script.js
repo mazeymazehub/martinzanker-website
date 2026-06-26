@@ -325,8 +325,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const aStart = getDocumentTop(mythusFilled);
-        // Mobile: invers zu RIVUS/GESICHTEN — größerer Wert = filled tiefer. Aktuell kein Offset.
-        const schriftenMeetY = meetY;
+        // Mobile: invers zu RIVUS/GESICHTEN — größerer Wert = filled tiefer. −17 → 17px höher.
+        const schriftenMeetY = window.innerWidth < BREAKPOINT_MOBILE ? meetY - 17 : meetY;
 
         const mythusBoxStart = getMythusBoxLogicalTop();
         const anchorHeight = mythusAnchor.offsetHeight;
@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYR = Math.max(meetYR, _layoutH() * 0.07 + 50);
                 meetYR -= 24;
             }
-            meetYR += _touchMeetDown;
+            meetYR += _touchMeetDown + (_touchMobile ? 20 : 0); // Touch-Mobile: RIVUS-Snaplinie 20px tiefer
             const sMeetRivus = (anchorStartR - meetYR) / (1 - BASE_PARALLAX_SPEED);
             if (sMeetRivus > 100) _namedPoints.push({ s: sMeetRivus, name: 'RIVUS', meetY: meetYR, anchorStart: anchorStartR });
         }
@@ -786,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const danielHalf = _touchMobile
                 ? (document.querySelector('#mythus-daniel-image-with-info .unterpunkt-heading-image')?.offsetHeight || 0) / 2
                 : 0;
-            meetYM += _touchMeetDown - (_touchMobile ? 220 : 0) + danielHalf; // netto 220px höher, dann halbe Daniel-Höhe tiefer
+            meetYM += _touchMeetDown - (_touchMobile ? 520 : 0) + danielHalf; // netto 520px höher, dann halbe Daniel-Höhe tiefer
             const sMeetMythusRaw = (anchorStartM - meetYM) / (1 - BASE_PARALLAX_SPEED);
             const sMeetRivusPrev = _namedPoints.find(p => p.name === 'RIVUS')?.s ?? 0;
             const sMeetMythus = (_narrowHoverSnap && sMeetRivusPrev > 0) ? Math.max(sMeetMythusRaw, sMeetRivusPrev + 150) : sMeetMythusRaw;
