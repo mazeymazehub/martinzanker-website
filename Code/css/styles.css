@@ -189,6 +189,17 @@ body.dark-mode::after {
     }
 }
 
+/* Touch-Mobile: MYTHUS-Sektion (und alles danach) im Dokumentfluss näher an RIVUS rücken.
+   Negativer margin-top zieht den MYTHUS-Anker-Container + nachfolgende Geschwister
+   (mythus-box-wrapper, Daniel, GESICHTEN, Michael) hoch → kleinerer docTop → kürzerer
+   Scrollweg zwischen den Snaps. Nur echtes Touch (hover:none) → narrowHover bleibt unberührt.
+   Wert tunbar. */
+@media (hover: none) and (pointer: coarse) and (max-width: 600px) {
+    #mythus-anchor-container {
+        margin-top: -300px;
+    }
+}
+
 /* Background stripes - dark gray frame behind navigation */
 .background-stripe-top,
 .background-stripe-bottom,
