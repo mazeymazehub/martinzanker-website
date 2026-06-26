@@ -1691,6 +1691,9 @@ document.addEventListener('DOMContentLoaded', function() {
             _rivusAnchorGap2 = getGesichtenAnchorGap();
             if (_rivusContentBoxWrapper2.style.position !== 'fixed') {
                 _box2WrapperDocTop = getDocumentTop(_rivusContentBoxWrapper2);
+                // Touch-Mobile: RIVUS im Dokument tiefer setzen → größerer Konzept→RIVUS-Abstand,
+                // kleinerer RIVUS→MYTHUS-Abstand. Verschiebt Snap UND Render konsistent (kein Sprung). Tunbar.
+                if (_isPhone()) _box2WrapperDocTop += 170;
             }
             _rivusContentBoxWrapper2.style.position = 'fixed';
             _rivusContentBoxWrapper2.style.top = '0';

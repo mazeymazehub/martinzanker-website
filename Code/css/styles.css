@@ -195,11 +195,9 @@ body.dark-mode::after {
    Scrollweg zwischen den Snaps. Nur echtes Touch (hover:none) → narrowHover bleibt unberührt.
    Wert tunbar. */
 @media (hover: none) and (pointer: coarse) and (max-width: 600px) {
-    /* Konzept→RIVUS-Abstand vergrößern: schiebt RIVUS + alles danach im Fluss nach unten.
-       Da MYTHUS denselben Versatz erbt, bleibt RIVUS↔MYTHUS unverändert. Wert tunbar. */
-    #rivus-anchor-container {
-        margin-top: 150px;
-    }
+    /* Hinweis: Abstände der Snap-Blöcke werden NICHT hier per margin gesteuert
+       (margin verändert den gemessenen docTop / s-Wert nicht zuverlässig), sondern
+       direkt im JS über die gecachten docTops (z.B. _box2WrapperDocTop für RIVUS). */
     #mythus-anchor-container {
         margin-top: -600px;
     }
