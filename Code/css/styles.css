@@ -196,7 +196,7 @@ body.dark-mode::after {
    Wert tunbar. */
 @media (hover: none) and (pointer: coarse) and (max-width: 600px) {
     #mythus-anchor-container {
-        margin-top: -300px;
+        margin-top: -600px;
     }
 }
 

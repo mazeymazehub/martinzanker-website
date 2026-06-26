@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 meetYR = Math.max(meetYR, _layoutH() * 0.07 + 50);
                 meetYR -= 24;
             }
-            meetYR += _touchMeetDown + (_touchMobile ? 60 : 0); // Touch-Mobile: RIVUS-Snaplinie 60px tiefer (20 + 40)
+            meetYR += _touchMeetDown + (_touchMobile ? 35 : 0); // Touch-Mobile: RIVUS-Snaplinie 35px tiefer (60 − 25)
             const sMeetRivus = (anchorStartR - meetYR) / (1 - BASE_PARALLAX_SPEED);
             if (sMeetRivus > 100) _namedPoints.push({ s: sMeetRivus, name: 'RIVUS', meetY: meetYR, anchorStart: anchorStartR });
         }
@@ -786,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const danielHalf = _touchMobile
                 ? (document.querySelector('#mythus-daniel-image-with-info .unterpunkt-heading-image')?.offsetHeight || 0) / 2
                 : 0;
-            meetYM += _touchMeetDown - (_touchMobile ? 820 : 0) + danielHalf; // netto 820px höher, dann halbe Daniel-Höhe tiefer
+            meetYM += _touchMeetDown - (_touchMobile ? 220 : 0) + danielHalf; // On-Screen-Snap (bestätigt richtig); Abstand läuft über margin-top im CSS
             const sMeetMythusRaw = (anchorStartM - meetYM) / (1 - BASE_PARALLAX_SPEED);
             const sMeetRivusPrev = _namedPoints.find(p => p.name === 'RIVUS')?.s ?? 0;
             const sMeetMythus = (_narrowHoverSnap && sMeetRivusPrev > 0) ? Math.max(sMeetMythusRaw, sMeetRivusPrev + 150) : sMeetMythusRaw;
