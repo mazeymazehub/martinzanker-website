@@ -258,9 +258,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_isPortraitLayout()) {
             minGap += 350;
         }
-        // Mobile: MYTHUS-Block 2px tiefer (war 68, um 70px angehoben)
+        // Mobile: MYTHUS-Block näher an RIVUS (−2 Alt-Wert, −65 für Rivus→Mythus ~100px weniger Scroll)
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            minGap -= 2;
+            minGap -= 67;
         }
         // Desktop (Landscape): MYTHUS-Position angepasst (verhindert Doppel-Snap mit RIVUS)
         const isPortrait = _isPortraitLayout();
@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const box2Wrapper = document.getElementById('rivus-content-box-wrapper');
         const box2Start = (box2Wrapper && box2Wrapper.style.position === 'fixed')
             ? _box2WrapperDocTop
-            : getDocumentTop(contentBox2);
+            : getDocumentTop(contentBox2) + (_isPhone() ? 170 : 0); // gleicher Touch-Offset wie _box2WrapperDocTop, sonst filled-Versatz
         const anchorHeight = gesichtenAnchor.offsetHeight;
         const anchorGap = getGesichtenAnchorGap();
         const anchorStart = box2Start + 50 - anchorGap - anchorHeight;
@@ -1693,7 +1693,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 _box2WrapperDocTop = getDocumentTop(_rivusContentBoxWrapper2);
                 // Touch-Mobile: RIVUS im Dokument tiefer setzen → größerer Konzept→RIVUS-Abstand,
                 // kleinerer RIVUS→MYTHUS-Abstand. Verschiebt Snap UND Render konsistent (kein Sprung). Tunbar.
-                if (_isPhone()) _box2WrapperDocTop += 235;
+                if (_isPhone()) _box2WrapperDocTop += 170;
             }
             _rivusContentBoxWrapper2.style.position = 'fixed';
             _rivusContentBoxWrapper2.style.top = '0';
@@ -2759,7 +2759,7 @@ document.addEventListener('DOMContentLoaded', function() {
             _box2WrapperDocTop = getDocumentTop(_rivusContentBoxWrapper2);
             // Gleicher Touch-Offset wie in positionAnchons, damit filled/outline-Speed
             // (calculateGesichtenAParallaxSpeed) denselben docTop sieht wie der graue Anker.
-            if (_isPhone()) _box2WrapperDocTop += 235;
+            if (_isPhone()) _box2WrapperDocTop += 170;
         }
         calculateGesichtenAParallaxSpeed();
         positionAnchors(); // fixiert Wrapper; ab hier ist der DOM im Runtime-Zustand
