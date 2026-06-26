@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const aStart = getDocumentTop(mythusFilled);
-        const schriftenMeetY = window.innerWidth < BREAKPOINT_MOBILE ? meetY - 10 : meetY;
+        const schriftenMeetY = window.innerWidth < BREAKPOINT_MOBILE ? meetY + 50 : meetY;
 
         const mythusBoxStart = getMythusBoxLogicalTop();
         const anchorHeight = mythusAnchor.offsetHeight;
@@ -569,8 +569,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const meetingRatio = getMeetingRatio();
         let meetY = _layoutH() * meetingRatio - 75;
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            // Smartphone: RIVUS-Treffpunkt bei 80% der Bildschirmhöhe
-            meetY = _layoutH() * 0.80 - 170;
+            // Smartphone: RIVUS-Treffpunkt bei 80% der Bildschirmhöhe (filled/outline 20px höher)
+            meetY = _layoutH() * 0.80 - 110;
         } else if (_isPortraitLayout()) {
             // Portrait-Modus: Treffpunkt 60px tiefer
             meetY += 60;
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const meetingRatio = getMeetingRatio();
         let meetY = _layoutH() * meetingRatio;
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            meetY = _layoutH() * 0.70 - 75; // Mobile: 30% vom unteren Bildschirmrand, filled/outline höher
+            meetY = _layoutH() * 0.70 - 15; // Mobile: 30% vom unteren Bildschirmrand, filled/outline höher (+60 ggü. Ursprung)
         } else if (_isPortraitLayout()) {
             meetY += 80; // Portrait (Tablet)
         } else {
