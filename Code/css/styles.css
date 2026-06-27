@@ -232,12 +232,11 @@ body.dark-mode::after {
     .content-box-2.collapsed {
         min-height: 58px;
     }
-    /* MYTHUS eingeklappt: Box-Höhe halbiert (130px → 65px). #mythus-box hat oben/unten
-       je 65px Padding (border-box) → auf je ~32px reduzieren. */
+    /* MYTHUS eingeklappt: gleiche Höhe wie die anderen Boxen (58px, wie RIVUS).
+       #mythus-box hat oben/unten je 65px Padding → auf 20px reduzieren, dann greift min-height:58. */
     #mythus-box.collapsed {
-        padding-top: 32px !important;
-        padding-bottom: 33px !important;
-        min-height: 0;
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;
     }
 
     /* Dropdown-Pfeil: links, knapp über dem Text, orange, dreht sich beim Aufklappen */
