@@ -2538,7 +2538,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Auf Hover-Geräten (< 640px) übernimmt image-transition.js die Bildsteuerung.
         const isHoverDevice = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
         if (isMobile && !isHoverDevice) {
-            updateMobileImageVisibility();
+            // Touch-Mobile: Bildsteuerung übernimmt der Wipe (image-transition.js via
+            // __imageTransitionUpdate, in updateScene). Opacity-Logik nur als Fallback.
+            if (!window.__imageTransitionUpdate) updateMobileImageVisibility();
         } else {
             if (_benImage) {
                 _benImage.style.transform = `translate3d(0, ${scrollY * BASE_UNTERPUNKT_SPEED}px, 0)`;

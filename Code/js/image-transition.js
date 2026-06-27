@@ -7,7 +7,8 @@
 // Nur aktiv bei (hover: hover) and (pointer: fine).
 (function () {
     'use strict';
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    // Läuft jetzt auch auf Touch-Smartphones (nicht nur narrowHover). Die Breiten-
+    // Begrenzung übernimmt update() selbst: bei >= BP wird zurückgesetzt und returned.
 
     const BP = 640;
 
