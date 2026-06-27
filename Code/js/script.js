@@ -922,7 +922,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const gesichtenBox = document.getElementById('gesichten-content-box-wrapper');
                 const gesichtenHeight = gesichtenBox ? gesichtenBox.offsetHeight : 0;
                 const meetY = _layoutH() * 0.70;
-                needed = Math.max(needed, lastSnap + (meetY + gesichtenHeight) / (1 - BASE_PARALLAX_SPEED));
+                // TEST: +800px extra Scrollweg, damit GESICHTEN ganz hochscrollt und Michael sichtbar bleibt
+                needed = Math.max(needed, lastSnap + (meetY + gesichtenHeight) / (1 - BASE_PARALLAX_SPEED) + 800);
             }
             const contentHeight = document.body.scrollHeight; // spacer ist bereits 0
             spacer.style.height = Math.max(0, needed - contentHeight + vhRef) + 'px';
