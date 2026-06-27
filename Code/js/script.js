@@ -2649,7 +2649,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // MYTHUS filled & outline
-        const _mythusTouchShiftF = (isMobile && !isHoverDevice) ? 65 : 0; // Touch: filled/outline 65px tiefer
+        const _mythusTouchShiftF = (isMobile && !isHoverDevice) ? 50 : 0; // Touch: filled/outline 50px tiefer (15px höher als der Anker bei 65)
         if (_mythusFilled)  _mythusFilled.style.transform  = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
         if (_mythusOutline) _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
 
