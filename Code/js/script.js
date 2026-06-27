@@ -263,9 +263,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_isPortraitLayout()) {
             minGap += 350;
         }
-        // Mobile: MYTHUS-Block näher an RIVUS (−2 Alt-Wert, −65 für Rivus→Mythus ~100px weniger Scroll)
+        // Mobile: MYTHUS-Block näher an RIVUS (Abstand verkleinern; ~200px weniger Scroll als -67)
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            minGap -= 67;
+            minGap -= 267;
         }
         // Desktop (Landscape): MYTHUS-Position angepasst (verhindert Doppel-Snap mit RIVUS)
         const isPortrait = _isPortraitLayout();
@@ -2649,7 +2649,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // MYTHUS filled & outline
-        const _mythusTouchShiftF = (isMobile && !isHoverDevice) ? 50 : 0; // Touch: filled/outline 50px tiefer (15px höher als der Anker bei 65)
+        const _mythusTouchShiftF = (isMobile && !isHoverDevice) ? 30 : 0; // Touch: filled/outline 30px tiefer (höher als Anker bei 65)
         if (_mythusFilled)  _mythusFilled.style.transform  = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
         if (_mythusOutline) _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
 

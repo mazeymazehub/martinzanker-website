@@ -245,7 +245,7 @@ body.dark-mode::after {
     .content-box-2 .block-arrow {
         display: block;
         position: absolute;
-        top: 18px;
+        top: 23px;
         left: 24px; /* links, etwa auf Höhe des Text-Anfangs */
         z-index: 30;
         padding: 6px;
