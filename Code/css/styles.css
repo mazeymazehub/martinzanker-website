@@ -245,7 +245,7 @@ body.dark-mode::after {
     .content-box-2 .block-arrow {
         display: block;
         position: absolute;
-        top: 8px;
+        top: 18px;
         left: 24px; /* links, etwa auf Höhe des Text-Anfangs */
         z-index: 30;
         padding: 6px;
@@ -1298,11 +1298,10 @@ section {
     #mythus-anchor-container .konzept-heading-filled,
     #gesichten-anchor-container .gesichten-anchor-filled { z-index: 4; }
 
-    /* Touch: MYTHUS-Schriften sind 65px tiefer und würden sonst hinter der Box (z:10)
-       verschwinden → Anchor + Filled über die Box heben (Stack anchor<filled<outline bleibt). */
+    /* Touch: nur der MYTHUS-Anker wird über die Box gehoben (sonst hinter z:10 versteckt).
+       Filled bleibt hinter der Box (z:4) → Box „schneidet" die Filled-Schrift wie im Design. */
     @media (hover: none) and (pointer: coarse) {
         #mythus-anchor { z-index: 11; }
-        #mythus-anchor-container .konzept-heading-filled { z-index: 12; }
     }
 
     .rivus-anchor-gray,
