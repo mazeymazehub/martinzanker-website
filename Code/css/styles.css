@@ -226,6 +226,7 @@ body.dark-mode::after {
     .content-box-2.collapsed .lang-container {
         max-height: 0;
         opacity: 0;
+        padding-top: 0; /* sonst bleiben 46px stehen (border-box) → ungleich hohe eingeklappte Boxen */
     }
     /* Eingeklappt: schmaler Streifen Box-Hintergrund für den Pfeil */
     .content-box.collapsed,

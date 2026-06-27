@@ -2603,8 +2603,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const _rivusTouchMeet      = (isMobile && !isHoverDevice) ? 40 : 0;
         // Touch: RIVUS-Anchor + Box zusätzlich 30px tiefer (über die filled/outline hinaus)
         const _rivusAnchorBoxExtra = (isMobile && !isHoverDevice) ? 30 : 0;
-        // Touch: ganzer GESICHTEN-Block (Anchor + filled + outline + Box) 100px tiefer (visuell, kein Reflow)
-        const _gesichtenTouchOffset = (isMobile && !isHoverDevice) ? 100 : 0;
+        // Touch: ganzer GESICHTEN-Block (Anchor + filled + outline + Box) 130px tiefer (visuell, kein Reflow)
+        const _gesichtenTouchOffset = (isMobile && !isHoverDevice) ? 130 : 0;
 
         // =============== ANCHOR TRANSFORMS (position:fixed + translate3d) ===============
         if (_anchorsReady) {
