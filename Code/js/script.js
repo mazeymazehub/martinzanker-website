@@ -2594,8 +2594,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const gesichtenHoverOffset = narrowHover ? -1500 : 0;
         // Touch: alle drei RIVUS-Schriften 40px tiefer → ihr Treffpunkt liegt 40px tiefer (kein Reflow)
         const _rivusTouchMeet      = (isMobile && !isHoverDevice) ? 40 : 0;
-        // Touch: RIVUS-Anchor + Box zusätzlich 40px tiefer (über die filled/outline hinaus)
-        const _rivusAnchorBoxExtra = (isMobile && !isHoverDevice) ? 40 : 0;
+        // Touch: RIVUS-Anchor + Box zusätzlich 30px tiefer (über die filled/outline hinaus)
+        const _rivusAnchorBoxExtra = (isMobile && !isHoverDevice) ? 30 : 0;
 
         // =============== ANCHOR TRANSFORMS (position:fixed + translate3d) ===============
         if (_anchorsReady) {
