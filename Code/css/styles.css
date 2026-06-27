@@ -1293,6 +1293,13 @@ section {
     #mythus-anchor-container .konzept-heading-filled,
     #gesichten-anchor-container .gesichten-anchor-filled { z-index: 4; }
 
+    /* Touch: MYTHUS-Schriften sind 65px tiefer und würden sonst hinter der Box (z:10)
+       verschwinden → Anchor + Filled über die Box heben (Stack anchor<filled<outline bleibt). */
+    @media (hover: none) and (pointer: coarse) {
+        #mythus-anchor { z-index: 11; }
+        #mythus-anchor-container .konzept-heading-filled { z-index: 12; }
+    }
+
     .rivus-anchor-gray,
     .rivus-anchor-filled,
     .rivus-anchor-outline,
