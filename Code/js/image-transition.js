@@ -119,9 +119,9 @@
 
         // 1. MYTHUS betritt Bildbereich → Wipe Daniel → Michael
         if (mythTop < imgBottom) {
-            // Touch: Wipe-Linie 15px tiefer
-            const _touch15 = window.matchMedia('(hover: none) and (pointer: coarse)').matches ? 15 : 0;
-            const wipeY = (mythR ? (mythR.top + mythR.bottom) / 2 : 0) + _touch15;
+            // Touch: Wipe-Linie 30px tiefer, damit sie hinter der (per Offset 45px tieferen) Box liegt
+            const _touchWipe = window.matchMedia('(hover: none) and (pointer: coarse)').matches ? 30 : 0;
+            const wipeY = (mythR ? (mythR.top + mythR.bottom) / 2 : 0) + _touchWipe;
             vis(el.ben, false);
             vis(el.benOverlay, false);
             applyWipeAtY(wipeY, el.michael, el.daniel, el.ben);
