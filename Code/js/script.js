@@ -2594,6 +2594,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const gesichtenHoverOffset = narrowHover ? -1500 : 0;
         // Touch: alle drei RIVUS-Schriften 40px tiefer → ihr Treffpunkt liegt 40px tiefer (kein Reflow)
         const _rivusTouchMeet      = (isMobile && !isHoverDevice) ? 40 : 0;
+        // Touch: RIVUS-Anchor + Box zusätzlich 40px tiefer (über die filled/outline hinaus)
+        const _rivusAnchorBoxExtra = (isMobile && !isHoverDevice) ? 40 : 0;
 
         // =============== ANCHOR TRANSFORMS (position:fixed + translate3d) ===============
         if (_anchorsReady) {
@@ -2607,7 +2609,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // RIVUS Anchor – folgt RIVUS Box 2 Wrapper
             if (_rivusAnchor) {
                 const wrapperVisualTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset;
-                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28 + _rivusTouchMeet;
+                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28 + _rivusTouchMeet + _rivusAnchorBoxExtra;
                 _rivusAnchor.style.transform = `translate3d(${_rivusAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
 
@@ -2657,7 +2659,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // RIVUS content box (links) - position:fixed wie KONZEPT, Transform: docTop - scrollY*(1-speed)
         if (_anchorsReady && _rivusContentBoxWrapper2) {
-            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset + _rivusTouchMeet;
+            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset + _rivusTouchMeet + _rivusAnchorBoxExtra;
             _rivusContentBoxWrapper2.style.transform = `translate3d(0, ${rivusTop}px, 0)`;
         }
         if (_rivusContentBox2) {
