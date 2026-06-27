@@ -2391,7 +2391,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const newHeight = startHeight;
             const newTextSize = startTextSize - (startTextSize - endTextSize) * progress;
             const header = document.querySelector('header');
-            if (header) header.style.top = `${30 + introOffset}px`; // stripe-top (30px) + Intro-Offset
+            // Smartphone: Header-Streifen (Blur + Logo) 50px höher starten. Nur der Header-top
+            // (Hero-Margin behält vollen introOffset, sonst doppelter Versatz). Im kleinen Zustand
+            // bleibt top bei 30 (Logo haftet sichtbar unter der Safe-Area).
+            if (header) header.style.top = `${30 + Math.max(0, introOffset - 50)}px`;
             if (phone && _headerLogoText) {
                 _headerLogoText.style.fontSize = `${newTextSize}px`;
             } else {
