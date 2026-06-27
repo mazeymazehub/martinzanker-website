@@ -1298,11 +1298,6 @@ section {
     #mythus-anchor-container .konzept-heading-filled,
     #gesichten-anchor-container .gesichten-anchor-filled { z-index: 4; }
 
-    /* Touch: nur der MYTHUS-Anker wird über die Box gehoben (sonst hinter z:10 versteckt).
-       Filled bleibt hinter der Box (z:4) → Box „schneidet" die Filled-Schrift wie im Design. */
-    @media (hover: none) and (pointer: coarse) {
-        #mythus-anchor { z-index: 11; }
-    }
 
     .rivus-anchor-gray,
     .rivus-anchor-filled,
