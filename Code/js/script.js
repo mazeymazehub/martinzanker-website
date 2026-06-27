@@ -1861,6 +1861,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =============== KLAPPBARE TEXTBLÖCKE (nur Smartphone) ===============
     // Jede Textbox kollabiert; ein Dropdown-Pfeil klappt sie smooth auf. Erster Block offen.
+    let _collapseReflowRAF = null;
     function initCollapsibleBlocks() {
         if (!_isPhone()) return;
         const boxes = document.querySelectorAll('.content-box, .content-box-2');
@@ -1876,6 +1877,18 @@ document.addEventListener('DOMContentLoaded', function() {
             arrow.addEventListener('click', function(e) {
                 e.stopPropagation();
                 box.classList.toggle('collapsed');
+                // Reflow: nachfolgende Blöcke folgen der sich ändernden Box-Höhe (rutschen nach
+                // unten/oben). recalculateLayout() je Frame während der ~0,5s-Klapp-Animation.
+                // scrollY sichern, da recalculateLayout den Spacer kurz auf 0 setzt (sonst Sprung).
+                if (_collapseReflowRAF) cancelAnimationFrame(_collapseReflowRAF);
+                const _t0 = performance.now();
+                (function _reflow() {
+                    const _sy = window.scrollY;
+                    recalculateLayout();
+                    if (window.scrollY !== _sy) window.scrollTo(0, _sy);
+                    _collapseReflowRAF = (performance.now() - _t0 < 560)
+                        ? requestAnimationFrame(_reflow) : null;
+                })();
             });
         });
     }
