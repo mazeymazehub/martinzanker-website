@@ -2600,6 +2600,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const _rivusTouchMeet      = (isMobile && !isHoverDevice) ? 40 : 0;
         // Touch: RIVUS-Anchor + Box zusätzlich 30px tiefer (über die filled/outline hinaus)
         const _rivusAnchorBoxExtra = (isMobile && !isHoverDevice) ? 30 : 0;
+        // Touch: ganzer GESICHTEN-Block (Anchor + filled + outline + Box) 100px tiefer (visuell, kein Reflow)
+        const _gesichtenTouchOffset = (isMobile && !isHoverDevice) ? 100 : 0;
 
         // =============== ANCHOR TRANSFORMS (position:fixed + translate3d) ===============
         if (_anchorsReady) {
@@ -2632,7 +2634,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const wrapperVisualTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + gesichtenHoverOffset;
                 const mobileAnchorOffset = isMobile ? 4 : 0;
                 const deskAnchorOffsetG = (!isMobile && !_isPortraitLayout()) ? 40 : 0; // Desktop: Anchor 40px tiefer
-                const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 28 + mobileAnchorOffset + deskAnchorOffsetG;
+                const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 28 + mobileAnchorOffset + deskAnchorOffsetG + _gesichtenTouchOffset;
                 _gesichtenAnchorGray.style.transform = `translate3d(${_gesichtenAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
         }
@@ -2676,7 +2678,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const mobileGesichtenOffset = isMobile ? 46 : 0;
             // Desktop: nur die Textbox 30px tiefer (Anchor + Snaplinie nutzen _gesichtenWrapperDocTop, bleiben)
             const desktopGesichtenTextOffset = (!isMobile && !_isPortraitLayout()) ? 30 : 0;
-            const gesichtenTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mobileGesichtenOffset + gesichtenHoverOffset + desktopGesichtenTextOffset;
+            const gesichtenTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mobileGesichtenOffset + gesichtenHoverOffset + desktopGesichtenTextOffset + _gesichtenTouchOffset;
             _gesichtenContentBoxWrapper.style.transform = `translate3d(0, ${gesichtenTop}px, 0)`;
         }
         if (_gesichtenContentBox) {
@@ -2692,8 +2694,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // GESICHTEN filled & outline
         const gesichtenFilledOffset = isMobile ? -26 : 0;
-        if (_gesichtenAnchorFilled)  _gesichtenAnchorFilled.style.transform  = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset}px, 0) rotate(-2deg)`;
-        if (_gesichtenAnchorOutline) _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset}px, 0) rotate(-2deg)`;
+        if (_gesichtenAnchorFilled)  _gesichtenAnchorFilled.style.transform  = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset}px, 0) rotate(-2deg)`;
+        if (_gesichtenAnchorOutline) _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset}px, 0) rotate(-2deg)`;
 
         // Text-Layer
         for (let i = 0; i < _allTextBehinds.length; i++) {
