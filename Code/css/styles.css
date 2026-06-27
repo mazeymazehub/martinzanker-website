@@ -512,6 +512,10 @@ header {
 body.dark-mode .logo-text {
     color: #ff6633; /* orange im Dark-Mode (wie das frühere dunkle Logo) */
 }
+/* Smartphone-Landing (Shrinking-Header): Logo 50px höher. Nicht für den fixen Subseiten-Header. */
+.shrinking-header .logo-text {
+    transform: translate(-50%, calc(-50% - 50px));
+}
 /* Subseiten haben einen fixen (nicht schrumpfenden) Header → feste Logo-Größe */
 .fixed-header .logo-text {
     font-size: 28px;
@@ -1212,7 +1216,7 @@ section {
         --spacing-box-padding: 20px;
         --image-alex-width: clamp(242px, 82.6vw, 386px);
         --image-ben-height: 80vh;
-        --heading-top-offset: 540px;
+        --heading-top-offset: 490px; /* MALEREI + Alex 50px höher (war 540) */
         --malerei-alex-gap: clamp(-385px, 8vw, -335px); /* -385px tiefer als Standard */
         --konzept-offset: clamp(200px, 40vh, 350px);
         --gesichten-offset: clamp(180px, 35vh, 300px);
