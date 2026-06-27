@@ -240,27 +240,32 @@ body.dark-mode::after {
         min-height: 0;
     }
 
-    /* Dropdown-Pfeil: absolut oben, mittig (Box-Mitte), orange, dreht sich beim Aufklappen */
+    /* Dropdown-Pfeil: links, knapp über dem Text, orange, dreht sich beim Aufklappen */
     .content-box .block-arrow,
     .content-box-2 .block-arrow {
         display: block;
         position: absolute;
         top: 8px;
-        left: 50%;
+        left: 24px; /* links, etwa auf Höhe des Text-Anfangs */
         z-index: 30;
         padding: 6px;
         background: none;
         border: none;
         cursor: pointer;
         line-height: 0;
-        color: #ff6633; /* Light- wie Dark-Mode orange */
+        color: #ff6633; /* Light-Mode orange */
         pointer-events: auto; /* Wrapper sind pointer-events:none → Pfeil explizit aktivieren */
-        transform: translateX(-50%) rotate(180deg); /* offen: Pfeil zeigt nach oben (= einklappen) */
+        transform: rotate(180deg); /* offen: Pfeil zeigt nach oben (= einklappen) */
         transition: transform 0.45s ease;
+    }
+    /* Dark-Mode: dunkelgrau wie der Seiten-Hintergrund (#333333), subtil auf der #1a1a1a-Box */
+    body.dark-mode .content-box .block-arrow,
+    body.dark-mode .content-box-2 .block-arrow {
+        color: #333333;
     }
     .content-box.collapsed .block-arrow,
     .content-box-2.collapsed .block-arrow {
-        transform: translateX(-50%) rotate(0deg); /* zu: Pfeil zeigt nach unten (= aufklappen) */
+        transform: rotate(0deg); /* zu: Pfeil zeigt nach unten (= aufklappen) */
     }
     .block-arrow svg {
         width: 38px;
