@@ -2592,6 +2592,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const rivusHoverOffset     = narrowHover ? -300 : 0;
         const mythusHoverOffset    = narrowHover ? -800 : 0;
         const gesichtenHoverOffset = narrowHover ? -1500 : 0;
+        // Touch: alle drei RIVUS-Schriften 40px tiefer → ihr Treffpunkt liegt 40px tiefer (kein Reflow)
+        const _rivusTouchMeet      = (isMobile && !isHoverDevice) ? 40 : 0;
 
         // =============== ANCHOR TRANSFORMS (position:fixed + translate3d) ===============
         if (_anchorsReady) {
@@ -2605,7 +2607,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // RIVUS Anchor – folgt RIVUS Box 2 Wrapper
             if (_rivusAnchor) {
                 const wrapperVisualTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset;
-                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28;
+                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28 + _rivusTouchMeet;
                 _rivusAnchor.style.transform = `translate3d(${_rivusAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
 
@@ -2679,8 +2681,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // RIVUS filled & outline
-        if (_rivusFilled)  _rivusFilled.style.transform  = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed + rivusHoverOffset}px, 0) rotate(-2deg)`;
-        if (_rivusOutline) _rivusOutline.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed + rivusHoverOffset}px, 0) rotate(-2deg)`;
+        if (_rivusFilled)  _rivusFilled.style.transform  = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed + rivusHoverOffset + _rivusTouchMeet}px, 0) rotate(-2deg)`;
+        if (_rivusOutline) _rivusOutline.style.transform = `translate3d(0, ${scrollY * gesichtenAParallaxSpeed + rivusHoverOffset + _rivusTouchMeet}px, 0) rotate(-2deg)`;
 
         // GESICHTEN filled & outline
         const gesichtenFilledOffset = isMobile ? -26 : 0;
