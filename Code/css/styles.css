@@ -512,10 +512,6 @@ header {
 body.dark-mode .logo-text {
     color: #ff6633; /* orange im Dark-Mode (wie das frühere dunkle Logo) */
 }
-/* Smartphone-Landing (Shrinking-Header): Logo 50px höher. Nicht für den fixen Subseiten-Header. */
-.shrinking-header .logo-text {
-    transform: translate(-50%, calc(-50% - 50px));
-}
 /* Subseiten haben einen fixen (nicht schrumpfenden) Header → feste Logo-Größe */
 .fixed-header .logo-text {
     font-size: 28px;
