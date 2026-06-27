@@ -2612,7 +2612,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // MYTHUS Anchor – folgt MYTHUS Box Wrapper
             if (_mythusAnchor) {
                 const wrapperVisualTop = _mythusWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mythusHoverOffset;
-                const mobileOffset = window.innerWidth < BREAKPOINT_MOBILE ? 17 : 0;
+                // Touch-Smartphone: MYTHUS-Schriften 65px tiefer (= halbe eingeklappte Box-Höhe)
+                const _mythusTouchShift = (isMobile && !isHoverDevice) ? 65 : 0;
+                const mobileOffset = (window.innerWidth < BREAKPOINT_MOBILE ? 17 : 0) + _mythusTouchShift;
                 const anchorTop = wrapperVisualTop - _mythusAnchorHeight2 - _mythusAnchorGap2 + mobileOffset;
                 _mythusAnchor.style.transform = `translate3d(${_mythusAnchorLeft}px, ${anchorTop}px, 0) rotate(4deg)`;
             }
@@ -2646,8 +2648,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // MYTHUS filled & outline
-        if (_mythusFilled)  _mythusFilled.style.transform  = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset}px, 0) rotate(2deg)`;
-        if (_mythusOutline) _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset}px, 0) rotate(2deg)`;
+        const _mythusTouchShiftF = (isMobile && !isHoverDevice) ? 65 : 0; // Touch: filled/outline 65px tiefer
+        if (_mythusFilled)  _mythusFilled.style.transform  = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
+        if (_mythusOutline) _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
 
         // RIVUS content box (links) - position:fixed wie KONZEPT, Transform: docTop - scrollY*(1-speed)
         if (_anchorsReady && _rivusContentBoxWrapper2) {
