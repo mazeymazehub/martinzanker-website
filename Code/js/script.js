@@ -2635,7 +2635,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (_mythusBox) {
             const mythusShift = window.innerWidth < BREAKPOINT_MOBILE ? '0%' : '20%';
-            const mythusBoxOffsetY = window.innerWidth < BREAKPOINT_MOBILE ? 12 : 0;
+            // Touch: Textbox 30px tiefer (nur die Box, nicht der Anker)
+            const mythusBoxOffsetY = (window.innerWidth < BREAKPOINT_MOBILE ? 12 : 0) + ((isMobile && !isHoverDevice) ? 30 : 0);
             _mythusBox.style.transform = `translate3d(${mythusShift}, ${mythusBoxOffsetY}px, 0)`;
         }
 
