@@ -271,9 +271,21 @@ body.dark-mode::after {
         height: 38px;
         display: block;
     }
-    /* MYTHUS-Pfeil 8px tiefer als die anderen */
+    /* MYTHUS-Pfeil 8px tiefer als die anderen (eingeklappt) */
     #mythus-box .block-arrow {
         top: 31px;
+    }
+    /* Aufgeklappt: Pfeil 8px über dem Text. Text-Oberkante = Box-Padding-top + 46px (lang-container).
+       Pfeilhöhe ~50px → top = Box-Padding-top − 12. Pro Box nach deren Padding. */
+    .content-box:not(.collapsed) .block-arrow,
+    .content-box-2:not(.collapsed) .block-arrow {
+        top: 8px; /* Padding 20px (KONZEPT, RIVUS) */
+    }
+    #gesichten-content-box:not(.collapsed) .block-arrow {
+        top: 25px; /* Padding 37px */
+    }
+    #mythus-box:not(.collapsed) .block-arrow {
+        top: 53px; /* Padding 65px */
     }
 }
 
