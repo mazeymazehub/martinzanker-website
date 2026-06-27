@@ -209,12 +209,17 @@ body.dark-mode::after {
     display: none;
 }
 @media (hover: none) and (pointer: coarse) and (max-width: 600px) {
-    /* Text smooth ein-/ausklappen */
+    .content-box,
+    .content-box-2 {
+        position: relative; /* Anker für den absolut zentrierten Pfeil */
+    }
+    /* Text smooth ein-/ausklappen; oben Platz für den Pfeil, damit er IMMER über dem Text steht */
     .content-box .lang-container,
     .content-box-2 .lang-container {
         overflow: hidden;
         max-height: 3000px;
         opacity: 1;
+        padding-top: 46px;
         transition: max-height 0.5s ease, opacity 0.35s ease;
     }
     .content-box.collapsed .lang-container,
@@ -222,26 +227,33 @@ body.dark-mode::after {
         max-height: 0;
         opacity: 0;
     }
+    /* Eingeklappt: schmaler Streifen Box-Hintergrund für den Pfeil */
+    .content-box.collapsed,
+    .content-box-2.collapsed {
+        min-height: 58px;
+    }
 
-    /* Dropdown-Pfeil: mittig, etwas größer, dreht sich beim Aufklappen */
+    /* Dropdown-Pfeil: absolut oben, mittig (Box-Mitte), orange, dreht sich beim Aufklappen */
     .content-box .block-arrow,
     .content-box-2 .block-arrow {
         display: block;
-        margin: 6px auto 2px;
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        z-index: 30;
         padding: 6px;
         background: none;
         border: none;
         cursor: pointer;
-        color: inherit;
         line-height: 0;
+        color: #ff6633; /* Light- wie Dark-Mode orange */
         pointer-events: auto; /* Wrapper sind pointer-events:none → Pfeil explizit aktivieren */
-        transform: rotate(180deg); /* offen: Pfeil zeigt nach oben (= einklappen) */
+        transform: translateX(-50%) rotate(180deg); /* offen: Pfeil zeigt nach oben (= einklappen) */
         transition: transform 0.45s ease;
     }
     .content-box.collapsed .block-arrow,
     .content-box-2.collapsed .block-arrow {
-        transform: rotate(0deg); /* zu: Pfeil zeigt nach unten (= aufklappen) */
-        margin: 14px auto;
+        transform: translateX(-50%) rotate(0deg); /* zu: Pfeil zeigt nach unten (= aufklappen) */
     }
     .block-arrow svg {
         width: 38px;
