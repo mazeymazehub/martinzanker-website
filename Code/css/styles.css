@@ -272,6 +272,10 @@ body.dark-mode::after {
         height: 38px;
         display: block;
     }
+    /* MYTHUS-Pfeil 8px tiefer als die anderen */
+    #mythus-box .block-arrow {
+        top: 31px;
+    }
 }
 
 /* Background stripes - dark gray frame behind navigation */
