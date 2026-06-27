@@ -1859,6 +1859,28 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
     });
 
+    // =============== KLAPPBARE TEXTBLÖCKE (nur Smartphone) ===============
+    // Jede Textbox kollabiert; ein Dropdown-Pfeil klappt sie smooth auf. Erster Block offen.
+    function initCollapsibleBlocks() {
+        if (!_isPhone()) return;
+        const boxes = document.querySelectorAll('.content-box, .content-box-2');
+        boxes.forEach((box, idx) => {
+            if (box.querySelector(':scope > .block-arrow')) return; // bereits initialisiert
+            const arrow = document.createElement('button');
+            arrow.className = 'block-arrow';
+            arrow.type = 'button';
+            arrow.setAttribute('aria-label', 'Textblock ein- oder ausklappen');
+            arrow.innerHTML = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9l7 7 7-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            box.appendChild(arrow);
+            if (idx !== 0) box.classList.add('collapsed'); // erster Block (KONZEPT) offen, Rest zu
+            arrow.addEventListener('click', function(e) {
+                e.stopPropagation();
+                box.classList.toggle('collapsed');
+            });
+        });
+    }
+    initCollapsibleBlocks();
+
     // Locale-Toggle (DE/EN)
     const localeBtns = document.querySelectorAll('.locale-switch__btn');
 

@@ -203,6 +203,53 @@ body.dark-mode::after {
     }
 }
 
+/* Klappbare Textblöcke – nur auf dem Smartphone per JS injiziert. Außerhalb von Touch
+   ausgeblendet, damit der Pfeil nie auf Desktop/Tablet auftaucht. */
+.block-arrow {
+    display: none;
+}
+@media (hover: none) and (pointer: coarse) and (max-width: 600px) {
+    /* Text smooth ein-/ausklappen */
+    .content-box .lang-container,
+    .content-box-2 .lang-container {
+        overflow: hidden;
+        max-height: 3000px;
+        opacity: 1;
+        transition: max-height 0.5s ease, opacity 0.35s ease;
+    }
+    .content-box.collapsed .lang-container,
+    .content-box-2.collapsed .lang-container {
+        max-height: 0;
+        opacity: 0;
+    }
+
+    /* Dropdown-Pfeil: mittig, etwas größer, dreht sich beim Aufklappen */
+    .content-box .block-arrow,
+    .content-box-2 .block-arrow {
+        display: block;
+        margin: 6px auto 2px;
+        padding: 6px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: inherit;
+        line-height: 0;
+        pointer-events: auto; /* Wrapper sind pointer-events:none → Pfeil explizit aktivieren */
+        transform: rotate(180deg); /* offen: Pfeil zeigt nach oben (= einklappen) */
+        transition: transform 0.45s ease;
+    }
+    .content-box.collapsed .block-arrow,
+    .content-box-2.collapsed .block-arrow {
+        transform: rotate(0deg); /* zu: Pfeil zeigt nach unten (= aufklappen) */
+        margin: 14px auto;
+    }
+    .block-arrow svg {
+        width: 38px;
+        height: 38px;
+        display: block;
+    }
+}
+
 /* Background stripes - dark gray frame behind navigation */
 .background-stripe-top,
 .background-stripe-bottom,
