@@ -139,9 +139,14 @@
             .impressum-heading-container {
                 left: 0;
             }
-            /* "IMPRESSUM" kleiner, damit es einzeilig in den Rahmen passt */
+            /* "IMPRESSUM" passend im Rahmen (einzeilig) */
             .impressum-heading {
-                font-size: clamp(30px, 11vw, 48px);
+                font-size: clamp(36px, 13.2vw, 58px);
+            }
+            /* alle Schriften 5px tiefer (Anchor/Filled-Section + Outline-Overlay gleich) */
+            .impressum-heading-section,
+            .impressum-outline-overlay {
+                padding-top: 78px;
             }
             .impressum-heading-section {
                 min-height: 398px;
