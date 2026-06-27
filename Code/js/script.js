@@ -2657,7 +2657,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // RIVUS content box (links) - position:fixed wie KONZEPT, Transform: docTop - scrollY*(1-speed)
         if (_anchorsReady && _rivusContentBoxWrapper2) {
-            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset;
+            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset + _rivusTouchMeet;
             _rivusContentBoxWrapper2.style.transform = `translate3d(0, ${rivusTop}px, 0)`;
         }
         if (_rivusContentBox2) {
