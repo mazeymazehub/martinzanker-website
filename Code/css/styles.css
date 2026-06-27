@@ -541,6 +541,15 @@ body.dark-mode .logo-text {
     letter-spacing: -0.08em;
     text-transform: uppercase;
     margin: 0;
+    white-space: nowrap; /* kein Zeilenumbruch (z.B. spanisch CONCEPTO) */
+}
+
+/* Spanisch: CONCEPTO ist breiter als das Fenster → Überschrift weiter nach links
+   (Anker folgt automatisch, da _konzeptAnchorLeft aus der Filled-Position gemessen wird). */
+@media (max-width: 640px) {
+    body.is-es .konzept-heading-container {
+        margin-left: -20px;
+    }
 }
 
 /* Fading effect for filled headings */

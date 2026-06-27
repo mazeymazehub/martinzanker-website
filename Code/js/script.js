@@ -1899,6 +1899,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function setLocale(locale) {
         localeBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.locale === locale));
+        // Body-Locale-Klasse (für CSS-Regeln, die nur in einer Sprache gelten sollen, z.B. ES-Überschriften)
+        document.body.classList.toggle('is-de', locale === 'de');
+        document.body.classList.toggle('is-en', locale === 'en');
+        document.body.classList.toggle('is-es', locale === 'es');
         document.querySelectorAll('.locale-de, .locale-en, .locale-es').forEach(el => {
             el.classList.toggle('active', el.classList.contains('locale-' + locale));
         });
