@@ -882,11 +882,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const spacer = document.getElementById('scroll-spacer');
         if (spacer) spacer.style.height = '0px';
 
-        // Hover-Desktop (Landscape): Seitenende "von unten" (Michael GAP über der Kante),
-        // OHNE Magnet dort. Spacer per _applyEndSpacer() so setzen, dass maxScroll == sEnd
-        // (zweistufig, robust gegen Mess-Ungenauigkeiten der Dokumenthöhe).
-        const _hoverEnd = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth >= BREAKPOINT_MOBILE;
-        if (_hoverEnd && spacer && !_isPortraitLayout() && _sMichaelForEnd > 0) {
+        // Breites Landscape-Gerät (Desktop ODER iPad ohne Maus): Seitenende "von unten"
+        // (Michael GAP über der Kante), OHNE Magnet dort. Spacer per _applyEndSpacer() so setzen,
+        // dass maxScroll == sEnd. Vorher nur Hover-Geräte → iPad ohne Maus konnte nicht zu Michael scrollen.
+        const _wideEnd = window.innerWidth >= BREAKPOINT_MOBILE;
+        if (_wideEnd && spacer && !_isPortraitLayout() && _sMichaelForEnd > 0) {
             _endSEnd = _applyEndSpacer(Math.round(_sMichaelForEnd));
             return;
         }
@@ -1858,7 +1858,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     allInfoImages.forEach(container => {
         container.addEventListener('click', function(e) {
-            if (window.innerWidth >= BREAKPOINT_MOBILE) return;
+            // Tap nur auf echten Hover-Geräten (Desktop mit Maus) überspringen → dort übernimmt :hover.
+            // Touch-Geräte (Smartphone UND iPad ohne Maus) nutzen den Tap, unabhängig von der Breite.
+            if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
             const isActive = this.classList.contains('info-active');
             document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
             if (!isActive) {
@@ -1868,9 +1870,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
         });
     });
-    // Tap außerhalb schließt Info (nur Mobile)
+    // Tap außerhalb schließt Info (Touch-Geräte inkl. iPad ohne Maus)
     document.addEventListener('click', () => {
-        if (window.innerWidth >= BREAKPOINT_MOBILE) return;
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
         document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
     });
 
