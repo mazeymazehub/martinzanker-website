@@ -981,9 +981,9 @@ body.no-image-transition .main-heading-image {
    - malerei-alex-gap : negativ → Bild über MALEREI (mehr negativ = Bild höher / mehr Abstand)
    - image-alex-width : Bildgröße (Alex ist ~quadratisch, Höhe ≈ Breite) */
 body.ipad-landscape {
-    --image-alex-width: clamp(300px, 30vw, 380px);
-    --heading-top-offset: 470px;
-    --malerei-alex-gap: calc(-30vw + 90px);
+    --image-alex-width: clamp(390px, 39vw, 494px); /* 30% größer; wächst nach unten (Oberkante = margin-top, bleibt) */
+    --heading-top-offset: 630px;                   /* MALEREI 160px tiefer */
+    --malerei-alex-gap: calc(-30vw - 70px);        /* kompensiert die 160px, damit die Bild-Oberkante bleibt */
 }
 
 @media (min-width: 641px) {
