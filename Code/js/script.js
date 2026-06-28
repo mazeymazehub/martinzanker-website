@@ -777,7 +777,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const anchorGapM = getKonzeptAnchorGap();
             const mobileAnchorOffsetM = window.innerWidth < BREAKPOINT_MOBILE ? 33 : 0;
             const narrowMythusShift = _narrowHoverSnap ? -800 : 0;
-            const anchorStartM = getDocumentTop(document.getElementById('mythus-box-wrapper')) - anchorGapM - anchorHeightM + mobileAnchorOffsetM + narrowMythusShift + _touchAnchorFix;
+            // Bei fixiertem Wrapper (Touch) liefert getDocumentTop falsche Werte → gecachten docTop nutzen.
+            const _mythusWrapTopS = (_mythusBoxWrapper && _mythusBoxWrapper.style.position === 'fixed')
+                ? _mythusWrapperDocTop
+                : getDocumentTop(document.getElementById('mythus-box-wrapper'));
+            const anchorStartM = _mythusWrapTopS - anchorGapM - anchorHeightM + mobileAnchorOffsetM + narrowMythusShift + _touchAnchorFix;
             let meetYM;
             if (_narrowHoverSnap) {
                 meetYM = NH_MEET_MYTHUS; // Fester Pixel-Wert → unabhängig von Fensterhöhe
@@ -1716,7 +1720,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_mythusAnchor && _mythusFilled && _mythusBoxWrapper) {
             _mythusAnchorHeight2 = _mythusAnchor.offsetHeight;
             _mythusAnchorGap2 = getKonzeptAnchorGap();
-            _mythusWrapperDocTop = getDocumentTop(_mythusBoxWrapper);
+            if (_mythusBoxWrapper.style.position !== 'fixed') {
+                _mythusWrapperDocTop = getDocumentTop(_mythusBoxWrapper);
+            }
+            // Touch: MYTHUS-Box-Wrapper fixieren (wie RIVUS) → JS-Transform synchron zum fixed Anker,
+            // kein Wobbeln beim iOS-Momentum. Desktop bleibt im Fluss (kein Momentum-Problem mit Maus).
+            if (navigator.maxTouchPoints > 0) {
+                _mythusBoxWrapper.style.position = 'fixed';
+                _mythusBoxWrapper.style.top = '0';
+                _mythusBoxWrapper.style.left = '0';
+                _mythusBoxWrapper.style.width = '100%';
+                _mythusBoxWrapper.style.marginTop = '0';
+                const scrollY0m = window.scrollY;
+                _mythusBoxWrapper.style.transform = `translate3d(0, ${_mythusWrapperDocTop - scrollY0m * (1 - BASE_PARALLAX_SPEED)}px, 0)`;
+            }
             _mythusAnchorLeft = _mythusFilled.getBoundingClientRect().left;
         }
 
@@ -2661,7 +2678,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // MYTHUS box - vertikal auf Wrapper, horizontal auf Box
         if (_mythusBoxWrapper) {
-            _mythusBoxWrapper.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED + mythusHoverOffset}px, 0)`;
+            const _mythusWrapY = (_mythusBoxWrapper.style.position === 'fixed')
+                ? (_mythusWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mythusHoverOffset) // Touch: fixed, synchron zum Anker
+                : (scrollY * BASE_PARALLAX_SPEED + mythusHoverOffset); // Desktop: Fluss
+            _mythusBoxWrapper.style.transform = `translate3d(0, ${_mythusWrapY}px, 0)`;
         }
         if (_mythusBox) {
             const mythusShift = window.innerWidth < BREAKPOINT_MOBILE ? '0%' : '20%';
@@ -2820,6 +2840,7 @@ document.addEventListener('DOMContentLoaded', function() {
         _resetFixedWrapper(_contentBoxWrapper);
         _resetFixedWrapper(_rivusContentBoxWrapper2);
         _resetFixedWrapper(_gesichtenContentBoxWrapper);
+        _resetFixedWrapper(_mythusBoxWrapper); // Touch: wird in positionAnchors fixiert → vor Re-Messung lösen
 
         // Box-Höhen neu messen (orientierungsabhängig)
         const _box2El = document.getElementById('rivus-content-box');
