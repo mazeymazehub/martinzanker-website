@@ -228,6 +228,11 @@ body.dark-mode::after {
         opacity: 0;
         padding-top: 0; /* sonst bleiben 46px stehen (border-box) → ungleich hohe eingeklappte Boxen */
     }
+    /* Smartphone: kleinerer Zeilenabstand der Box-Texte (war 1.8) */
+    .content-box p,
+    .content-box-2 p {
+        line-height: 1.4;
+    }
     /* Eingeklappt: schmaler Streifen Box-Hintergrund für den Pfeil */
     .content-box.collapsed,
     .content-box-2.collapsed {

@@ -1751,6 +1751,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Anchors sind jetzt positioniert → einblenden (verhindert FOUC oben links).
         document.body.classList.add('layout-ready');
 
+        // Smartphone: Alex-Treppentext direkt aktiv zeigen. Beim ersten Scrollen wieder ausblenden,
+        // da der Ghost position:fixed ist und sonst oben am Bildschirm kleben bliebe.
+        if (_isPhone()) {
+            requestAnimationFrame(() => {
+                const alexContainer = document.querySelector('.main-heading-container .image-with-info');
+                if (alexContainer && !alexContainer.classList.contains('info-active')) {
+                    alexContainer.classList.add('info-active');
+                    activateStairGhost(alexContainer);
+                    window.addEventListener('scroll', () => {
+                        document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
+                    }, { passive: true, once: true });
+                }
+            });
+        }
+
         // Sanfte Theme-Transitions erst nach initialem Rendern aktivieren
         requestAnimationFrame(() => {
             document.body.classList.add('theme-transitioning');
