@@ -231,7 +231,7 @@ body.dark-mode::after {
     /* Smartphone: kleinerer Zeilenabstand der Box-Texte (war 1.8) */
     .content-box p,
     .content-box-2 p {
-        line-height: 1.4;
+        line-height: 1.3;
     }
     /* Eingeklappt: schmaler Streifen Box-Hintergrund für den Pfeil */
     .content-box.collapsed,
