@@ -1827,7 +1827,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const cp = window.getComputedStyle(p);
                 dstPs[j].style.opacity    = '0';
                 dstPs[j].style.transform  = 'translate3d(0,42px,0)';
-                dstPs[j].style.color      = isDark ? '#E9E9E4' : cp.color;
+                // Touch-Geräte (iPhone + iPad): Treppentext immer weiß (iPad-Landscape liegt >768px
+                // außerhalb der weißen Mobile-CSS-Regel und wäre sonst dunkel/unsichtbar auf dem Bild).
+                dstPs[j].style.color      = (isDark || navigator.maxTouchPoints > 0) ? '#E9E9E4' : cp.color;
                 dstPs[j].style.fontSize   = (parseFloat(cp.fontSize) * 0.9) + 'px';
                 dstPs[j].style.transition = 'none';
                 animTargets.push({ el: dstPs[j], delay: 0 });
@@ -1846,8 +1848,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const topOffset = (isBen && isDesktopPointer) ? -130        // Ben: 130px höher (200-70 tiefer)
                         : (isMichael && isNarrowHover) ? -35        // Michael narrowHover: 35px höher
                         : (isDaniel && isNarrowHover) ? -60 : 0;    // Daniel narrowHover: 60px höher
-        _stairGhost.style.top        = (r.top + 10 + topOffset) + 'px';
-        _stairGhost.style.left       = (r.left + leftOffset) + 'px';
+        // iPad (Touch, breiter als Smartphone): Alex-Treppe an der rechten unteren Bildecke
+        // verankern, von dort 30px hoch und 30px nach links versetzt (statt an der Stair-Position).
+        const _isTablet = navigator.maxTouchPoints > 0 && window.innerWidth > 600;
+        const _alexImg = isAlex ? container.querySelector('.main-heading-image') : null;
+        const _ir = _alexImg ? _alexImg.getBoundingClientRect() : null;
+        if (isAlex && _isTablet && _ir && _ir.height > 1) {
+            _stairGhost.style.top    = (_ir.bottom - 30 - r.height) + 'px';
+            _stairGhost.style.left   = (_ir.right  - 30 - r.width)  + 'px';
+        } else {
+            _stairGhost.style.top    = (r.top + 10 + topOffset) + 'px';
+            _stairGhost.style.left   = (r.left + leftOffset) + 'px';
+        }
         _stairGhost.style.width      = r.width + 'px';
         _stairGhost.style.transition = 'none';
         _stairGhost.style.opacity    = '1';
