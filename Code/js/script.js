@@ -1858,9 +1858,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     allInfoImages.forEach(container => {
         container.addEventListener('click', function(e) {
-            // Tap nur auf echten Hover-Geräten (Desktop mit Maus) überspringen → dort übernimmt :hover.
-            // Touch-Geräte (Smartphone UND iPad ohne Maus) nutzen den Tap, unabhängig von der Breite.
-            if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+            // Tap auf Touch-Geräten (Smartphone UND iPad). maxTouchPoints ist zuverlässiger als die
+            // hover-Media-Query (iPadOS meldet oft hover:hover, obwohl keine Maus da ist).
+            if (!(navigator.maxTouchPoints > 0 || 'ontouchstart' in window)) return;
             const isActive = this.classList.contains('info-active');
             document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
             if (!isActive) {
@@ -1870,9 +1870,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
         });
     });
-    // Tap außerhalb schließt Info (Touch-Geräte inkl. iPad ohne Maus)
+    // Tap außerhalb schließt Info (Touch-Geräte inkl. iPad)
     document.addEventListener('click', () => {
-        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+        if (!(navigator.maxTouchPoints > 0 || 'ontouchstart' in window)) return;
         document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
     });
 

@@ -3379,6 +3379,8 @@ body.michael-tall #michael-image-with-info .image-info .words-stair {
        von Nav/Inhalt (nur Notch- bzw. Home-Indicator-Bereich), verdecken also nichts Klickbares. */
     #safe-area-top    { top: 0;    height: env(safe-area-inset-top);    z-index: 99999; }
     #safe-area-bottom { bottom: 0; height: env(safe-area-inset-bottom); z-index: 99999; }
+    /* Unten ist der Rahmen hell (#E9E9E4, wie die vertikalen Streifen), nicht orange wie oben. */
+    #safe-area-bottom { background-color: #E9E9E4; }
     body.dark-mode #safe-area-top,
     body.dark-mode #safe-area-bottom { background-color: #1a1a1a; } /* dunkle Rahmenfarbe */
 }
