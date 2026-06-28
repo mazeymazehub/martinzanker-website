@@ -983,7 +983,7 @@ body.no-image-transition .main-heading-image {
 body.ipad-landscape {
     --image-alex-width: clamp(300px, 30vw, 380px);
     --heading-top-offset: 470px;
-    --malerei-alex-gap: calc(-30vw - 40px);
+    --malerei-alex-gap: calc(-30vw + 90px);
 }
 
 @media (min-width: 641px) {
