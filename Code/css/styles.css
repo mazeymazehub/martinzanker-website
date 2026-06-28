@@ -974,6 +974,18 @@ body.no-image-transition .main-heading-image {
     margin-top: var(--malerei-alex-gap);
 }
 
+/* iPad im Landscape: MALEREI (bzw. PAINTING/PINTURA) UNTER das Alex-Bild legen und das
+   Bild höher setzen — ähnlich wie auf dem iPhone. Klasse wird per JS gesetzt (ipad-landscape),
+   da iPad-Landscape per CSS nicht von Desktop unterscheidbar ist. Werte tunbar:
+   - heading-top-offset: vertikale Position von MALEREI (größer = tiefer)
+   - malerei-alex-gap : negativ → Bild über MALEREI (mehr negativ = Bild höher / mehr Abstand)
+   - image-alex-width : Bildgröße (Alex ist ~quadratisch, Höhe ≈ Breite) */
+body.ipad-landscape {
+    --image-alex-width: clamp(300px, 30vw, 380px);
+    --heading-top-offset: 470px;
+    --malerei-alex-gap: calc(-30vw - 40px);
+}
+
 @media (min-width: 641px) {
     .main-heading-container .words-stair {
         margin-bottom: -4px; /* 100px tiefer als globale 96px */

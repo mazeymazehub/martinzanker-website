@@ -129,6 +129,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function _updateAspectClasses() {
         document.body.classList.toggle('aspect-portrait', _isPortraitLayout());
         document.body.classList.toggle('orient-landscape', window.innerWidth > window.innerHeight);
+        // iPad im Landscape (Touch, kein Smartphone): eigenes Hero-Layout (MALEREI unter Bild, Bild höher).
+        // CSS kann iPad-Landscape nicht zuverlässig von Desktop trennen → hier per JS-Klasse.
+        document.body.classList.toggle('ipad-landscape',
+            navigator.maxTouchPoints > 0
+            && window.innerWidth > window.innerHeight
+            && Math.min(window.innerWidth, window.innerHeight) >= 600);
     }
 
     // Hilfsfunktion: Dynamischen Treffpunkt-Ratio berechnen
