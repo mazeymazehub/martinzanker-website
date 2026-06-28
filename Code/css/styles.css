@@ -2313,7 +2313,8 @@ body.dark-mode .image-info::after {
 .daniel-mobile-3,
 .daniel-mobile-4,
 .michael-mobile-3,
-.michael-mobile-4 {
+.michael-mobile-4,
+.alex-en {
     display: none;
 }
 
@@ -2362,6 +2363,14 @@ body.dark-mode .image-info::after {
 .words-stair__line:nth-child(9)  { left: 144px; }
 .words-stair__line:nth-child(10) { left: 160px; }
 .words-stair__line:nth-child(11) { left: 176px; }
+
+/* Alex-Größenzeile fest auf Stufe 6 halten. Sie steht im DOM an Position 9, weil die
+   EN-Mobile-Umbruchzeilen (alex-en) dazwischen liegen (sonst nur versteckt) – ohne diese
+   feste Position würde nth-child(9) sie auf Stufe 9 schieben. Gilt Desktop + Mobile (DE/ES). */
+.main-heading-container .words-stair__line.alex-size {
+    left: 96px;
+    transform: skew(0deg, -30deg) scaleY(1.33333);
+}
 
 /* Daniel Desktop: fehlende left-Positionen und korrekter Transform für desktop-3 */
 @media (min-width: 769px) {
@@ -2439,6 +2448,16 @@ body.dark-mode .image-info::after {
     .main-heading-container .words-stair__line:nth-child(4) { left: 64px; }
     .main-heading-container .words-stair__line:nth-child(5) { left: 80px; }
     .main-heading-container .words-stair__line:nth-child(6) { left: 96px; }
+
+    /* Alex EN auf Mobile: längeren Materialtext anders umbrechen
+       (AND COLOURED / PENCIL ON / CANVAS,). Nur englische Seite (body.is-en).
+       DE/ES behalten ihren kürzeren 2-Zeilen-Umbruch (alex-tail-default). */
+    body.is-en .main-heading-container .alex-tail-default { display: none; }
+    body.is-en .main-heading-container .words-stair__line.alex-en { display: list-item; }
+    body.is-en .main-heading-container .words-stair__line.alex-en-a { left: 64px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    body.is-en .main-heading-container .words-stair__line.alex-en-b { left: 80px; transform: skew(60deg, -30deg) scaleY(0.66667); }
+    body.is-en .main-heading-container .words-stair__line.alex-en-c { left: 96px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    body.is-en .main-heading-container .words-stair__line.alex-size { left: 112px; transform: skew(60deg, -30deg) scaleY(0.66667); }
 
     .info-active .words-stair__line p {
         transform: translate3d(0, -41px, 0);
