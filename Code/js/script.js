@@ -1860,8 +1860,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const _alexImg = isAlex ? container.querySelector('.main-heading-image') : null;
         const _ir = _alexImg ? _alexImg.getBoundingClientRect() : null;
         if (isAlex && _isTablet && _ir && _ir.height > 1) {
-            _stairGhost.style.top    = (_ir.bottom - 30 - r.height) + 'px';
-            _stairGhost.style.left   = (_ir.right  - 30 - r.width)  + 'px';
+            // Rechte untere Ecke der Treppe direkt auf die rechte untere Bildecke legen.
+            _stairGhost.style.top    = (_ir.bottom - r.height) + 'px';
+            _stairGhost.style.left   = (_ir.right  - r.width)  + 'px';
         } else {
             _stairGhost.style.top    = (r.top + 10 + topOffset) + 'px';
             _stairGhost.style.left   = (r.left + leftOffset) + 'px';
