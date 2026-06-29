@@ -463,17 +463,6 @@ header {
     box-shadow: none;
 }
 
-/* iOS-Safari erzeugt an der Header-Blur-Unterkante manchmal eine helle Fransen-/Halo-Linie
-   (im Dark-Mode über dem dunklen KONZEPT sichtbar). Unterkante weich auslaufen lassen → keine
-   harte Blur-Kante mehr. Das Logo ist vertikal zentriert, der 6px-Fade unten berührt es nicht.
-   Nur Smartphone-Landing (Subseiten haben einen kleinen fixen Header mit tief sitzendem Logo). */
-@media (hover: none) and (pointer: coarse) and (max-width: 600px) {
-    body:not(.sub-page) header {
-        -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 6px), transparent);
-        mask-image: linear-gradient(to bottom, #000 calc(100% - 6px), transparent);
-    }
-}
-
 /* Shrinking header (landing page) - starts at 123px, shrinks to 43px */
 .shrinking-header {
     height: 123px;
