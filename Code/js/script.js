@@ -1863,7 +1863,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Horizontal: MITTE der Treppe auf die rechte Bildkante (r.width*0.45).
             // Vertikal: Unterkante der Treppe an der Bild-Unterkante (top = bottom - volle r.height),
             // dann 40px höher; im Landscape zusätzlich 100px höher. Bezug bleibt die Bildecke (_ir).
-            const _alexExtraHigh = (window.innerWidth > window.innerHeight) ? 100 : 0;
+            const _alexExtraHigh = (window.innerWidth > window.innerHeight) ? 50 : 0;
             _stairGhost.style.top    = (_ir.bottom - r.height - 40 - _alexExtraHigh) + 'px';
             _stairGhost.style.left   = (_ir.right  - r.width * 0.45)  + 'px';
         } else {
