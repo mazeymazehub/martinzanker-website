@@ -483,10 +483,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const mythusBoxHeight = mythusBox.offsetHeight;
         const danielNaturalTop = getDocumentTop(mythusDaniel);
 
-        // Mobile: Daniel statisch 45px unter Logo-Unterkante
+        // Mobile: Daniel statisch 15px unter Logo-Unterkante (wie Ben/Michael/Marcus → Oberkanten bündig)
         if (window.innerWidth < BREAKPOINT_MOBILE) {
             const headerEl = document.querySelector('header');
-            const topPos = headerEl ? headerEl.offsetHeight + 45 : 80;
+            const topPos = headerEl ? headerEl.offsetHeight + 15 : 50;
             mythusDaniel.style.top = `${topPos}px`;
             return;
         }
