@@ -335,6 +335,15 @@ body.dark-mode::after {
     width: 20px;
 }
 
+/* Vertikale Backing-Streifen hell wie der Rahmen (#E9E9E4). Sie liegen hinter den hellen
+   frame-border-left/right und sind normal verdeckt — aber wenn die Safari-URL-Leiste beim
+   Hochscrollen die Viewport-Höhe ändert, ziehen die fixierten Rahmen kurz nach und gäben sonst
+   das dunkle #333333 frei (kurzes schwarzes Durchblitzen). Dark-Mode bleibt #1a1a1a. */
+body:not(.dark-mode) .background-stripe-left,
+body:not(.dark-mode) .background-stripe-right {
+    background-color: #E9E9E4;
+}
+
 /* =============== NAVIGATION =============== */
 
 .main-nav {
