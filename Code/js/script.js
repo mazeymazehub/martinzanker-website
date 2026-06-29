@@ -1861,8 +1861,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const _ir = _alexImg ? _alexImg.getBoundingClientRect() : null;
         if (isAlex && _isTablet && _ir && _ir.height > 1) {
             // Rechte untere Ecke der Treppe direkt auf die rechte untere Bildecke legen.
+            // Ghost rendert 0.9-skaliert (siehe fontSize*0.9) → er ist ~10% schmaler als die
+            // gemessene Quell-Treppe r.width; daher r.width*0.9, sonst läge die rechte Kante zu weit links.
             _stairGhost.style.top    = (_ir.bottom - r.height) + 'px';
-            _stairGhost.style.left   = (_ir.right  - r.width)  + 'px';
+            _stairGhost.style.left   = (_ir.right  - r.width * 0.9)  + 'px';
         } else {
             _stairGhost.style.top    = (r.top + 10 + topOffset) + 'px';
             _stairGhost.style.left   = (r.left + leftOffset) + 'px';
