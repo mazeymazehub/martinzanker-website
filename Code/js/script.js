@@ -3065,6 +3065,19 @@ document.addEventListener('DOMContentLoaded', function() {
             if (themeColorMeta) themeColorMeta.setAttribute('content', '#ff6633'); // orange Rahmenfarbe
             if (themeSwitch) themeSwitch.checked = false;
         }
+        // Sichtbaren Treppentext-Ghost an den neuen Modus anpassen, ohne ihn auszublenden.
+        // Die Farbe wurde beim Klonen fixiert → ohne Update könnte der Text nach dem Toggle
+        // unsichtbar werden (z.B. dunkler Text auf dunklem Gradient). In-place, keine Re-Animation.
+        const _activeContainer = document.querySelector('.info-active');
+        if (typeof _stairGhost !== 'undefined' && _stairGhost && _activeContainer) {
+            const _srcPs = _activeContainer.querySelectorAll('.words-stair__line p');
+            const _dstPs = _stairGhost.querySelectorAll('.words-stair__line p');
+            _dstPs.forEach((p, i) => {
+                p.style.color = isDark || navigator.maxTouchPoints > 0
+                    ? '#E9E9E4'
+                    : (_srcPs[i] ? window.getComputedStyle(_srcPs[i]).color : p.style.color);
+            });
+        }
     };
 
     // Debug-Interface: recalculateLayout zugänglich machen
