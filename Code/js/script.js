@@ -2664,7 +2664,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Touch: RIVUS-Anchor + Box zusätzlich 30px tiefer (über die filled/outline hinaus)
         const _rivusAnchorBoxExtra = (isMobile && !isHoverDevice) ? 30 : 0;
         // Touch: ganzer GESICHTEN-Block (Anchor + filled + outline + Box) 130px tiefer (visuell, kein Reflow)
-        const _gesichtenTouchOffset = (isMobile && !isHoverDevice) ? 130 : 0;
+        const _gesichtenTouchOffset = (isMobile && !isHoverDevice) ? 115 : 0; // war 130; GESICHTEN 15px höher
 
         // =============== ANCHOR TRANSFORMS (position:fixed + translate3d) ===============
         if (_anchorsReady) {
