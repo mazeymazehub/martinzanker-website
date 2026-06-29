@@ -2643,10 +2643,9 @@ body.dark-mode .mobile-dropdown__trigger {
     color: #E9E9E4;
 }
 
-/* Deutschlandflagge in der Sprachauswahl (iPhone-Dropdown): im Dark-Mode vertikal spiegeln.
-   Die Streifen nutzen currentColor + Opacity (0.9/0.5/0.15) → bei hellem currentColor kehrt sich
-   Schwarz-Rot-Gold optisch um; scaleY(-1) stellt die Reihenfolge wieder her. */
-body.dark-mode #mobile-locale-menu button[data-locale="de"] svg {
+/* Deutschlandflagge in der Sprachauswahl (iPhone-Dropdown): Symbol generell vertikal spiegeln
+   (Light- und Dark-Mode). */
+#mobile-locale-menu button[data-locale="de"] svg {
     transform: scaleY(-1);
 }
 
