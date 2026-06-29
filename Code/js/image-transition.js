@@ -158,7 +158,9 @@
             // Wrapper-Top liegt etwas über der Box → Ben würde im Spalt durchblitzen.
             const konzBoxR = el.konzeptBox ? el.konzeptBox.getBoundingClientRect() : null;
             const wipeY = konzBoxR ? konzBoxR.top : (konzR ? konzR.top : 0);
-            const A = Math.max(0, Math.min(benR.height, wipeY - benR.top));
+            // +1px Überlappung + aufgerundet: Bens Schnittkante liegt 1px IN der (deckenden) Box,
+            // sonst bleibt bei Sub-Pixel-Rundung eine hauchdünne helle Ben-Zeile an der Box-Oberkante.
+            const A = Math.max(0, Math.min(benR.height, Math.ceil(wipeY - benR.top) + 1));
             el.ben.style.transition    = 'none';
             el.ben.style.opacity       = '1';
             el.ben.style.clipPath      = A < 1 ? '' : `inset(${A.toFixed(1)}px 0 0 0)`;
