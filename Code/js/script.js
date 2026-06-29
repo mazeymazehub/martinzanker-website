@@ -1956,6 +1956,9 @@ document.addEventListener('DOMContentLoaded', function() {
             else if (locale === 'es') el.textContent = el.dataset.es || el.dataset.de;
             else el.textContent = el.dataset.de;
         });
+        // "Home" führt zur sprachrichtigen Landingpage (Label bleibt überall "Home").
+        const _homeUrls = { de: 'index.html', en: 'index-en.html', es: 'index-es.html' };
+        document.querySelectorAll('.nav-home').forEach(a => { a.href = _homeUrls[locale] || 'index.html'; });
         localStorage.setItem('locale', locale);
     }
 
