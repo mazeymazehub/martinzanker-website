@@ -1913,6 +1913,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let _collapseReflowRAF = null;
     function initCollapsibleBlocks() {
         if (!_isPhone()) return;
+        // Initiales Einklappen ohne Animation (sofort), damit der Load-Recalc die fertig
+        // eingeklappten Höhen misst und nicht einen Zwischenstand der 0,5s-Animation.
+        document.body.classList.add('no-collapse-anim');
         const boxes = document.querySelectorAll('.content-box, .content-box-2');
         boxes.forEach((box, idx) => {
             if (box.querySelector(':scope > .block-arrow')) return; // bereits initialisiert
@@ -1940,6 +1943,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 })();
             });
         });
+        // Klapp-Animation erst nach Anwendung des Initial-Zustands wieder aktivieren (2 Frames).
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.body.classList.remove('no-collapse-anim');
+        }));
     }
     initCollapsibleBlocks();
 

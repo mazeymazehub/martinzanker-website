@@ -208,6 +208,12 @@ body.dark-mode::after {
 .block-arrow {
     display: none;
 }
+/* Initiales Einklappen ohne Animation: sonst misst ein schneller (gecachter) Load-Recalc die
+   Boxen mitten in der 0,5s-Klapp-Animation (zu hoch) → loses Layout, das beim ersten Toggle
+   zusammenrutscht. Klasse wird beim Init kurz gesetzt und nach 2 Frames wieder entfernt. */
+body.no-collapse-anim .lang-container {
+    transition: none !important;
+}
 @media (hover: none) and (pointer: coarse) and (max-width: 600px) {
     .content-box,
     .content-box-2 {
