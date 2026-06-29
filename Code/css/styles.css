@@ -3436,5 +3436,19 @@ body.michael-tall #michael-image-with-info .image-info .words-stair {
     #safe-area-bottom { background-color: #E9E9E4; }
     body.dark-mode #safe-area-top,
     body.dark-mode #safe-area-bottom { background-color: #1a1a1a; } /* dunkle Rahmenfarbe */
+    /* Gleiche Körnung wie der Rest: der untere Safe-Area-Balken liegt mit z99999 ÜBER dem
+       Grain-Overlay (body::after, z10000) und bekäme sonst keine Körnung (fiel auf iPad mit
+       Home-Indicator als glatte Linie auf). Daher denselben Grain direkt per ::after auflegen. */
+    #safe-area-bottom::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.3 0.3 0.3 0 0 0.3 0.3 0.3 0 0 0.3 0.3 0.3 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' fill='%23808080'/%3E%3C/svg%3E");
+        background-size: 250px 250px;
+        background-repeat: repeat;
+        opacity: 0.25;
+        pointer-events: none;
+    }
+    body.dark-mode #safe-area-bottom::after { opacity: 0.20; }
 }
 
