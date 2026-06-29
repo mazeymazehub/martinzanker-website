@@ -1862,8 +1862,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isAlex && _isTablet && _ir && _ir.height > 1) {
             // Horizontal: MITTE der Treppe auf die rechte Bildkante (r.width*0.45).
             // Vertikal: Unterkante der Treppe an der Bild-Unterkante (top = bottom - volle r.height),
-            // damit nichts unter das Bild hängt. (Mittelpunkt-auf-Kante säße halb darunter → tiefer.)
-            _stairGhost.style.top    = (_ir.bottom - r.height) + 'px';
+            // dann 40px höher. Bezug bleibt die rechte untere Bildecke (_ir).
+            _stairGhost.style.top    = (_ir.bottom - r.height - 40) + 'px';
             _stairGhost.style.left   = (_ir.right  - r.width * 0.45)  + 'px';
         } else {
             _stairGhost.style.top    = (r.top + 10 + topOffset) + 'px';
