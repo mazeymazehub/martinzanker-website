@@ -2500,14 +2500,13 @@ body.dark-mode .image-info::after {
     padding: 3rem;
     border-radius: 8px;
     line-height: 1.8;
-    font-size: 1.15em; /* Impressum-Schriften 15% größer (Inhaltstext erbt diese Größe) */
 }
 
 .impressum-content h2 {
     color: var(--color-dark);
     margin-top: 2rem;
     margin-bottom: 1rem;
-    font-size: 1.725rem; /* 1.5rem + 15% */
+    font-size: 1.5rem;
 }
 
 .impressum-content h2:first-child {
