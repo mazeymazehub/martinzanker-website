@@ -239,12 +239,13 @@ body.no-collapse-anim .lang-container {
     .content-box-2 p {
         line-height: 1.25;
     }
-    /* Eingeklappt: alle Boxen identisch — 58px hoch, einheitliches Padding 20px. Das !important
-       überschreibt das unterschiedliche Basis-Padding (MYTHUS 65px, GESICHTEN 37px), sodass alle
-       eingeklappten Boxen exakt gleich aussehen. */
+    /* Eingeklappt: alle Boxen 58px. */
     .content-box.collapsed,
     .content-box-2.collapsed {
         min-height: 58px;
+    }
+    /* MYTHUS: Basis-Padding 65px → eingeklappt auf 20px reduzieren, damit min-height:58 greift (wie die anderen). */
+    #mythus-box.collapsed {
         padding-top: 20px !important;
         padding-bottom: 20px !important;
     }
@@ -274,7 +275,6 @@ body.no-collapse-anim .lang-container {
     }
     .content-box.collapsed .block-arrow,
     .content-box-2.collapsed .block-arrow {
-        top: 4px; /* vertikal zentriert in der 58px-Box (Button ~50px hoch), für alle gleich */
         transform: rotate(0deg); /* zu: Pfeil zeigt nach unten (= aufklappen) */
     }
     .block-arrow svg {
