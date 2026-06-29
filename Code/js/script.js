@@ -1860,10 +1860,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const _alexImg = isAlex ? container.querySelector('.main-heading-image') : null;
         const _ir = _alexImg ? _alexImg.getBoundingClientRect() : null;
         if (isAlex && _isTablet && _ir && _ir.height > 1) {
-            // Horizontale MITTE der Treppe auf die rechte Bildkante, Unterkante auf die Bild-Unterkante.
-            // Ghost rendert 0.9-skaliert (siehe fontSize*0.9) → ~10% kleiner als die Quell-Treppe r;
-            // tatsächliche Ghost-Höhe ≈ r.height*0.9, Breite ≈ r.width*0.9 (halbe Breite = r.width*0.45).
-            _stairGhost.style.top    = (_ir.bottom - r.height * 0.9) + 'px';
+            // MITTE der Treppe (horizontal UND vertikal) auf die rechte untere Bildecke legen.
+            // Ghost rendert 0.9-skaliert (siehe fontSize*0.9) → tatsächliche Größe ≈ r*0.9,
+            // halbe Größe = r*0.45.
+            _stairGhost.style.top    = (_ir.bottom - r.height * 0.45) + 'px';
             _stairGhost.style.left   = (_ir.right  - r.width * 0.45)  + 'px';
         } else {
             _stairGhost.style.top    = (r.top + 10 + topOffset) + 'px';
