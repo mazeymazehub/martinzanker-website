@@ -269,9 +269,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_isPortraitLayout()) {
             minGap += 350;
         }
-        // Mobile: MYTHUS-Block näher an RIVUS (Abstand verkleinern; ~200px weniger Scroll als -67)
+        // Mobile: MYTHUS-Block näher an RIVUS (Abstand verkleinern)
         if (window.innerWidth < BREAKPOINT_MOBILE) {
-            minGap -= 267;
+            minGap -= 567; // war 267; Abstand RIVUS→MYTHUS zusätzlich 300px kleiner
         }
         // Desktop (Landscape): MYTHUS-Position angepasst (verhindert Doppel-Snap mit RIVUS)
         const isPortrait = _isPortraitLayout();
