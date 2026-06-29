@@ -1899,8 +1899,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     // Tap außerhalb schließt Info (Touch-Geräte inkl. iPad ohne Maus)
-    document.addEventListener('click', () => {
+    document.addEventListener('click', (e) => {
         if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+        // Taps auf die Nav-Bedienelemente (Theme-Toggle, Sprache, Niveau, Menü) sollen den
+        // Treppentext NICHT schließen – sonst verschwindet er beim Umschalten von Day/Night.
+        if (e.target.closest('.main-nav')) return;
         document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
     });
 
