@@ -1651,13 +1651,18 @@ section {
     #mythus-daniel-image-with-info .daniel-canvas   { left: 96px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
     #mythus-daniel-image-with-info .daniel-size     { left: 112px; transform: skew(60deg, -30deg) scaleY(0.66667); }
 
-    .michael-desktop-3 { display: none !important; }
-    .michael-mobile-3, .michael-mobile-4 { display: list-item !important; }
+    /* Michael Mobile (≤768): Name in zwei Zeilen splitten (MICHAEL / (AT THE CROSS)). 7 sichtbare
+       Zeilen, alle explizit positioniert → unabhängig von nth-child. */
+    .michael-name-full, .michael-desktop-3 { display: none !important; }
+    .michael-name, .michael-paren, .michael-mobile-3, .michael-mobile-4 { display: list-item !important; }
 
-    #michael-image-with-info .michael-mobile-3          { left: 48px; transform: skew(60deg, -30deg) scaleY(0.66667); }
-    #michael-image-with-info .michael-mobile-4          { left: 64px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
-    #michael-image-with-info .words-stair__line:nth-child(6) { left: 80px; transform: skew(60deg, -30deg) scaleY(0.66667); }
-    #michael-image-with-info .words-stair__line:nth-child(7) { left: 96px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #michael-image-with-info .michael-name     { left: 16px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #michael-image-with-info .michael-paren    { left: 32px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #michael-image-with-info .michael-year     { left: 48px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #michael-image-with-info .michael-mobile-3 { left: 64px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #michael-image-with-info .michael-mobile-4 { left: 80px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #michael-image-with-info .michael-canvas   { left: 96px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #michael-image-with-info .michael-size     { left: 112px; transform: skew(60deg, -30deg) scaleY(0.66667); }
 
 
     body:not(.dark-mode) .image-info {
@@ -2337,8 +2342,20 @@ body.dark-mode .image-info::after {
 .daniel-mobile-4,
 .michael-mobile-3,
 .michael-mobile-4,
+.michael-name,
+.michael-paren,
 .alex-en {
     display: none;
+}
+
+/* Michael Desktop (≥769px): explizite Stufen-Positionen (1:1 wie der bisherige nth-child-Zustand:
+   16/32/64/80/96). Hält das Desktop-Layout stabil, obwohl die Mobile-Split-Zeilen im DOM stehen. */
+@media (min-width: 769px) {
+    #michael-image-with-info .michael-name-full { left: 16px; transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #michael-image-with-info .michael-year      { left: 32px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #michael-image-with-info .michael-desktop-3 { left: 64px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #michael-image-with-info .michael-canvas    { left: 80px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #michael-image-with-info .michael-size      { left: 96px; transform: skew(60deg, -30deg) scaleY(0.66667); }
 }
 
 .words-stair {
