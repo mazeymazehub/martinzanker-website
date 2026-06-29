@@ -2716,7 +2716,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // MYTHUS filled & outline
-        const _mythusTouchShiftF = (isMobile && !isHoverDevice) ? 30 : 0; // Touch: filled/outline 30px tiefer (höher als Anker bei 65)
+        const _mythusTouchShiftF = (isMobile && !isHoverDevice) ? 5 : 0; // Touch: filled/outline 5px tiefer (war 30 → 25px höher, trifft Anker an der Snaplinie)
         if (_mythusFilled)  _mythusFilled.style.transform  = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
         if (_mythusOutline) _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
 
