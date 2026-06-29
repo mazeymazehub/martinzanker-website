@@ -239,14 +239,12 @@ body.no-collapse-anim .lang-container {
     .content-box-2 p {
         line-height: 1.25;
     }
-    /* Eingeklappt: schmaler Streifen Box-Hintergrund für den Pfeil */
+    /* Eingeklappt: alle Boxen identisch — 58px hoch, einheitliches Padding 20px. Das !important
+       überschreibt das unterschiedliche Basis-Padding (MYTHUS 65px, GESICHTEN 37px), sodass alle
+       eingeklappten Boxen exakt gleich aussehen. */
     .content-box.collapsed,
     .content-box-2.collapsed {
         min-height: 58px;
-    }
-    /* MYTHUS eingeklappt: gleiche Höhe wie die anderen Boxen (58px, wie RIVUS).
-       #mythus-box hat oben/unten je 65px Padding → auf 20px reduzieren, dann greift min-height:58. */
-    #mythus-box.collapsed {
         padding-top: 20px !important;
         padding-bottom: 20px !important;
     }
@@ -276,16 +274,13 @@ body.no-collapse-anim .lang-container {
     }
     .content-box.collapsed .block-arrow,
     .content-box-2.collapsed .block-arrow {
+        top: 4px; /* vertikal zentriert in der 58px-Box (Button ~50px hoch), für alle gleich */
         transform: rotate(0deg); /* zu: Pfeil zeigt nach unten (= aufklappen) */
     }
     .block-arrow svg {
         width: 38px;
         height: 38px;
         display: block;
-    }
-    /* MYTHUS-Pfeil 8px tiefer als die anderen (eingeklappt) */
-    #mythus-box .block-arrow {
-        top: 31px;
     }
     /* Aufgeklappt: Pfeil 8px über dem Text. Text-Oberkante = Box-Padding-top + 46px (lang-container).
        Pfeilhöhe ~50px → top = Box-Padding-top − 12. Pro Box nach deren Padding. */
