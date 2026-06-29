@@ -3425,9 +3425,11 @@ body.michael-tall #michael-image-with-info .image-info .words-stair {
     #safe-area-bottom { background-color: #E9E9E4; }
     body.dark-mode #safe-area-top,
     body.dark-mode #safe-area-bottom { background-color: #1a1a1a; } /* dunkle Rahmenfarbe */
-    /* Gleiche Körnung wie der Rest: der untere Safe-Area-Balken liegt mit z99999 ÜBER dem
-       Grain-Overlay (body::after, z10000) und bekäme sonst keine Körnung (fiel auf iPad mit
-       Home-Indicator als glatte Linie auf). Daher denselben Grain direkt per ::after auflegen. */
+    /* Gleiche Körnung wie der Rest: die Safe-Area-Balken liegen mit z99999 ÜBER dem Grain-Overlay
+       (body::after, z10000) und bekämen sonst keine Körnung. Die Kante zwischen "kein Grain"
+       (Balken) und "Grain" (Inhalt) erscheint als helle/dunkle Linie (oben im Dark-Mode, unten
+       auf iPad mit Home-Indicator). Daher denselben Grain direkt per ::after auf beide auflegen. */
+    #safe-area-top::after,
     #safe-area-bottom::after {
         content: '';
         position: absolute;
@@ -3438,6 +3440,7 @@ body.michael-tall #michael-image-with-info .image-info .words-stair {
         opacity: 0.25;
         pointer-events: none;
     }
+    body.dark-mode #safe-area-top::after,
     body.dark-mode #safe-area-bottom::after { opacity: 0.20; }
 }
 
