@@ -1968,6 +1968,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function rotateBlocksForPhone() {
         if (_blocksRotated || !_isPhone()) return;
         _blocksRotated = true;
+        document.body.classList.add('phone-blocks-rotated'); // für CSS-Overrides (X-Position der Anker)
 
         // Anker-Überschriften setzen. ACHTUNG: Pro Anker gibt es drei Ebenen — filled + outline liegen
         // IM Container, die "gray"-Ebene (Snap-Referenz) liegt AUSSERHALB (eigenes <h2>). Alle drei setzen.

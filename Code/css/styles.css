@@ -582,6 +582,16 @@ body.dark-mode .logo-text {
     }
 }
 
+/* iPhone-Block-Rotation: X-Position der Anker mitrotieren. MYTHUS-Anker (zeigt RIVUS) verliert sein
+   margin-left, GESICHTEN-Anker (zeigt MYTHUS) bekommt MYTHUS' margin-left. RIVUS-Anker = unverändert
+   (RIVUS und GESICHTEN teilen ohnehin dieselbe X-Position). */
+body.phone-blocks-rotated #mythus-anchor-container {
+    margin-left: 0 !important;
+}
+body.phone-blocks-rotated #gesichten-anchor-container {
+    margin-left: max(0px, calc(26px - (100vw - 400px) * 0.026)) !important;
+}
+
 /* Fading effect for filled headings */
 .main-heading-filled,
 .konzept-heading-filled,
