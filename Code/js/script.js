@@ -2844,8 +2844,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // GESICHTEN filled & outline
         const gesichtenFilledOffset = isMobile ? -26 : 0;
-        if (_gesichtenAnchorFilled)  _gesichtenAnchorFilled.style.transform  = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset}px, 0) rotate(${_gFillAng}deg)`;
-        if (_gesichtenAnchorOutline) _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset}px, 0) rotate(${_gFillAng}deg)`;
+        // iPhone-Rotation: MYTHUS filled+outline tiefer, damit sie am gezeigten Anker-Stand auf dem grauen MYTHUS liegen
+        const _mythusMeetOffset = _blocksRotated ? 50 : 0;
+        if (_gesichtenAnchorFilled)  _gesichtenAnchorFilled.style.transform  = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset + _mythusMeetOffset}px, 0) rotate(${_gFillAng}deg)`;
+        if (_gesichtenAnchorOutline) _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset + _mythusMeetOffset}px, 0) rotate(${_gFillAng}deg)`;
 
         // Text-Layer
         for (let i = 0; i < _allTextBehinds.length; i++) {
