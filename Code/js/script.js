@@ -1989,6 +1989,21 @@ document.addEventListener('DOMContentLoaded', function() {
             lcM.innerHTML = hR; // MYTHUS-Box zeigt RIVUS
             lcG.innerHTML = hM; // GESICHTEN-Box zeigt MYTHUS
         }
+
+        // Bilder im selben Ring rotieren: Container-IDs/Positionen + die Wipe-State-Machine
+        // (image-transition.js, triggert nach Box-Positionen) bleiben unverändert — nur der INHALT
+        // (img + words-stair-Label) wandert. Jedes Bild folgt seiner Box:
+        //   Ben-Slot (Pos2/GESICHTEN-Box) ← Michael, Daniel-Slot (Pos3/RIVUS) ← Ben,
+        //   Michael-Slot (Pos4/MYTHUS) ← Daniel. Sichtbare Wipe-Folge wird damit Michael → Ben → Daniel.
+        const imgB = document.getElementById('ben-image-with-info');
+        const imgD = document.getElementById('mythus-daniel-image-with-info');
+        const imgM = document.getElementById('michael-image-with-info');
+        if (imgB && imgD && imgM) {
+            const hB = imgB.innerHTML, hD = imgD.innerHTML, hM2 = imgM.innerHTML;
+            imgB.innerHTML = hM2; // Ben-Slot zeigt Michael
+            imgD.innerHTML = hB;  // Daniel-Slot zeigt Ben
+            imgM.innerHTML = hD;  // Michael-Slot zeigt Daniel
+        }
     }
     rotateBlocksForPhone();
 
@@ -2998,7 +3013,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =============== BEN STAIRCASE: iPad Portrait Split ===============
     function updateBenStaircase() {
-        const benList = document.querySelector('#ben-container .words-stair');
+        // Inhaltsfolgend: Ben-Treppe kann durch die iPhone-Block-Rotation in einem anderen
+        // Container-Slot liegen. Liste über eine eindeutige Ben-Zeilenklasse finden statt per Container-ID.
+        const _benAnchor = document.querySelector('.ben-masse');
+        const benList = _benAnchor ? _benAnchor.closest('.words-stair') : null;
         if (!benList) return;
 
         const isSplit = window.innerWidth <= BREAKPOINT_MOBILE
@@ -3045,7 +3063,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateDanielStaircase() {
-        const danielList = document.querySelector('#mythus-daniel-image-with-info .words-stair');
+        // Inhaltsfolgend (s. updateBenStaircase): Liste über eindeutige Daniel-Zeilenklasse finden.
+        const _danAnchor = document.querySelector('.daniel-size');
+        const danielList = _danAnchor ? _danAnchor.closest('.words-stair') : null;
         if (!danielList) return;
 
         const isMobile = window.innerWidth <= BREAKPOINT_MOBILE;
