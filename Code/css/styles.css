@@ -2495,6 +2495,7 @@ body.dark-mode .image-info::after {
         top: 58%;                 /* Mitte der unteren Bildschirmhälfte */
         z-index: 10002;           /* über dem Rahmen (frame-border 9999, safe-area 10000, bottom-bar 10001) */
         pointer-events: none;
+        transform: translate3d(-20px, 20px, 0); /* 20px nach links, 20px nach unten */
     }
     body.bottom-stair-visible #bottom-stair-menu {
         pointer-events: auto;
