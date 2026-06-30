@@ -591,6 +591,12 @@ body.phone-blocks-rotated #mythus-anchor-container {
 body.phone-blocks-rotated #gesichten-anchor-container {
     margin-left: max(0px, calc(26px - (100vw - 400px) * 0.026)) !important;
 }
+/* RIVUS-Anker zeigt nach Rotation GESICHTEN (längeres Wort) → kleiner. */
+body.phone-blocks-rotated .rivus-anchor-filled,
+body.phone-blocks-rotated .rivus-anchor-outline,
+body.phone-blocks-rotated .rivus-anchor-gray {
+    font-size: calc(var(--font-size-heading-large) * 0.85) !important;
+}
 
 /* Fading effect for filled headings */
 .main-heading-filled,
