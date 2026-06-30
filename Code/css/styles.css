@@ -618,10 +618,11 @@ body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-filled,
 body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-outline {
     top: calc(var(--gesichten-offset) + 38px + 352px) !important;
 }
-/* RIVUS-Schriften (im mythus-anchor-Slot) filled+outline (Basis +352px → +592px). */
+/* RIVUS-Schriften (im mythus-anchor-Slot) filled+outline: ~320px tiefer, damit sie am Snap-Punkt
+   auf dem grauen Anker liegen (Debug: fill lag ~342px über gray). Basis +352px → +912px. */
 body.phone-blocks-rotated #mythus-anchor-container .konzept-heading-filled,
 body.phone-blocks-rotated #mythus-anchor-container .konzept-heading-outline {
-    top: calc(var(--konzept-offset) + 352px + 240px) !important;
+    top: calc(var(--konzept-offset) + 352px + 560px) !important;
 }
 /* Ben-Treppentext (nach Rotation im daniel-Slot) 2px höher. */
 body.phone-blocks-rotated #mythus-daniel-image-with-info .words-stair {
