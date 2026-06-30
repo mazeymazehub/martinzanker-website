@@ -607,11 +607,12 @@ body.phone-blocks-rotated .rivus-anchor-outline,
 body.phone-blocks-rotated .rivus-anchor-gray {
     font-size: calc(var(--font-size-heading-large) * 0.85) !important;
 }
-/* GESICHTEN (im rivus-anchor-Slot) filled+outline: +37px (Basis +40px). */
-body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-filled,
-body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-outline {
-    top: calc(var(--gesichten-offset) + 37px + 352px) !important;
-}
+/* GESICHTEN (im rivus-anchor-Slot): z-Ebenen über die Bilder heben (gray z:3, filled z:4 – wie das
+   MYTHUS/GESICHTEN-Anchor-System), sonst verschwindet GESICHTEN durch die Bild-Rotation hinter dem
+   pos2-Bild (Bild erreicht beim Wipe z:2 und liegt im DOM nach .rivus-anchor-gray). Position bleibt
+   nativ rivus (Basis-Top +40px), damit Anchor→Textblock-Abstand wie bei RIVUS ist. */
+body.phone-blocks-rotated .rivus-anchor-gray   { z-index: 3 !important; }
+body.phone-blocks-rotated .rivus-anchor-filled { z-index: 4 !important; }
 
 /* Fading effect for filled headings */
 .main-heading-filled,
