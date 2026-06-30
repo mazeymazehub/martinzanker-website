@@ -2484,6 +2484,54 @@ body.dark-mode .image-info::after {
     #mythus-daniel-image-with-info .daniel-size      { left: 144px; }
 }
 
+/* =============== Treppentext-Menü am Seitenende (nur iPhone) =============== */
+#bottom-stair-menu { display: none; }
+@media (max-width: 600px) and (hover: none) and (pointer: coarse) {
+    #bottom-stair-menu {
+        display: block;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 60%;                 /* Mitte der unteren Bildschirmhälfte */
+        z-index: 30;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+    }
+    body.bottom-stair-visible #bottom-stair-menu {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    #bottom-stair-menu ul {
+        list-style: none;
+        margin: 0;
+        padding-left: 36px;
+    }
+    #bottom-stair-menu .bottom-stair__line {
+        height: 60px;
+        position: relative;
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+    #bottom-stair-menu .bottom-stair__line:nth-child(1) { left: 0;    transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #bottom-stair-menu .bottom-stair__line:nth-child(2) { left: 24px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #bottom-stair-menu .bottom-stair__line:nth-child(3) { left: 48px; transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #bottom-stair-menu a {
+        display: inline-block;
+        font-family: 'Inter', sans-serif;
+        font-weight: 900;
+        font-size: 48px;          /* größer als die übrigen Treppentexte (32px) */
+        letter-spacing: -0.2px;
+        line-height: 50px;
+        text-transform: uppercase;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    #bottom-stair-menu .bottom-stair__line:nth-child(1) a { color: #333366; } /* Werke – Blau */
+    #bottom-stair-menu .bottom-stair__line:nth-child(2) a { color: #333333; } /* Texte – Schwarz */
+    #bottom-stair-menu .bottom-stair__line:nth-child(3) a { color: #333366; } /* Kontakt – Blau */
+}
+
 .words-stair__line p {
     height: 42px; /* --stair-clip */
     line-height: 34px;

@@ -2688,6 +2688,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const imageSpeed = scrollY * 0.5;
         const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
 
+        // Treppentext-Menü (Subseiten-Links) am Seitenende einblenden, wenn ganz nach unten gescrollt
+        // ist. Sichtbarkeit nur iPhone-relevant (CSS-Media-Query gated). Schwelle: ~6px vor maxScroll.
+        const _atBottom = (window.innerHeight + scrollY) >= (document.documentElement.scrollHeight - 6);
+        document.body.classList.toggle('bottom-stair-visible', _atBottom);
+
         // iPhone-Block-Rotation: MYTHUS-Anker zeigt RIVUS-Inhalt, GESICHTEN-Anker zeigt MYTHUS-Inhalt →
         // deren Winkel mit-rotieren (RIVUS-Winkel −2/−4, MYTHUS-Winkel +2/+4). RIVUS-Anker bleibt gleich.
         const _mFillAng = _blocksRotated ? -2 : 2, _mGrayAng = _blocksRotated ? -4 : 4;
