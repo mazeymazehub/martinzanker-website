@@ -586,7 +586,7 @@ body.dark-mode .logo-text {
    margin-left, GESICHTEN-Anker (zeigt MYTHUS) bekommt MYTHUS' margin-left. RIVUS-Anker = unverändert
    (RIVUS und GESICHTEN teilen ohnehin dieselbe X-Position). */
 body.phone-blocks-rotated #mythus-anchor-container {
-    margin-left: 115px !important; /* RIVUS-Schriften nach rechts (50 + 100 - 20 - 20 + 5) */
+    margin-left: 122px !important; /* RIVUS-Schriften nach rechts (115 + 7) */
 }
 /* GESICHTEN-Anker zeigt jetzt MYTHUS → linksbündig (start start) + volle Größe wie das echte MYTHUS,
    statt rechtsbündig/60px der GESICHTEN-Position. */
