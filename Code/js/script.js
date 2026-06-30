@@ -2828,7 +2828,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const mobileGesichtenOffset = isMobile ? 46 : 0;
             // Desktop: nur die Textbox 30px tiefer (Anchor + Snaplinie nutzen _gesichtenWrapperDocTop, bleiben)
             const desktopGesichtenTextOffset = (!isMobile && !_isPortraitLayout()) ? 30 : 0;
-            const gesichtenTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mobileGesichtenOffset + gesichtenHoverOffset + desktopGesichtenTextOffset + _gesichtenTouchOffset;
+            const gesichtenTop = _gesichtenWrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + mobileGesichtenOffset + gesichtenHoverOffset + desktopGesichtenTextOffset + _gesichtenTouchOffset + (_blocksRotated ? -30 : 0); // iPhone-Rotation: MYTHUS-Textbox 30px höher (Anker bleibt)
             _gesichtenContentBoxWrapper.style.transform = `translate3d(0, ${gesichtenTop}px, 0)`;
         }
         if (_gesichtenContentBox) {
