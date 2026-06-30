@@ -588,8 +588,18 @@ body.dark-mode .logo-text {
 body.phone-blocks-rotated #mythus-anchor-container {
     margin-left: 0 !important;
 }
+/* GESICHTEN-Anker zeigt jetzt MYTHUS → linksbündig (start start) + volle Größe wie das echte MYTHUS,
+   statt rechtsbündig/60px der GESICHTEN-Position. */
 body.phone-blocks-rotated #gesichten-anchor-container {
+    place-items: start start !important;
+    padding-left: var(--spacing-container) !important;
+    padding-right: 0 !important;
     margin-left: max(0px, calc(26px - (100vw - 400px) * 0.026)) !important;
+}
+body.phone-blocks-rotated #gesichten-anchor-container .gesichten-anchor-filled,
+body.phone-blocks-rotated #gesichten-anchor-container .gesichten-anchor-outline,
+body.phone-blocks-rotated #gesichten-anchor-gray {
+    font-size: var(--font-size-heading-large) !important;
 }
 /* RIVUS-Anker zeigt nach Rotation GESICHTEN (längeres Wort) → kleiner. */
 body.phone-blocks-rotated .rivus-anchor-filled,
