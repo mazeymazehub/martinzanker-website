@@ -1955,6 +1955,42 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('no-collapse-anim');
         }));
     }
+
+    // =============== iPHONE: BLOCK-REIHENFOLGE PER INHALTS-ROTATION ===============
+    // Gewünschte iPhone-Reihenfolge: KONZEPT → GESICHTEN → RIVUS → MYTHUS.
+    // Statt die fragile Positions-/Snap-Mechanik umzubauen, bleiben die Boxen/Anker an Ort und
+    // Stelle und nur ihr ANGEZEIGTER Inhalt rotiert (3er-Ring):
+    //   Pos2 (rivus-*)     ← GESICHTEN-Inhalt
+    //   Pos3 (mythus-*)    ← RIVUS-Inhalt
+    //   Pos4 (gesichten-*) ← MYTHUS-Inhalt
+    // Nur iPhone (_isPhone). Schritt 1: Texte (Anker-Überschrift + Box-Body). Bilder folgen separat.
+    let _blocksRotated = false;
+    function rotateBlocksForPhone() {
+        if (_blocksRotated || !_isPhone()) return;
+        _blocksRotated = true;
+
+        // Anker-Überschriften (alle h2-Layer je Container) auf die rotierte Beschriftung setzen.
+        const setHead = (containerId, text) => {
+            const c = document.getElementById(containerId);
+            if (c) c.querySelectorAll('h2').forEach(h => { h.textContent = text; });
+        };
+        setHead('rivus-anchor-container', 'GESICHTEN');
+        setHead('mythus-anchor-container', 'RIVUS');
+        setHead('gesichten-anchor-container', 'MYTHUS');
+
+        // Box-Bodys (lang-container, enthält alle Sprach-/Niveau-Varianten) im Ring rotieren.
+        const lcR = document.querySelector('#rivus-content-box .lang-container');
+        const lcM = document.querySelector('#mythus-box .lang-container');
+        const lcG = document.querySelector('#gesichten-content-box .lang-container');
+        if (lcR && lcM && lcG) {
+            const hR = lcR.innerHTML, hM = lcM.innerHTML, hG = lcG.innerHTML;
+            lcR.innerHTML = hG; // RIVUS-Box zeigt GESICHTEN
+            lcM.innerHTML = hR; // MYTHUS-Box zeigt RIVUS
+            lcG.innerHTML = hM; // GESICHTEN-Box zeigt MYTHUS
+        }
+    }
+    rotateBlocksForPhone();
+
     initCollapsibleBlocks();
 
     // Locale-Toggle (DE/EN)
