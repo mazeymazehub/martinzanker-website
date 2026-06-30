@@ -623,9 +623,9 @@ body.phone-blocks-rotated #mythus-anchor-container .konzept-heading-filled,
 body.phone-blocks-rotated #mythus-anchor-container .konzept-heading-outline {
     top: calc(var(--konzept-offset) + 352px + 160px) !important;
 }
-/* Ben-Treppentext (nach Rotation im daniel-Slot) 85px höher. */
+/* Ben-Treppentext (nach Rotation im daniel-Slot) 55px höher. */
 body.phone-blocks-rotated #mythus-daniel-image-with-info .words-stair {
-    transform: translate3d(0, -85px, 0) !important;
+    transform: translate3d(0, -55px, 0) !important;
 }
 
 /* Fading effect for filled headings */
