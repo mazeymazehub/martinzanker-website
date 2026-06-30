@@ -2523,19 +2523,16 @@ body.dark-mode .image-info::after {
         text-transform: uppercase;
         text-decoration: none;
         white-space: nowrap;
-        /* Einfahr-Animation wie die übrigen Treppentexte (slide-up + fade) */
+        /* Einfahr-Animation exakt wie die übrigen Treppentexte: alle Zeilen GLEICHZEITIG,
+           slide-up + fade, 0.35s ease (vgl. activateStairGhost, delay 0 für alle). */
         opacity: 0;
-        transform: translate3d(0, 48px, 0);
-        transition: transform 0.45s ease, opacity 0.45s ease;
+        transform: translate3d(0, 42px, 0);
+        transition: opacity 0.35s ease, transform 0.35s ease;
     }
     body.bottom-stair-visible #bottom-stair-menu a {
         opacity: 1;
         transform: translate3d(0, 0, 0);
     }
-    /* Gestaffelt einfahren (Treppe baut sich von oben nach unten auf) */
-    #bottom-stair-menu .bottom-stair__line:nth-child(1) a { transition-delay: 0s;    }
-    #bottom-stair-menu .bottom-stair__line:nth-child(2) a { transition-delay: 0.08s; }
-    #bottom-stair-menu .bottom-stair__line:nth-child(3) a { transition-delay: 0.16s; }
     #bottom-stair-menu .bottom-stair__line:nth-child(1) a { color: #333366; } /* Werke – Blau */
     #bottom-stair-menu .bottom-stair__line:nth-child(2) a { color: #333333; } /* Texte – Schwarz */
     #bottom-stair-menu .bottom-stair__line:nth-child(3) a { color: #333366; } /* Kontakt – Blau */
