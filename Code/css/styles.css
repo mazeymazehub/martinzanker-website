@@ -607,6 +607,11 @@ body.phone-blocks-rotated .rivus-anchor-outline,
 body.phone-blocks-rotated .rivus-anchor-gray {
     font-size: calc(var(--font-size-heading-large) * 0.85) !important;
 }
+/* GESICHTEN (im rivus-anchor-Slot) filled+outline 20px höher (Basis: +40px+352px → +20px+352px). */
+body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-filled,
+body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-outline {
+    top: calc(var(--gesichten-offset) + 20px + 352px) !important;
+}
 
 /* Fading effect for filled headings */
 .main-heading-filled,
