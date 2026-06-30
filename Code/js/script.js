@@ -2762,7 +2762,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // RIVUS Anchor – folgt RIVUS Box 2 Wrapper
             if (_rivusAnchor) {
                 const wrapperVisualTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset;
-                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28 + _rivusTouchMeet + _rivusAnchorBoxExtra + (_blocksRotated ? -100 : 0); // TEST: GESICHTEN-Grau 100px höher (Diagnose Element)
+                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28 + _rivusTouchMeet + _rivusAnchorBoxExtra + (_blocksRotated ? 200 : 0); // iPhone-Rotation: GESICHTEN-Grau 200px tiefer
                 _rivusAnchor.style.transform = `translate3d(${_rivusAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
 
