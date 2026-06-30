@@ -2762,7 +2762,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // RIVUS Anchor – folgt RIVUS Box 2 Wrapper
             if (_rivusAnchor) {
                 const wrapperVisualTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset;
-                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28 + _rivusTouchMeet + _rivusAnchorBoxExtra; // GESICHTEN nutzt nativen rivus-Anchor-Abstand (wie RIVUS)
+                const anchorTop = wrapperVisualTop - _rivusAnchorHeight2 - _rivusAnchorGap2 + 28 + _rivusTouchMeet + _rivusAnchorBoxExtra + (_blocksRotated ? 15 : 0); // iPhone-Rotation: GESICHTEN-Anchor-Grau 15px tiefer
                 _rivusAnchor.style.transform = `translate3d(${_rivusAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
             }
 
@@ -2815,7 +2815,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // RIVUS content box (links) - position:fixed wie KONZEPT, Transform: docTop - scrollY*(1-speed)
         if (_anchorsReady && _rivusContentBoxWrapper2) {
-            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset + _rivusTouchMeet + _rivusAnchorBoxExtra;
+            const rivusTop = _box2WrapperDocTop - scrollY * (1 - BASE_PARALLAX_SPEED) + rivusHoverOffset + _rivusTouchMeet + _rivusAnchorBoxExtra + (_blocksRotated ? 30 : 0); // iPhone-Rotation: GESICHTEN-Textblock 30px tiefer
             _rivusContentBoxWrapper2.style.transform = `translate3d(0, ${rivusTop}px, 0)`;
         }
         if (_rivusContentBox2) {
