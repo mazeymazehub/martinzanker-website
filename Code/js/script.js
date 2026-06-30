@@ -1969,14 +1969,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_blocksRotated || !_isPhone()) return;
         _blocksRotated = true;
 
-        // Anker-Überschriften (alle h2-Layer je Container) auf die rotierte Beschriftung setzen.
-        const setHead = (containerId, text) => {
-            const c = document.getElementById(containerId);
-            if (c) c.querySelectorAll('h2').forEach(h => { h.textContent = text; });
+        // Anker-Überschriften setzen. ACHTUNG: Pro Anker gibt es drei Ebenen — filled + outline liegen
+        // IM Container, die "gray"-Ebene (Snap-Referenz) liegt AUSSERHALB (eigenes <h2>). Alle drei setzen.
+        const setHead = (text, ...selectors) => {
+            selectors.forEach(sel => document.querySelectorAll(sel).forEach(el => { el.textContent = text; }));
         };
-        setHead('rivus-anchor-container', 'GESICHTEN');
-        setHead('mythus-anchor-container', 'RIVUS');
-        setHead('gesichten-anchor-container', 'MYTHUS');
+        setHead('GESICHTEN', '#rivus-anchor-container h2',     '.rivus-anchor-gray');
+        setHead('RIVUS',     '#mythus-anchor-container h2',    '#mythus-anchor');
+        setHead('MYTHUS',    '#gesichten-anchor-container h2', '#gesichten-anchor-gray');
 
         // Box-Bodys (lang-container, enthält alle Sprach-/Niveau-Varianten) im Ring rotieren.
         const lcR = document.querySelector('#rivus-content-box .lang-container');
