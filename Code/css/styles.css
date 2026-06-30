@@ -616,7 +616,7 @@ body.phone-blocks-rotated .rivus-anchor-filled { z-index: 4 !important; }
 /* GESICHTEN-Anchor filled+outline 15px tiefer (Basis +40px → +55px). */
 body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-filled,
 body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-outline {
-    top: calc(var(--gesichten-offset) + 55px + 352px) !important;
+    top: calc(var(--gesichten-offset) + 48px + 352px) !important;
 }
 
 /* Fading effect for filled headings */
