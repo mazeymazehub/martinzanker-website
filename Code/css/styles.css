@@ -618,10 +618,10 @@ body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-filled,
 body.phone-blocks-rotated #rivus-anchor-container .rivus-anchor-outline {
     top: calc(var(--gesichten-offset) + 38px + 352px) !important;
 }
-/* RIVUS-Schriften (im mythus-anchor-Slot) filled+outline – TEST 100px tiefer (Basis +352px → +492px). */
+/* RIVUS-Schriften (im mythus-anchor-Slot) filled+outline – TEST 200px tiefer (Basis +352px → +592px). */
 body.phone-blocks-rotated #mythus-anchor-container .konzept-heading-filled,
 body.phone-blocks-rotated #mythus-anchor-container .konzept-heading-outline {
-    top: calc(var(--konzept-offset) + 352px + 140px) !important;
+    top: calc(var(--konzept-offset) + 352px + 240px) !important;
 }
 
 /* Fading effect for filled headings */
