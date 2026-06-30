@@ -1912,6 +1912,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============== KLAPPBARE TEXTBLÖCKE (nur Smartphone) ===============
     // Jede Textbox kollabiert; ein Dropdown-Pfeil klappt sie smooth auf. Erster Block offen.
     let _collapseReflowRAF = null;
+    let _isReflowing = false; // true während des Toggle-Reflows → Scroll-Render-Schleife pausiert
     function initCollapsibleBlocks() {
         if (!_isPhone()) return;
         // Initiales Einklappen ohne Animation (sofort), damit der Load-Recalc die fertig
@@ -1935,12 +1936,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 // scrollY sichern, da recalculateLayout den Spacer kurz auf 0 setzt (sonst Sprung).
                 if (_collapseReflowRAF) cancelAnimationFrame(_collapseReflowRAF);
                 const _t0 = performance.now();
+                _isReflowing = true; // Scroll-Render-Schleife pausieren (recalc rendert hier selbst)
                 (function _reflow() {
                     const _sy = window.scrollY;
                     recalculateLayout();
                     if (window.scrollY !== _sy) window.scrollTo(0, _sy);
-                    _collapseReflowRAF = (performance.now() - _t0 < 560)
-                        ? requestAnimationFrame(_reflow) : null;
+                    if (performance.now() - _t0 < 560) {
+                        _collapseReflowRAF = requestAnimationFrame(_reflow);
+                    } else {
+                        _collapseReflowRAF = null;
+                        _isReflowing = false;
+                    }
                 })();
             });
         });
@@ -2335,6 +2341,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let _scrollRafActive = false;
     let _lastScrollEventTime = 0;
     function _scrollRenderLoop() {
+        if (_isReflowing) { _scrollRafActive = false; return; } // recalc rendert während des Reflows
         const sy = window.scrollY;
         const moved = sy !== latestScroll;
         latestScroll = sy;
@@ -2349,8 +2356,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     window.addEventListener('scroll', () => {
         document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
-        _lastScrollEventTime = performance.now();
         latestScroll = window.scrollY;
+        // Während des Toggle-Reflows nicht rendern (recalc übernimmt das) – verhindert, dass die
+        // Schleife die transient geklemmte Scroll-Position liest und die Blöcke „springen".
+        if (_isReflowing) return;
+        _lastScrollEventTime = performance.now();
         if (!_scrollRafActive) {
             _scrollRafActive = true;
             requestAnimationFrame(_scrollRenderLoop);
