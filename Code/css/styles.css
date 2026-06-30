@@ -2492,41 +2492,50 @@ body.dark-mode .image-info::after {
         position: fixed;
         left: 0;
         right: 0;
-        top: 60%;                 /* Mitte der unteren Bildschirmhälfte */
-        z-index: 30;
-        opacity: 0;
+        top: 58%;                 /* Mitte der unteren Bildschirmhälfte */
+        z-index: 10002;           /* über dem Rahmen (frame-border 9999, safe-area 10000, bottom-bar 10001) */
         pointer-events: none;
-        transition: opacity 0.4s ease;
     }
     body.bottom-stair-visible #bottom-stair-menu {
-        opacity: 1;
         pointer-events: auto;
     }
     #bottom-stair-menu ul {
         list-style: none;
         margin: 0;
-        padding-left: 36px;
+        padding-left: 40px;
     }
     #bottom-stair-menu .bottom-stair__line {
-        height: 60px;
+        height: 72px;
         position: relative;
         will-change: transform;
         backface-visibility: hidden;
     }
     #bottom-stair-menu .bottom-stair__line:nth-child(1) { left: 0;    transform: skew(60deg, -30deg) scaleY(0.66667); }
-    #bottom-stair-menu .bottom-stair__line:nth-child(2) { left: 24px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
-    #bottom-stair-menu .bottom-stair__line:nth-child(3) { left: 48px; transform: skew(60deg, -30deg) scaleY(0.66667); }
+    #bottom-stair-menu .bottom-stair__line:nth-child(2) { left: 30px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
+    #bottom-stair-menu .bottom-stair__line:nth-child(3) { left: 60px; transform: skew(60deg, -30deg) scaleY(0.66667); }
     #bottom-stair-menu a {
         display: inline-block;
         font-family: 'Inter', sans-serif;
-        font-weight: 900;
-        font-size: 48px;          /* größer als die übrigen Treppentexte (32px) */
+        font-weight: 900;         /* bold/black (höchstes Gewicht) */
+        font-size: 60px;          /* deutlich größer als die übrigen Treppentexte (32px) */
         letter-spacing: -0.2px;
-        line-height: 50px;
+        line-height: 62px;
         text-transform: uppercase;
         text-decoration: none;
         white-space: nowrap;
+        /* Einfahr-Animation wie die übrigen Treppentexte (slide-up + fade) */
+        opacity: 0;
+        transform: translate3d(0, 48px, 0);
+        transition: transform 0.45s ease, opacity 0.45s ease;
     }
+    body.bottom-stair-visible #bottom-stair-menu a {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+    /* Gestaffelt einfahren (Treppe baut sich von oben nach unten auf) */
+    #bottom-stair-menu .bottom-stair__line:nth-child(1) a { transition-delay: 0s;    }
+    #bottom-stair-menu .bottom-stair__line:nth-child(2) a { transition-delay: 0.08s; }
+    #bottom-stair-menu .bottom-stair__line:nth-child(3) a { transition-delay: 0.16s; }
     #bottom-stair-menu .bottom-stair__line:nth-child(1) a { color: #333366; } /* Werke – Blau */
     #bottom-stair-menu .bottom-stair__line:nth-child(2) a { color: #333333; } /* Texte – Schwarz */
     #bottom-stair-menu .bottom-stair__line:nth-child(3) a { color: #333366; } /* Kontakt – Blau */
