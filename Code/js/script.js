@@ -2672,6 +2672,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const imageSpeed = scrollY * 0.5;
         const isMobile = window.innerWidth < BREAKPOINT_MOBILE;
 
+        // iPhone-Block-Rotation: MYTHUS-Anker zeigt RIVUS-Inhalt, GESICHTEN-Anker zeigt MYTHUS-Inhalt →
+        // deren Winkel mit-rotieren (RIVUS-Winkel −2/−4, MYTHUS-Winkel +2/+4). RIVUS-Anker bleibt gleich.
+        const _mFillAng = _blocksRotated ? -2 : 2, _mGrayAng = _blocksRotated ? -4 : 4;
+        const _gFillAng = _blocksRotated ?  2 : -2, _gGrayAng = _blocksRotated ?  4 : -4;
+
         // Main heading image
         if (_mainImageContainer) {
             _mainImageContainer.style.transform = `translate3d(0, ${scrollY * BASE_PARALLAX_SPEED}px, 0)`;
@@ -2752,7 +2757,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const _mythusTouchShift = (isMobile && !isHoverDevice) ? 65 : 0;
                 const mobileOffset = (window.innerWidth < BREAKPOINT_MOBILE ? 17 : 0) + _mythusTouchShift;
                 const anchorTop = wrapperVisualTop - _mythusAnchorHeight2 - _mythusAnchorGap2 + mobileOffset;
-                _mythusAnchor.style.transform = `translate3d(${_mythusAnchorLeft}px, ${anchorTop}px, 0) rotate(4deg)`;
+                _mythusAnchor.style.transform = `translate3d(${_mythusAnchorLeft}px, ${anchorTop}px, 0) rotate(${_mGrayAng}deg)`;
             }
 
             // GESICHTEN Anchor – folgt GESICHTEN Box Wrapper
@@ -2761,7 +2766,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const mobileAnchorOffset = isMobile ? 4 : 0;
                 const deskAnchorOffsetG = (!isMobile && !_isPortraitLayout()) ? 40 : 0; // Desktop: Anchor 40px tiefer
                 const anchorTop = wrapperVisualTop - _gesichtenAnchorHeight2 - _gesichtenAnchorGap2 + 28 + mobileAnchorOffset + deskAnchorOffsetG + _gesichtenTouchOffset;
-                _gesichtenAnchorGray.style.transform = `translate3d(${_gesichtenAnchorLeft}px, ${anchorTop}px, 0) rotate(-4deg)`;
+                _gesichtenAnchorGray.style.transform = `translate3d(${_gesichtenAnchorLeft}px, ${anchorTop}px, 0) rotate(${_gGrayAng}deg)`;
             }
         }
 
@@ -2789,8 +2794,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // MYTHUS filled & outline
         const _mythusTouchShiftF = (isMobile && !isHoverDevice) ? 5 : 0; // Touch: filled/outline 5px tiefer (war 30 → 25px höher, trifft Anker an der Snaplinie)
-        if (_mythusFilled)  _mythusFilled.style.transform  = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
-        if (_mythusOutline) _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(2deg)`;
+        if (_mythusFilled)  _mythusFilled.style.transform  = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(${_mFillAng}deg)`;
+        if (_mythusOutline) _mythusOutline.style.transform = `translate3d(0, ${scrollY * mythusAParallaxSpeed + 8 + mythusHoverOffset + _mythusTouchShiftF}px, 0) rotate(${_mFillAng}deg)`;
 
         // RIVUS content box (links) - position:fixed wie KONZEPT, Transform: docTop - scrollY*(1-speed)
         if (_anchorsReady && _rivusContentBoxWrapper2) {
@@ -2823,8 +2828,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // GESICHTEN filled & outline
         const gesichtenFilledOffset = isMobile ? -26 : 0;
-        if (_gesichtenAnchorFilled)  _gesichtenAnchorFilled.style.transform  = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset}px, 0) rotate(-2deg)`;
-        if (_gesichtenAnchorOutline) _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset}px, 0) rotate(-2deg)`;
+        if (_gesichtenAnchorFilled)  _gesichtenAnchorFilled.style.transform  = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset}px, 0) rotate(${_gFillAng}deg)`;
+        if (_gesichtenAnchorOutline) _gesichtenAnchorOutline.style.transform = `translate3d(0, ${scrollY * rivusAParallaxSpeed + gesichtenFilledOffset + gesichtenHoverOffset + _gesichtenTouchOffset}px, 0) rotate(${_gFillAng}deg)`;
 
         // Text-Layer
         for (let i = 0; i < _allTextBehinds.length; i++) {
