@@ -2328,15 +2328,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial update
     updateScene();
 
+    // Render-Schleife: läuft während des Scrollens UND des Momentum-Auslaufens jeden Frame und liest
+    // window.scrollY frisch. iOS drosselt während des Momentum-Scrollens die scroll-Events stark →
+    // ein nur eventgetriebenes Rendern läuft dann ruckartig nach. Die rAF-Schleife liest stattdessen
+    // die (live korrekte) Scroll-Position pro Frame → flüssig, auch beim Abbremsen ohne Finger.
+    let _scrollRafActive = false;
+    let _lastScrollEventTime = 0;
+    function _scrollRenderLoop() {
+        const sy = window.scrollY;
+        const moved = sy !== latestScroll;
+        latestScroll = sy;
+        updateScene();
+        // Weiterlaufen solange sich die Position ändert oder kurz nach dem letzten Scroll-Event
+        // (deckt das Momentum-Auslaufen ab, in dem kaum noch Events feuern).
+        if (moved || (performance.now() - _lastScrollEventTime) < 300) {
+            requestAnimationFrame(_scrollRenderLoop);
+        } else {
+            _scrollRafActive = false;
+        }
+    }
     window.addEventListener('scroll', () => {
         document.querySelectorAll('.info-active').forEach(clearInfoOverlay);
+        _lastScrollEventTime = performance.now();
         latestScroll = window.scrollY;
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                updateScene();
-                ticking = false;
-            });
-            ticking = true;
+        if (!_scrollRafActive) {
+            _scrollRafActive = true;
+            requestAnimationFrame(_scrollRenderLoop);
         }
 
         // Magnet Snap: Timer nur starten wenn User nicht aktiv scrollt (und kein Resize läuft —
