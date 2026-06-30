@@ -628,17 +628,18 @@ body.phone-blocks-rotated #mythus-anchor-container .konzept-heading-outline {
 body.phone-blocks-rotated #mythus-daniel-image-with-info .words-stair {
     transform: translate3d(0, -2px, 0) !important;
 }
-/* Michael-Treppentext wird nach der Rotation über den Klon #ben-stair-overlay angezeigt. Die
-   michael-spezifischen Treppen-Regeln sind auf #michael-image-with-info gescoped und greifen dort
-   nicht → Fallback auf nth-child (zählt versteckte name-full/desktop-3 mit) verschiebt die Stufen.
-   Hier dieselbe saubere Staffelung für den Klon (nur sichtbare Zeilen, 16px-Schritte). */
-body.phone-blocks-rotated #ben-stair-overlay .michael-name     { left: 16px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
-body.phone-blocks-rotated #ben-stair-overlay .michael-paren    { left: 32px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
-body.phone-blocks-rotated #ben-stair-overlay .michael-year     { left: 48px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
-body.phone-blocks-rotated #ben-stair-overlay .michael-mobile-3 { left: 64px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
-body.phone-blocks-rotated #ben-stair-overlay .michael-mobile-4 { left: 80px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
-body.phone-blocks-rotated #ben-stair-overlay .michael-canvas   { left: 96px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
-body.phone-blocks-rotated #ben-stair-overlay .michael-size     { left: 112px; transform: skew(60deg, -30deg) scaleY(0.66667); }
+/* Michael-Treppentext: Nach der Rotation liegen Michaels Zeilen in #ben-image-with-info (sichtbar
+   bzw. als Klon im #ben-stair-overlay), während #michael-image-with-info jetzt Daniel enthält. Die
+   michael-Treppen-Regeln (auf #michael-image-with-info gescoped) greifen dadurch nirgends mehr →
+   nth-child-Fallback verschiebt die Stufen (versteckte name-full/desktop-3 mitgezählt). michael-*
+   ist eindeutig, daher hier per Klasse global (gated) – greift im Container UND im Klon. */
+body.phone-blocks-rotated .michael-name     { left: 16px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+body.phone-blocks-rotated .michael-paren    { left: 32px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+body.phone-blocks-rotated .michael-year     { left: 48px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+body.phone-blocks-rotated .michael-mobile-3 { left: 64px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+body.phone-blocks-rotated .michael-mobile-4 { left: 80px;  transform: skew(60deg, -30deg) scaleY(0.66667); }
+body.phone-blocks-rotated .michael-canvas   { left: 96px;  transform: skew(0deg,  -30deg) scaleY(1.33333); }
+body.phone-blocks-rotated .michael-size     { left: 112px; transform: skew(60deg, -30deg) scaleY(0.66667); }
 
 /* Fading effect for filled headings */
 .main-heading-filled,
