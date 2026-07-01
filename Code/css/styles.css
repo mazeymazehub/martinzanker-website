@@ -2526,8 +2526,8 @@ body.dark-mode .image-info::after {
         text-transform: uppercase;
         text-decoration: none;
         white-space: nowrap;
-        -webkit-text-stroke: 1.5px #E9E9E4; /* weiße Outline */
-        text-stroke: 1.5px #E9E9E4;
+        -webkit-text-stroke: 1.5px #333366; /* blaue Outline */
+        text-stroke: 1.5px #333366;
         /* Reveal-Animation wie die übrigen Treppentexte: Text schiebt sich von unten unter der
            (Clip-)Linie hervor (kein Fade). Alle Zeilen gleichzeitig, 0.4s ease. */
         transform: translate3d(0, 100%, 0);
