@@ -2515,6 +2515,7 @@ body.dark-mode .image-info::after {
     #bottom-stair-menu .bottom-stair__line:nth-child(2) { left: 30px; transform: skew(0deg,  -30deg) scaleY(1.33333); }
     #bottom-stair-menu .bottom-stair__line:nth-child(3) { left: 60px; transform: skew(60deg, -30deg) scaleY(0.66667); }
     #bottom-stair-menu a {
+        position: relative;
         display: inline-block;
         font-family: 'Inter', sans-serif;
         font-weight: 900;         /* bold/black (höchstes Gewicht) */
@@ -2524,18 +2525,31 @@ body.dark-mode .image-info::after {
         text-transform: uppercase;
         text-decoration: none;
         white-space: nowrap;
+        -webkit-text-stroke: 1.5px var(--color-dark); /* Outline wie bei den Anker-Treppentexten */
+        text-stroke: 1.5px var(--color-dark);
         /* Einfahr-Animation exakt wie die übrigen Treppentexte: alle Zeilen GLEICHZEITIG,
            slide-up + fade, 0.35s ease (vgl. activateStairGhost, delay 0 für alle). */
         opacity: 0;
         transform: translate3d(0, 42px, 0);
         transition: opacity 0.35s ease, transform 0.35s ease;
     }
+    /* Grain über dem Menütext (Menü liegt über dem globalen Grain-Overlay, bekäme sonst keinen) */
+    #bottom-stair-menu a::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.3 0.3 0.3 0 0 0.3 0.3 0.3 0 0 0.3 0.3 0.3 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' fill='%23808080'/%3E%3C/svg%3E");
+        background-size: 250px 250px;
+        background-repeat: repeat;
+        opacity: 0.25;
+    }
     body.bottom-stair-visible #bottom-stair-menu a {
         opacity: 1;
         transform: translate3d(0, 0, 0);
     }
     #bottom-stair-menu .bottom-stair__line:nth-child(1) a { color: #333366; } /* Werke – Blau */
-    #bottom-stair-menu .bottom-stair__line:nth-child(2) a { color: #333333; } /* Texte – Schwarz */
+    #bottom-stair-menu .bottom-stair__line:nth-child(2) a { color: #333366; } /* Texte – Blau */
     #bottom-stair-menu .bottom-stair__line:nth-child(3) a { color: #333366; } /* Kontakt – Blau */
 }
 
