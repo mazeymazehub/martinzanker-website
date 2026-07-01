@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculateKonzeptAParallaxSpeed() {
+        if (_isReflowing) return; // Klapp-Reflow: Speed einfrieren, sonst springen filled/outline (Speed·scrollY)
         const konzeptFilled = document.querySelector('.konzept-heading-filled');
         const alexImage = document.querySelector('.main-heading-image');
         const konzeptAnchor = document.querySelector('.konzept-heading-anchor');
@@ -301,6 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // positionMythusAnchor() entfällt — Anchor wird in positionAnchors() via transform positioniert.
 
     function calculateMythusAParallaxSpeed() {
+        if (_isReflowing) return; // Klapp-Reflow: Speed einfrieren, sonst springen filled/outline (Speed·scrollY)
         const mythusFilled = document.getElementById('mythus-filled');
         const mythusBox = document.getElementById('mythus-box');
         const mythusAnchor = document.getElementById('mythus-anchor');
@@ -553,6 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculateGesichtenAParallaxSpeed() {
+        if (_isReflowing) return; // Klapp-Reflow: Speed einfrieren, sonst springen filled/outline (Speed·scrollY)
         const gesichtenFilled = document.querySelector('.rivus-anchor-filled');
         const contentBox2 = document.getElementById('rivus-content-box');
         const gesichtenAnchor = document.querySelector('.rivus-anchor-gray');
@@ -632,6 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let rivusAParallaxSpeed = BASE_PARALLAX_SPEED;
 
     function calculateRivusAParallaxSpeed() {
+        if (_isReflowing) return; // Klapp-Reflow: Speed einfrieren, sonst springen filled/outline (Speed·scrollY)
         const rivusFilled = document.getElementById('gesichten-anchor-filled');
         const rivusContentBox = document.getElementById('gesichten-content-box');
         const rivusAnchor = document.getElementById('gesichten-anchor-gray');
