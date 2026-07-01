@@ -275,7 +275,12 @@ body.no-collapse-anim .lang-container {
         pointer-events: auto; /* Wrapper sind pointer-events:none → Pfeil explizit aktivieren */
         transform: rotate(180deg); /* offen: Pfeil zeigt nach oben (= einklappen) */
         transition: transform 0.45s ease;
+        -webkit-tap-highlight-color: transparent; /* kein dunkler Tap-Schleier auf iOS */
+        -webkit-touch-callout: none;
+        outline: none;
     }
+    .content-box .block-arrow:focus,
+    .content-box-2 .block-arrow:focus { outline: none; }
     /* Dark-Mode: dunkelgrau wie der Seiten-Hintergrund (#333333), subtil auf der #1a1a1a-Box */
     body.dark-mode .content-box .block-arrow,
     body.dark-mode .content-box-2 .block-arrow {
