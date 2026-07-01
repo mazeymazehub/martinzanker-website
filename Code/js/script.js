@@ -1636,8 +1636,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // anheben → Bild wächst nach oben, Unterkante bleibt fix. Im "großen Michael"-Modus
         // entfällt das (Bild ist per Höhe groß, sitzt fest unter der Box).
         const michaelGrowShift = (!isPortrait && !isMobile && !_michaelTall()) ? -MICHAEL_DESKTOP_GROW : 0;
-        // iPad Portrait (Touch + Portrait; iPhone ist oben per early-return raus): Michael 150px tiefer
-        const _ipadPortraitMichael = (isPortrait && navigator.maxTouchPoints > 0) ? 150 : 0;
+        // iPad Portrait (Touch + Portrait; iPhone ist oben per early-return raus): Michael 350px tiefer
+        // (Seite wächst automatisch mit: outerContainer.minHeight = imageTop + Bildhöhe + 120)
+        const _ipadPortraitMichael = (isPortrait && navigator.maxTouchPoints > 0) ? 350 : 0;
         const imageTop = finalOffset + desktopOffset + michaelGrowShift + _ipadPortraitMichael;
         // naturalTop wurde mit style.top='0px' gemessen → sicher positions-unabhängig
         _michaelVisualDocTop = michaelNaturalTop + imageTop;
