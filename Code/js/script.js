@@ -903,7 +903,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (_isReflowing) return;
 
         const spacer = document.getElementById('scroll-spacer');
-        if (spacer) spacer.style.height = '0px';
+        // Spacer NICHT auf 0 kollabieren: das würde maxScroll kurz einbrechen lassen → der Browser
+        // klemmt scrollY auf einen festen Wert (Content ohne Spacer) → sichtbarer Sprung an dieselbe
+        // Stelle und zurück (v.a. am Seitenende / MYTHUS). Content-Höhe unten per (scrollHeight −
+        // aktuelle Spacer-Höhe) messen. (Der Landscape-Pfad _applyEndSpacer misst weiterhin eigenständig.)
+        const _prevSpacerH = spacer ? spacer.offsetHeight : 0;
 
         // Breites Landscape-Gerät (Desktop ODER iPad ohne Maus): Seitenende "von unten"
         // (Michael GAP über der Kante), OHNE Magnet dort. Spacer per _applyEndSpacer() so setzen,
@@ -948,7 +952,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // +800px extra Scrollweg, damit GESICHTEN ganz hochscrollt und Michael sichtbar bleibt
                 needed = Math.max(needed, lastSnap + (meetY + gesichtenHeight) / (1 - BASE_PARALLAX_SPEED) + 800);
             }
-            const contentHeight = document.body.scrollHeight; // spacer ist bereits 0
+            const contentHeight = document.body.scrollHeight - _prevSpacerH; // Content ohne den (nicht kollabierten) Spacer
             spacer.style.height = Math.max(0, needed - contentHeight + vhRef) + 'px';
         }
     }
