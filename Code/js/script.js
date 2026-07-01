@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculateKonzeptAParallaxSpeed() {
-        if (_isReflowing) return; // Klapp-Reflow: Speed einfrieren, sonst springen filled/outline (Speed·scrollY)
+        if (_isReflowing || _freezeAnchorSpeed) return; // Klapp: Speed durch Reflow UND finalen Recalc einfrieren (sonst Speed·scrollY-Sprung)
         const konzeptFilled = document.querySelector('.konzept-heading-filled');
         const alexImage = document.querySelector('.main-heading-image');
         const konzeptAnchor = document.querySelector('.konzept-heading-anchor');
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // positionMythusAnchor() entfällt — Anchor wird in positionAnchors() via transform positioniert.
 
     function calculateMythusAParallaxSpeed() {
-        if (_isReflowing) return; // Klapp-Reflow: Speed einfrieren, sonst springen filled/outline (Speed·scrollY)
+        if (_isReflowing || _freezeAnchorSpeed) return; // Klapp: Speed durch Reflow UND finalen Recalc einfrieren (sonst Speed·scrollY-Sprung)
         const mythusFilled = document.getElementById('mythus-filled');
         const mythusBox = document.getElementById('mythus-box');
         const mythusAnchor = document.getElementById('mythus-anchor');
@@ -555,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculateGesichtenAParallaxSpeed() {
-        if (_isReflowing) return; // Klapp-Reflow: Speed einfrieren, sonst springen filled/outline (Speed·scrollY)
+        if (_isReflowing || _freezeAnchorSpeed) return; // Klapp: Speed durch Reflow UND finalen Recalc einfrieren (sonst Speed·scrollY-Sprung)
         const gesichtenFilled = document.querySelector('.rivus-anchor-filled');
         const contentBox2 = document.getElementById('rivus-content-box');
         const gesichtenAnchor = document.querySelector('.rivus-anchor-gray');
@@ -635,7 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let rivusAParallaxSpeed = BASE_PARALLAX_SPEED;
 
     function calculateRivusAParallaxSpeed() {
-        if (_isReflowing) return; // Klapp-Reflow: Speed einfrieren, sonst springen filled/outline (Speed·scrollY)
+        if (_isReflowing || _freezeAnchorSpeed) return; // Klapp: Speed durch Reflow UND finalen Recalc einfrieren (sonst Speed·scrollY-Sprung)
         const rivusFilled = document.getElementById('gesichten-anchor-filled');
         const rivusContentBox = document.getElementById('gesichten-content-box');
         const rivusAnchor = document.getElementById('gesichten-anchor-gray');
@@ -1932,6 +1932,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Jede Textbox kollabiert; ein Dropdown-Pfeil klappt sie smooth auf. Erster Block offen.
     let _collapseReflowRAF = null;
     let _isReflowing = false; // true während des Toggle-Reflows → Scroll-Render-Schleife pausiert
+    let _freezeAnchorSpeed = false; // true über den ganzen Klapp-Vorgang → Anker-Parallax-Speeds eingefroren
     function initCollapsibleBlocks() {
         if (!_isPhone()) return;
         // Initiales Einklappen ohne Animation (sofort), damit der Load-Recalc die fertig
@@ -1970,6 +1971,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (_collapseReflowRAF) cancelAnimationFrame(_collapseReflowRAF);
                 const _t0 = performance.now();
                 _isReflowing = true; // Scroll-Render-Schleife pausieren (recalc rendert hier selbst)
+                _freezeAnchorSpeed = true; // Anker-Speeds über den ganzen Vorgang einfrieren (auch finaler Recalc)
                 (function _reflow() {
                     const _sy = window.scrollY;
                     recalculateLayout();
@@ -1996,6 +1998,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             _spacerEl.style.height = (_curH + (_syEnd - _maxScrollNow) + 2) + 'px';
                         }
                         if (window.scrollY !== _syEnd) window.scrollTo(0, _syEnd);
+                        _freezeAnchorSpeed = false; // Speeds erst nach dem finalen Recalc wieder freigeben (nächster Resize/Wechsel rechnet neu)
                         // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
                         if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
                     }
