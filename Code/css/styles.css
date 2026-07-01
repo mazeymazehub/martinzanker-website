@@ -1425,14 +1425,18 @@ section {
     #gesichten-anchor-container .gesichten-anchor-filled { z-index: 4; }
 
 
+    /* Graue Ebenen blockieren weiterhin Taps auf verdeckten Bildbereichen. */
     .rivus-anchor-gray,
+    .gesichten-anchor-gray { pointer-events: auto; }
+    /* Filled + Outline tap-DURCHLÄSSIG machen: die Outline liegt mit z:15 über der Box (z:10) und
+       damit über den Aufklapp-Pfeilen; sonst fängt sie deren Taps ab. Sie tragen keine eigene
+       Interaktion, daher gefahrlos auf pointer-events:none. */
     .rivus-anchor-filled,
     .rivus-anchor-outline,
     .konzept-heading-filled,
     .konzept-heading-outline,
-    .gesichten-anchor-gray,
     .gesichten-anchor-filled,
-    .gesichten-anchor-outline { pointer-events: auto; }
+    .gesichten-anchor-outline { pointer-events: none; }
 
     /* Content-Boxen blockieren Taps auf verdeckten Bildbereichen (Wrapper bleibt transparent) */
     .content-box,
