@@ -1983,6 +1983,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         // für den finalen (offenen/geschlossenen) Zustand berechnen, scrollY erhalten.
                         const _syEnd = window.scrollY;
                         recalculateLayout();
+                        // Der finale Recalc kann den Spacer aus einer inzwischen geänderten innerHeight
+                        // (iOS-Adressleiste ein-/ausgeklappt seit dem letzten Recalc) kleiner berechnen →
+                        // maxScroll < _syEnd → Browser klemmt scrollY auf einen festen Wert (Sprung an
+                        // dieselbe Stelle, dann via scrollTo zurück). Tritt nur beim ERSTEN Toggle nach
+                        // dem Scrollen auf. Fix: Spacer bei Bedarf so vergrößern, dass _syEnd erreichbar
+                        // bleibt, DANN erst zurückscrollen → keine Klemmung, kein Sprung.
+                        const _spacerEl = document.getElementById('scroll-spacer');
+                        const _maxScrollNow = document.documentElement.scrollHeight - window.innerHeight;
+                        if (_spacerEl && _maxScrollNow < _syEnd) {
+                            const _curH = parseFloat(_spacerEl.style.height) || 0;
+                            _spacerEl.style.height = (_curH + (_syEnd - _maxScrollNow) + 2) + 'px';
+                        }
                         if (window.scrollY !== _syEnd) window.scrollTo(0, _syEnd);
                         // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
                         if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
