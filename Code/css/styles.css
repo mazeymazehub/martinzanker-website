@@ -646,12 +646,6 @@ body.phone-blocks-rotated #ben-stair-overlay .words-stair {
     transform: translate3d(0, -50px, 0) !important;
 }
 
-/* Daniel liegt nach der Rotation im michael-Slot (unterste Sektion). Am Seitenende überlappt sein
-   Treppentext mit dem Link-Menü (z:9998) → Daniel-Slot über die Links heben. */
-body.phone-blocks-rotated #michael-image-with-info {
-    z-index: 9999 !important;
-}
-
 /* Fading effect for filled headings */
 .main-heading-filled,
 .konzept-heading-filled,
