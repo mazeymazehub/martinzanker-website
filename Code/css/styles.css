@@ -3306,6 +3306,18 @@ body.theme-transitioning .frame-border-right {
     margin-left: 0; /* Override -20vw from .content-box-2 */
 }
 
+/* iPad Portrait: GESICHTEN-Text zwischen RIVUS-Kante (links, −20vw) und MYTHUS-Kante (rechts) aufspannen. */
+@media (orientation: portrait) and (min-width: 601px) and (max-width: 1024px) and (hover: none) and (pointer: coarse) {
+    #gesichten-content-box {
+        margin-left: -20vw;  /* linke Textkante wie RIVUS (content-box-2) */
+        margin-right: 0;
+        width: 120vw;
+    }
+    #gesichten-content-box p {
+        max-width: calc(100vw - 175px); /* rechte Textkante bis zur MYTHUS-Textkante (80vw−175px + 20vw) */
+    }
+}
+
 @media (max-width: 480px) {
 #gesichten-content-box {
         width: calc(100vw - 40px);
