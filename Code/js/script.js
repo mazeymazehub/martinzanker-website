@@ -892,6 +892,12 @@ document.addEventListener('DOMContentLoaded', function() {
         _namedPoints.forEach(p => { if (p.zone !== undefined) meetingPointZoneOverrides.set(p.s, p.zone); });
         window.__snapInfo = _namedPoints.map(p => ({ name: p.name, s: Math.round(p.s), meetY: Math.round(p.meetY || 0), anchorStart: Math.round(p.anchorStart || 0) }));
 
+        // Während des Klapp-Reflows den Spacer NICHT neu berechnen: sonst wird er pro Frame auf 0
+        // gesetzt und aus den animierenden Höhen (body.scrollHeight, gesichtenHeight) rekonstruiert →
+        // maxScroll bricht am Seitenende ein, scrollY wird ~Screenhöhe geklemmt → wildes Springen.
+        // Der finale Spacer wird nach Reflow-Ende einmal sauber gesetzt (siehe Toggle-Handler).
+        if (_isReflowing) return;
+
         const spacer = document.getElementById('scroll-spacer');
         if (spacer) spacer.style.height = '0px';
 
@@ -1951,6 +1957,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         _collapseReflowRAF = null;
                         _isReflowing = false;
+                        // Spacer/Seitenende wurde während des Reflows übersprungen → einmal sauber
+                        // für den finalen (offenen/geschlossenen) Zustand berechnen, scrollY erhalten.
+                        const _syEnd = window.scrollY;
+                        recalculateLayout();
+                        if (window.scrollY !== _syEnd) window.scrollTo(0, _syEnd);
                     }
                 })();
             });
