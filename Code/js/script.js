@@ -527,6 +527,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const isPortraitDaniel = _isPortraitLayout();
         if (window.innerWidth >= 1025 && !isPortraitDaniel) finalOffset += 0;
+        // iPad Portrait (Touch + Portrait; iPhone ist oben bereits per early-return raus): Daniel 200px tiefer
+        if (isPortraitDaniel && navigator.maxTouchPoints > 0) finalOffset += 200;
 
         mythusDaniel.style.top = `${finalOffset}px`;
     }
