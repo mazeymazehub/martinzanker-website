@@ -2539,6 +2539,12 @@ body.dark-mode .image-info::after {
     #bottom-stair-menu .bottom-stair__line:nth-child(1) a { color: #333366; } /* Werke – Blau */
     #bottom-stair-menu .bottom-stair__line:nth-child(2) a { color: #333366; } /* Texte – Blau */
     #bottom-stair-menu .bottom-stair__line:nth-child(3) a { color: #333366; } /* Kontakt – Blau */
+    /* Dark-Mode: Link-Treppentext orange */
+    body.dark-mode #bottom-stair-menu a {
+        color: #ff6633 !important;
+        -webkit-text-stroke: 1.5px #ff6633;
+        text-stroke: 1.5px #ff6633;
+    }
 }
 
 .words-stair__line p {
