@@ -2493,7 +2493,7 @@ body.dark-mode .image-info::after {
         left: 0;
         right: 0;
         top: 58%;                 /* Mitte der unteren Bildschirmhälfte */
-        z-index: 10002;           /* über dem Rahmen (frame-border 9999, safe-area 10000, bottom-bar 10001) */
+        z-index: 9998;            /* über dem Rahmen (frame-border 999), aber UNTER dem globalen Grain (10000) → gleiche Körnung wie die Seite */
         pointer-events: none;
         transform: translate3d(-20px, 23px, 0); /* 20px nach links, 23px nach unten */
     }
@@ -2532,17 +2532,6 @@ body.dark-mode .image-info::after {
            (Clip-)Linie hervor (kein Fade). Alle Zeilen gleichzeitig, 0.4s ease. */
         transform: translate3d(0, 100%, 0);
         transition: transform 0.4s ease;
-    }
-    /* Grain über dem Menütext (Menü liegt über dem globalen Grain-Overlay, bekäme sonst keinen) */
-    #bottom-stair-menu a::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.3 0.3 0.3 0 0 0.3 0.3 0.3 0 0 0.3 0.3 0.3 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' fill='%23808080'/%3E%3C/svg%3E");
-        background-size: 250px 250px;
-        background-repeat: repeat;
-        opacity: 0.25;
     }
     body.bottom-stair-visible #bottom-stair-menu a {
         transform: translate3d(0, 0, 0);
