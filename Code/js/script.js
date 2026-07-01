@@ -1941,7 +1941,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (idx !== 0) box.classList.add('collapsed'); // erster Block (KONZEPT) offen, Rest zu
             arrow.addEventListener('click', function(e) {
                 e.stopPropagation();
+                const lc = box.querySelector('.lang-container');
+                const willOpen = box.classList.contains('collapsed');
                 box.classList.toggle('collapsed');
+                // Statt fixer max-height:3000 die ECHTE Inhaltshöhe animieren → linearer Reveal ohne
+                // „Aufschnappen" (Box erreichte ihre Höhe sonst schon in den ersten ~15 % der 0,5s).
+                // Öffnen: 0 → scrollHeight; Schließen: aktuelle Höhe (ggf. 'none') fixieren, dann → 0.
+                if (lc) {
+                    if (willOpen) {
+                        lc.style.maxHeight = lc.scrollHeight + 'px';
+                    } else {
+                        lc.style.maxHeight = lc.scrollHeight + 'px';
+                        void lc.offsetHeight; // Reflow erzwingen, damit die 0-Transition von der echten Höhe startet
+                        lc.style.maxHeight = '0px';
+                    }
+                }
                 // Reflow: nachfolgende Blöcke folgen der sich ändernden Box-Höhe (rutschen nach
                 // unten/oben). recalculateLayout() je Frame während der ~0,5s-Klapp-Animation.
                 // scrollY sichern, da recalculateLayout den Spacer kurz auf 0 setzt (sonst Sprung).
@@ -1962,6 +1976,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         const _syEnd = window.scrollY;
                         recalculateLayout();
                         if (window.scrollY !== _syEnd) window.scrollTo(0, _syEnd);
+                        // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
+                        if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
                     }
                 })();
             });
