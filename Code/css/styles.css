@@ -249,6 +249,14 @@ body.no-collapse-anim .lang-container {
         padding-top: 20px !important;
         padding-bottom: 20px !important;
     }
+    /* Padding-Wechsel (65↔20) beim Klappen mitanimieren, sonst springt die MYTHUS-Box schlagartig
+       um +45px (weiter als die anderen Blöcke) und flackert. */
+    #mythus-box {
+        transition: padding-top 0.5s ease, padding-bottom 0.5s ease;
+    }
+    body.no-collapse-anim #mythus-box {
+        transition: none !important;
+    }
 
     /* Dropdown-Pfeil: links, knapp über dem Text, orange, dreht sich beim Aufklappen */
     .content-box .block-arrow,
