@@ -1977,6 +1977,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 _collapseSettleTimer = setTimeout(() => {
                     _collapseSettleTimer = null;
                     const _syEnd = window.scrollY;
+                    // Freeze VOR dem finalen Recalc lösen: genau dieser eine Recalc muss die
+                    // Anker-Speeds neu rechnen, sonst richten sich die filled/outline-Schriften der
+                    // Folgeblöcke nicht mehr auf ihre (verschobenen) Anker aus (stehen zu hoch).
+                    // Die Folge-Anker sind dabei off-screen; der eigene Anker der getippten Box
+                    // ändert seine Speed nicht (sein docTop hängt nicht von der eigenen Boxhöhe ab).
+                    _freezeAnchorSpeed = false;
                     recalculateLayout();
                     // Der finale Recalc kann den Spacer aus einer inzwischen geänderten innerHeight
                     // (iOS-Adressleiste ein-/ausgeklappt seit dem letzten Recalc) kleiner berechnen →
@@ -1990,7 +1996,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         _spacerEl.style.height = (_curH + (_syEnd - _maxScrollNow) + 2) + 'px';
                     }
                     if (window.scrollY !== _syEnd) window.scrollTo(0, _syEnd);
-                    _freezeAnchorSpeed = false; // nächster Resize/Wechsel rechnet Speeds neu
                     // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
                     if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
                 }, 580);
