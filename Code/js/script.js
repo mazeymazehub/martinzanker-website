@@ -958,7 +958,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 needed = Math.max(needed, lastSnap + (meetY + gesichtenHeight) / (1 - BASE_PARALLAX_SPEED) + 800);
             }
             const contentHeight = document.body.scrollHeight - _prevSpacerH; // Content ohne den (nicht kollabierten) Spacer
-            spacer.style.height = Math.max(0, needed - contentHeight + vhRef) + 'px';
+            let _spH = Math.max(0, needed - contentHeight + vhRef);
+            // Spacer NIE unter die aktuelle Scroll-Position kürzen: sonst klemmt der Browser scrollY
+            // synchron mitten im Recalc → Transforms werden mit dem geklemmten Wert gerechnet, das
+            // spätere scrollTo stellt zurück → ein Frame Transform/Scroll-Mismatch = sichtbarer
+            // Sprung (je näher am Seitenende, desto größer). Überlänge ist harmlos; der nächste
+            // Recalc von weiter oben strafft wieder.
+            _spH = Math.max(_spH, window.scrollY + window.innerHeight - contentHeight + 2);
+            spacer.style.height = _spH + 'px';
         }
     }
 
@@ -2001,6 +2008,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         _spacerEl.style.height = (_curH + (_syEnd - _maxScrollNow) + 2) + 'px';
                     }
                     if (window.scrollY !== _syEnd) window.scrollTo(0, _syEnd);
+                    // Transforms synchron auf den finalen scrollY rechnen: falls der Recalc mit einem
+                    // (kurz geklemmten) anderen scrollY gerendert hat, käme sonst ein Frame mit
+                    // Transform/Scroll-Mismatch zum Paint → sichtbarer Sprung hoch/runter.
+                    applyParallaxEffect(window.scrollY);
                     // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
                     if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
                 }, 580);

@@ -3549,6 +3549,13 @@ body.michael-tall #michael-image-with-info .image-info .words-stair {
         margin-left: 0 !important;
         max-width: calc(100vw - 2 * var(--spacing-box-padding)) !important;
     }
+    /* Nach der iPhone-Rotation zeigt #gesichten-content-box den MYTHUS-Text: die obige
+       "fast Rand-zu-Rand"-Regel (für den alten GESICHTEN-Inhalt) neutralisieren →
+       gleiche Einzüge wie die anderen Blöcke (Text berührte sonst beidseitig den Rahmen). */
+    body.phone-blocks-rotated.aspect-portrait #gesichten-content-box p {
+        margin-left: 4px !important;
+        max-width: calc(100vw - 80px) !important;
+    }
     body.aspect-portrait #gesichten-content-box p:first-child {
         margin-top: 20px;
     }
