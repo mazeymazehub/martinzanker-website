@@ -1930,7 +1930,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =============== KLAPPBARE TEXTBLÖCKE (nur Smartphone) ===============
     // Jede Textbox kollabiert; ein Dropdown-Pfeil klappt sie smooth auf. Erster Block offen.
-    let _collapseReflowRAF = null;
+    let _collapseSettleTimer = null; // finaler Recalc nach Ende der Klapp-Animation
     let _isReflowing = false; // true während des Toggle-Reflows → Scroll-Render-Schleife pausiert
     let _freezeAnchorSpeed = false; // true über den ganzen Klapp-Vorgang → Anker-Parallax-Speeds eingefroren
     function initCollapsibleBlocks() {
@@ -1965,44 +1965,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         lc.style.maxHeight = '0px';
                     }
                 }
-                // Reflow: nachfolgende Blöcke folgen der sich ändernden Box-Höhe (rutschen nach
-                // unten/oben). recalculateLayout() je Frame während der ~0,5s-Klapp-Animation.
-                // scrollY sichern, da recalculateLayout den Spacer kurz auf 0 setzt (sonst Sprung).
-                if (_collapseReflowRAF) cancelAnimationFrame(_collapseReflowRAF);
-                const _t0 = performance.now();
-                _isReflowing = true; // Scroll-Render-Schleife pausieren (recalc rendert hier selbst)
-                _freezeAnchorSpeed = true; // Anker-Speeds über den ganzen Vorgang einfrieren (auch finaler Recalc)
-                (function _reflow() {
-                    const _sy = window.scrollY;
+                // KEIN per-Frame-Recalc während der Klapp-Animation mehr. Die Box-Wrapper sind
+                // position:fixed → die Höhenanimation ändert nur die sichtbare Box, nicht den
+                // Dokumentfluss. Die Folgeblöcke (per JS-Margins positioniert) sind währenddessen
+                // off-screen. Das frühere recalculateLayout() pro Frame löste/fixierte die Wrapper
+                // ~34× pro Vorgang und maß die ganze Kette neu → Mess-Streuung = Springen, am
+                // stärksten beim untersten Block (MYTHUS: längste Kette, größtes scrollY).
+                // Stattdessen: alles eingefroren lassen, EIN Recalc nach Animationsende.
+                clearTimeout(_collapseSettleTimer);
+                _freezeAnchorSpeed = true; // Anker-Speeds bis nach dem finalen Recalc einfrieren
+                _collapseSettleTimer = setTimeout(() => {
+                    _collapseSettleTimer = null;
+                    const _syEnd = window.scrollY;
                     recalculateLayout();
-                    if (window.scrollY !== _sy) window.scrollTo(0, _sy);
-                    if (performance.now() - _t0 < 560) {
-                        _collapseReflowRAF = requestAnimationFrame(_reflow);
-                    } else {
-                        _collapseReflowRAF = null;
-                        _isReflowing = false;
-                        // Spacer/Seitenende wurde während des Reflows übersprungen → einmal sauber
-                        // für den finalen (offenen/geschlossenen) Zustand berechnen, scrollY erhalten.
-                        const _syEnd = window.scrollY;
-                        recalculateLayout();
-                        // Der finale Recalc kann den Spacer aus einer inzwischen geänderten innerHeight
-                        // (iOS-Adressleiste ein-/ausgeklappt seit dem letzten Recalc) kleiner berechnen →
-                        // maxScroll < _syEnd → Browser klemmt scrollY auf einen festen Wert (Sprung an
-                        // dieselbe Stelle, dann via scrollTo zurück). Tritt nur beim ERSTEN Toggle nach
-                        // dem Scrollen auf. Fix: Spacer bei Bedarf so vergrößern, dass _syEnd erreichbar
-                        // bleibt, DANN erst zurückscrollen → keine Klemmung, kein Sprung.
-                        const _spacerEl = document.getElementById('scroll-spacer');
-                        const _maxScrollNow = document.documentElement.scrollHeight - window.innerHeight;
-                        if (_spacerEl && _maxScrollNow < _syEnd) {
-                            const _curH = parseFloat(_spacerEl.style.height) || 0;
-                            _spacerEl.style.height = (_curH + (_syEnd - _maxScrollNow) + 2) + 'px';
-                        }
-                        if (window.scrollY !== _syEnd) window.scrollTo(0, _syEnd);
-                        _freezeAnchorSpeed = false; // Speeds erst nach dem finalen Recalc wieder freigeben (nächster Resize/Wechsel rechnet neu)
-                        // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
-                        if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
+                    // Der finale Recalc kann den Spacer aus einer inzwischen geänderten innerHeight
+                    // (iOS-Adressleiste ein-/ausgeklappt seit dem letzten Recalc) kleiner berechnen →
+                    // maxScroll < _syEnd → Browser klemmt scrollY auf einen festen Wert (Sprung an
+                    // dieselbe Stelle, dann via scrollTo zurück). Fix: Spacer bei Bedarf so
+                    // vergrößern, dass _syEnd erreichbar bleibt, DANN erst zurückscrollen.
+                    const _spacerEl = document.getElementById('scroll-spacer');
+                    const _maxScrollNow = document.documentElement.scrollHeight - window.innerHeight;
+                    if (_spacerEl && _maxScrollNow < _syEnd) {
+                        const _curH = parseFloat(_spacerEl.style.height) || 0;
+                        _spacerEl.style.height = (_curH + (_syEnd - _maxScrollNow) + 2) + 'px';
                     }
-                })();
+                    if (window.scrollY !== _syEnd) window.scrollTo(0, _syEnd);
+                    _freezeAnchorSpeed = false; // nächster Resize/Wechsel rechnet Speeds neu
+                    // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
+                    if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
+                }, 580);
             });
         });
         // Klapp-Animation erst nach Anwendung des Initial-Zustands wieder aktivieren (2 Frames).
