@@ -19,7 +19,9 @@
             konzept:    document.querySelector('.content-box-wrapper'),
             konzeptBox: document.querySelector('.content-box'),
             rivus:      document.getElementById('rivus-content-box-wrapper'),
+            rivusBox:   document.getElementById('rivus-content-box'),
             mythus:     document.getElementById('mythus-box-wrapper'),
+            mythusBox:  document.getElementById('mythus-box'),
             ben:        document.getElementById('ben-image-with-info'),
             benOverlay: document.getElementById('ben-stair-overlay'),
             daniel:     document.getElementById('mythus-daniel-image-with-info'),
@@ -119,9 +121,17 @@
 
         // 1. MYTHUS betritt Bildbereich → Wipe Daniel → Michael
         if (mythTop < imgBottom) {
-            // Touch: Wipe-Linie 30px tiefer, damit sie hinter der (per Offset 45px tieferen) Box liegt
-            const _touchWipe = window.matchMedia('(hover: none) and (pointer: coarse)').matches ? 30 : 0;
-            const wipeY = (mythR ? (mythR.top + mythR.bottom) / 2 : 0) + _touchWipe;
+            // Touch: Wipe-Linie fest unter der BOX-OBERKANTE statt Box-Mitte. Die Mitte wandert beim
+            // Auf-/Zuklappen mit der Boxhöhe → die Bildwechsel-Linie sprang sichtbar (altes Bild
+            // blitzte unter der Box auf). Oberkante+40 liegt immer hinter der deckenden Box (min. 58px).
+            const _touch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+            let wipeY;
+            if (_touch) {
+                const bR = el.mythusBox ? el.mythusBox.getBoundingClientRect() : mythR;
+                wipeY = (bR ? bR.top : 0) + 40;
+            } else {
+                wipeY = (mythR ? (mythR.top + mythR.bottom) / 2 : 0);
+            }
             vis(el.ben, false);
             vis(el.benOverlay, false);
             applyWipeAtY(wipeY, el.michael, el.daniel, el.ben);
@@ -131,7 +141,15 @@
 
         // 2. RIVUS betritt Bildbereich → Wipe Ben → Daniel
         if (rivTop < imgBottom) {
-            const wipeY = rivR ? (rivR.top + rivR.bottom) / 2 : 0;
+            // Touch: Linie an der Box-Oberkante verankern (s. Kommentar in Zustand 1).
+            const _touch2 = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+            let wipeY;
+            if (_touch2) {
+                const bR2 = el.rivusBox ? el.rivusBox.getBoundingClientRect() : rivR;
+                wipeY = (bR2 ? bR2.top : 0) + 40;
+            } else {
+                wipeY = rivR ? (rivR.top + rivR.bottom) / 2 : 0;
+            }
             applyWipeAtY(wipeY, el.daniel, el.ben, el.ben);
             if (el.benOverlay) {
                 const px = Math.max(0, benR.bottom - wipeY);
