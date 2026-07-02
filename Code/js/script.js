@@ -301,6 +301,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function getMythusBoxLogicalTop() {
         const mythusBox = document.getElementById('mythus-box');
         if (!mythusBox) return 0;
+        // Wrapper fixiert (z.B. während der Klapp-Animation): getDocumentTop liefert dann ~0 →
+        // gecachten Wrapper-docTop + Box-Offset im Wrapper verwenden.
+        const _w = document.getElementById('mythus-box-wrapper');
+        if (_w && _w.style.position === 'fixed') return _mythusWrapperDocTop + mythusBox.offsetTop;
         return getDocumentTop(mythusBox);
     }
 
@@ -954,8 +958,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const gesichtenBox = document.getElementById('gesichten-content-box-wrapper');
                 const gesichtenHeight = gesichtenBox ? gesichtenBox.offsetHeight : 0;
                 const meetY = _layoutH() * 0.70;
-                // +800px extra Scrollweg, damit GESICHTEN ganz hochscrollt und Michael sichtbar bleibt
-                needed = Math.max(needed, lastSnap + (meetY + gesichtenHeight) / (1 - BASE_PARALLAX_SPEED) + 800);
+                // +650px extra Scrollweg (war 800; Seite endet 150px früher), damit GESICHTEN ganz
+                // hochscrollt und das letzte Bild sichtbar bleibt
+                needed = Math.max(needed, lastSnap + (meetY + gesichtenHeight) / (1 - BASE_PARALLAX_SPEED) + 650);
             }
             const contentHeight = document.body.scrollHeight - _prevSpacerH; // Content ohne den (nicht kollabierten) Spacer
             let _spH = Math.max(0, needed - contentHeight + vhRef);
@@ -1943,6 +1948,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============== KLAPPBARE TEXTBLÖCKE (nur Smartphone) ===============
     // Jede Textbox kollabiert; ein Dropdown-Pfeil klappt sie smooth auf. Erster Block offen.
     let _collapseSettleTimer = null; // finaler Recalc nach Ende der Klapp-Animation
+    let _collapseFlowRAF = null;     // leichter Flow-Follow während der Klapp-Animation
     let _isReflowing = false; // true während des Toggle-Reflows → Scroll-Render-Schleife pausiert
     let _freezeAnchorSpeed = false; // true über den ganzen Klapp-Vorgang → Anker-Parallax-Speeds eingefroren
     function initCollapsibleBlocks() {
@@ -1986,6 +1992,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Stattdessen: alles eingefroren lassen, EIN Recalc nach Animationsende.
                 clearTimeout(_collapseSettleTimer);
                 _freezeAnchorSpeed = true; // Anker-Speeds bis nach dem finalen Recalc einfrieren
+                // Leichter Flow-Follow: NUR die drei Margin-Setzer der in-flow Anchor-Container pro
+                // Frame (lesen live die animierende Box-Höhe). Damit gleiten die sichtbaren
+                // Bild-Container (z.B. das unten hereinragende nächste Bild) smooth mit, statt beim
+                // Settle zu springen — ohne Wrapper-Unfix/Spacer/Speeds (die alten Sprungquellen).
+                if (_collapseFlowRAF) cancelAnimationFrame(_collapseFlowRAF);
+                const _tf0 = performance.now();
+                (function _flowFollow() {
+                    positionGesichtenAndBox2();
+                    positionMythusBlock();
+                    positionRivusAndBox3();
+                    _collapseFlowRAF = (performance.now() - _tf0 < 560) ? requestAnimationFrame(_flowFollow) : null;
+                })();
                 _collapseSettleTimer = setTimeout(() => {
                     _collapseSettleTimer = null;
                     const _syEnd = window.scrollY;

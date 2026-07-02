@@ -3631,3 +3631,38 @@ body.michael-tall #michael-image-with-info .image-info .words-stair {
     body.dark-mode #safe-area-bottom::after { opacity: 0.20; }
 }
 
+/* =============== iPHONE-OVERRIDES (Dateiende: gewinnen die Kaskade) =============== */
+/* MYTHUS-Text (nach Rotation in #gesichten-content-box): exakt dieselben Einzüge wie die anderen
+   Blöcke. Ans Dateiende gesetzt + hohe Spezifität, um alle Portrait-/Legacy-Regeln des alten
+   GESICHTEN-Inhalts sicher zu überstimmen (Text stand sonst Rahmen-zu-Rahmen). */
+@media (max-width: 640px) {
+    body.phone-blocks-rotated #gesichten-content-box {
+        padding-left: var(--spacing-box-padding) !important;
+        padding-right: var(--spacing-box-padding) !important;
+    }
+    body.phone-blocks-rotated #gesichten-content-box .lang-container,
+    body.phone-blocks-rotated #gesichten-content-box .lang-text {
+        width: auto !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    body.phone-blocks-rotated #gesichten-content-box p {
+        text-align: justify !important;
+        max-width: calc(100vw - 80px) !important;
+        margin-left: 4px !important;
+        margin-right: 0 !important;
+    }
+
+    /* Unterer horizontaler Rahmenstreifen +15% (20px → 23px; Seitenränder-Überlappung 19 → 22). */
+    body.phone-blocks-rotated::before { height: 23px; }
+    body.phone-blocks-rotated .background-stripe-bottom { height: 23px; }
+    body.phone-blocks-rotated .frame-border-left,
+    body.phone-blocks-rotated .frame-border-right { bottom: 22px; }
+
+    /* Bottom-Bar-Symbole +15%: Dark/Light-Toggle, Sprache (Globus), Sprachniveau (Aa), Menü. */
+    body.phone-blocks-rotated .theme-switch { transform: translateY(-50%) scale(1.15); }
+    body.phone-blocks-rotated .mobile-dropdown__trigger { transform: scale(1.15); }
+    body.phone-blocks-rotated .nav-toggle { transform: scale(1.15); }
+}
+
