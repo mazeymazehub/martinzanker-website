@@ -95,10 +95,15 @@ document.addEventListener('DOMContentLoaded', function() {
     */
 
     // Layout-Referenzhöhe: auf Hover-Geräten die eingefrorene Höhe (siehe
-    // applyFrozenViewportMetrics), auf Touch-Geräten live. Für alle Höhen-METRIKEN
-    // (meetY, Bild-Offsets, Fade-Schwellen). Modus-Checks (h/w > 1.2) bleiben live.
+    // applyFrozenViewportMetrics), auf Touch-Geräten STABIL (beim Laden gecacht, nur bei
+    // Breiten-Resize/Orientierungswechsel aktualisiert). Live-innerHeight schwankt auf iOS mit der
+    // Adressleiste → jeder Toggle-Recalc sampelte eine andere Höhe → meetY/Treffpunkte wanderten
+    // mit jedem Aufklappen nach unten. Der Resize-Handler ignoriert Höhen-Only-Änderungen auf Touch
+    // ohnehin — das hier zieht die übrigen Recalc-Auslöser auf dieselbe Referenz.
+    // Für alle Höhen-METRIKEN (meetY, Bild-Offsets, Fade-Schwellen). Modus-Checks (h/w > 1.2) bleiben live.
+    let _touchLayoutH = window.innerHeight;
     function _layoutH() {
-        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return window.innerHeight;
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return _touchLayoutH;
         // Hover-Geräte (Desktop-Browser): feste Referenzhöhen, völlig unabhängig von der
         // Fenstergröße beim Laden. Das Portrait-/iPad-Layout greift damit auf Desktop nie
         // (670/Breite ist nie > 1,2 bei >=640px) — es bleibt echten Touch-Geräten vorbehalten.
@@ -3187,6 +3192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // klemmt scrollY nach oben (Sprung „zu Mythus" am Seitenende). Layout nutzt feste _layoutH().
         if (!_hoverDev && window.innerWidth === _lastResizeWidth) return;
         _lastResizeWidth = window.innerWidth;
+        if (!_hoverDev) _touchLayoutH = window.innerHeight; // echte Breitenänderung (Orientierung) → Referenzhöhe neu fassen
         isResizing = true; // Snap-Mechanik pausieren (keine Snaps durch Resize-Scroll-Events)
         _updateAspectClasses(); // sofort (Media-Query-Ersatz); auf Hover-Geräten eingefroren → kein Flip beim Höhen-Ziehen
         if (_hoverDev && _endFloor > 0) {
