@@ -2003,6 +2003,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // dem Settle-Ergebnis, da die Margins linear von der Boxhöhe abhängen → kein Sprung.
                 clearTimeout(_collapseSettleTimer);
                 _freezeAnchorSpeed = true; // Anker-Speeds bis nach dem finalen Recalc einfrieren
+                // Diagnose: sichtbare Position des grauen Ankers dieses Blocks am Tap festhalten
+                const _dbgGrayEl = document.querySelector(['.konzept-heading-anchor', '.rivus-anchor-gray', '#mythus-anchor', '#gesichten-anchor-gray'][idx] || '');
+                window.__collapseDiff = 'TAP[' + idx + '] gray=' + (_dbgGrayEl ? Math.round(_dbgGrayEl.getBoundingClientRect().top) : '-');
                 const _followEl = [
                     document.querySelector('.rivus-anchor-container'),      // nach KONZEPT-Box
                     document.getElementById('mythus-anchor-container'),     // nach Box 2 (rivus-content-box)
@@ -2031,7 +2034,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         sp: Math.round(parseFloat((document.getElementById('scroll-spacer') || { style: {} }).style.height) || 0),
                         sy: Math.round(window.scrollY)
                     });
+                    try {
                     const _dbgB = _dbgSnap();
+                    const _dbgG0 = _dbgGrayEl ? Math.round(_dbgGrayEl.getBoundingClientRect().top) : 0;
                     const _syEnd = window.scrollY;
                     // Freeze VOR dem finalen Recalc lösen: genau dieser eine Recalc muss die
                     // Anker-Speeds neu rechnen, sonst richten sich die filled/outline-Schriften der
@@ -2059,9 +2064,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
                     if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
                     const _dbgA = _dbgSnap();
+                    const _dbgG1 = _dbgGrayEl ? Math.round(_dbgGrayEl.getBoundingClientRect().top) : 0;
                     const _dbgD = Object.keys(_dbgB).filter(k => _dbgA[k] !== _dbgB[k])
                         .map(k => k + ':' + _dbgB[k] + '>' + _dbgA[k]).join(' ');
-                    window.__collapseDiff = 'SETTLE[' + idx + '] ' + (_dbgD || 'keine Aenderung');
+                    window.__collapseDiff = 'SETTLE[' + idx + '] gray:' + _dbgG0 + '>' + _dbgG1 + ' ' + (_dbgD || 'ok');
+                    } catch (err) {
+                        // Exception mitten im Settle = halb aktualisiertes Layout (Wrapper gelöst,
+                        // Transforms nicht gesetzt) → genau das Sprungbild. Im Overlay sichtbar machen.
+                        window.__collapseDiff = 'SETTLE-FEHLER[' + idx + '] ' + err.message;
+                    }
                 }, 580);
             });
         });
