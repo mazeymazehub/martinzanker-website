@@ -1963,7 +1963,13 @@ document.addEventListener('DOMContentLoaded', function() {
             arrow.className = 'block-arrow';
             arrow.type = 'button';
             arrow.setAttribute('aria-label', 'Textblock ein- oder ausklappen');
-            arrow.innerHTML = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9l7 7 7-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            // Zwei getrennte Linien statt eines Pfads: beim Auf-/Zuklappen dreht jede Linie um ihren
+            // fixen äußeren Endpunkt (±90°) → die Spitze "morpht" auf der vertikalen Mittelachse
+            // nach oben/unten (∨ → — → ∧), die seitlichen Endpunkte bleiben stehen.
+            arrow.innerHTML = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">'
+                + '<line class="arrow-left"  x1="5"  y1="9" x2="12" y2="16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'
+                + '<line class="arrow-right" x1="19" y1="9" x2="12" y2="16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'
+                + '</svg>';
             box.appendChild(arrow);
             if (idx !== 0) box.classList.add('collapsed'); // erster Block (KONZEPT) offen, Rest zu
             arrow.addEventListener('click', function(e) {
