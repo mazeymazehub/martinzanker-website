@@ -2244,8 +2244,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Gespeicherte Präferenz wiederherstellen (Standard: expert)
-    setLanguage(localStorage.getItem('lang-level') || 'expert');
-    currentLang = localStorage.getItem('lang-level') || 'expert';
+    setLanguage(localStorage.getItem('lang-level') || 'clear');
+    currentLang = localStorage.getItem('lang-level') || 'clear';
 
     // Mobile Dropdowns (Globus + Aa) — nur ≤480px sichtbar
     const mobileLocaleTrigger = document.getElementById('mobile-locale-trigger');
