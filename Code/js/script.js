@@ -1125,6 +1125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const fil = elF ? Math.round(elF.getBoundingClientRect().top) : '-';
                 L.push(p.name.slice(0, 4) + ' s=' + p.s + ' mY=' + p.meetY + ' gray=' + top + ' fill=' + fil);
             });
+            if (window.__collapseDiff) L.push(window.__collapseDiff); // Settle-Diff des letzten Klapp-Vorgangs
             dbg.textContent = L.join('\n');
         };
         window.addEventListener('scroll', renderDbg, { passive: true });
@@ -2017,6 +2018,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 })();
                 _collapseSettleTimer = setTimeout(() => {
                     _collapseSettleTimer = null;
+                    // Diagnose (#debug): Layout-Kennwerte vor/nach dem Settle vergleichen → zeigt
+                    // exakt, welcher Wert den sichtbaren Sprung verursacht.
+                    const _dbgSnap = () => ({
+                        gesW: Math.round(_gesichtenWrapperDocTop), mythW: Math.round(_mythusWrapperDocTop),
+                        b2W: Math.round(_box2WrapperDocTop),
+                        sR: Math.round(rivusAParallaxSpeed * 1000), sM: Math.round(mythusAParallaxSpeed * 1000),
+                        sG: Math.round(gesichtenAParallaxSpeed * 1000),
+                        gA: Math.round(parseFloat((document.getElementById('gesichten-anchor-container') || { style: {} }).style.marginTop) || 0),
+                        mA: Math.round(parseFloat((document.getElementById('mythus-anchor-container') || { style: {} }).style.marginTop) || 0),
+                        rA: Math.round(parseFloat((document.querySelector('.rivus-anchor-container') || { style: {} }).style.marginTop) || 0),
+                        sp: Math.round(parseFloat((document.getElementById('scroll-spacer') || { style: {} }).style.height) || 0),
+                        sy: Math.round(window.scrollY)
+                    });
+                    const _dbgB = _dbgSnap();
                     const _syEnd = window.scrollY;
                     // Freeze VOR dem finalen Recalc lösen: genau dieser eine Recalc muss die
                     // Anker-Speeds neu rechnen, sonst richten sich die filled/outline-Schriften der
@@ -2043,6 +2058,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     applyParallaxEffect(window.scrollY);
                     // Offen: max-height freigeben, damit Sprach-/Niveauwechsel die Höhe anpassen kann.
                     if (lc && !box.classList.contains('collapsed')) lc.style.maxHeight = 'none';
+                    const _dbgA = _dbgSnap();
+                    const _dbgD = Object.keys(_dbgB).filter(k => _dbgA[k] !== _dbgB[k])
+                        .map(k => k + ':' + _dbgB[k] + '>' + _dbgA[k]).join(' ');
+                    window.__collapseDiff = 'SETTLE[' + idx + '] ' + (_dbgD || 'keine Aenderung');
                 }, 580);
             });
         });
