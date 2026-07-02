@@ -1113,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selFill = { KONZEPT: '.konzept-heading-filled', RIVUS: '.rivus-anchor-filled', MYTHUS: '#mythus-filled', GESICHTEN: '#gesichten-anchor-filled' };
         const renderDbg = () => {
             const sY = window.scrollY;
-            const L = ['iH=' + window.innerHeight + ' lH=' + Math.round(_layoutH()) + ' sY=' + Math.round(sY) + ' port=' + (_isPortraitLayout() ? 1 : 0)];
+            const L = ['v2 iH=' + window.innerHeight + ' lH=' + Math.round(_layoutH()) + ' sY=' + Math.round(sY) + ' port=' + (_isPortraitLayout() ? 1 : 0)];
             const _sat = document.getElementById('safe-area-top');
             const _sab = document.getElementById('safe-area-bottom');
             L.push('SAT h=' + (_sat ? _sat.offsetHeight : 'MISSING') + ' z=' + (_sat ? getComputedStyle(_sat).zIndex : '-') +
