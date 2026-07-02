@@ -1976,6 +1976,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.stopPropagation();
                 const lc = box.querySelector('.lang-container');
                 const willOpen = box.classList.contains('collapsed');
+                const _h0 = box.offsetHeight; // Starthöhe VOR dem Toggle (Basis für den Delta-Follow)
                 box.classList.toggle('collapsed');
                 // Statt fixer max-height:3000 die ECHTE Inhaltshöhe animieren → linearer Reveal ohne
                 // „Aufschnappen" (Box erreichte ihre Höhe sonst schon in den ersten ~15 % der 0,5s).
@@ -1989,25 +1990,29 @@ document.addEventListener('DOMContentLoaded', function() {
                         lc.style.maxHeight = '0px';
                     }
                 }
-                // KEIN per-Frame-Recalc während der Klapp-Animation mehr. Die Box-Wrapper sind
-                // position:fixed → die Höhenanimation ändert nur die sichtbare Box, nicht den
-                // Dokumentfluss. Die Folgeblöcke (per JS-Margins positioniert) sind währenddessen
-                // off-screen. Das frühere recalculateLayout() pro Frame löste/fixierte die Wrapper
-                // ~34× pro Vorgang und maß die ganze Kette neu → Mess-Streuung = Springen, am
-                // stärksten beim untersten Block (MYTHUS: längste Kette, größtes scrollY).
-                // Stattdessen: alles eingefroren lassen, EIN Recalc nach Animationsende.
+                // KEIN Neu-MESSEN während der Klapp-Animation: Die Margin-Formeln (position*Block)
+                // mischen sonst zwei Koordinatensysteme — gecachte Wrapper-docTops stammen aus dem
+                // Zustand "Wrapper gelöst" (Settle), Live-Messungen im Zustand "Wrapper fixiert"
+                // fallen kleiner aus (fixierte Wrapper tragen keine Flusshöhe bei). Ergebnis war ein
+                // sofortiger Sprung nach oben + Rücksprung beim Settle (sogar beim MYTHUS-Toggle,
+                // wo sich nichts ändern müsste).
+                // Stattdessen reines DELTA: der erste in-flow Container UNTER der getippten Box wird
+                // pro Frame um exakt das Höhen-Delta der Box verschoben — er schiebt per marginTop
+                // alles Folgende mit (auch die sichtbaren Bild-Container). Mathematisch identisch mit
+                // dem Settle-Ergebnis, da die Margins linear von der Boxhöhe abhängen → kein Sprung.
                 clearTimeout(_collapseSettleTimer);
                 _freezeAnchorSpeed = true; // Anker-Speeds bis nach dem finalen Recalc einfrieren
-                // Leichter Flow-Follow: NUR die drei Margin-Setzer der in-flow Anchor-Container pro
-                // Frame (lesen live die animierende Box-Höhe). Damit gleiten die sichtbaren
-                // Bild-Container (z.B. das unten hereinragende nächste Bild) smooth mit, statt beim
-                // Settle zu springen — ohne Wrapper-Unfix/Spacer/Speeds (die alten Sprungquellen).
+                const _followEl = [
+                    document.querySelector('.rivus-anchor-container'),      // nach KONZEPT-Box
+                    document.getElementById('mythus-anchor-container'),     // nach Box 2 (rivus-content-box)
+                    document.getElementById('gesichten-anchor-container'),  // nach Box 3 (mythus-box)
+                    null                                                    // Box 4 ist die letzte
+                ][idx] || null;
+                const _m0 = _followEl ? (parseFloat(_followEl.style.marginTop) || 0) : 0;
                 if (_collapseFlowRAF) cancelAnimationFrame(_collapseFlowRAF);
                 const _tf0 = performance.now();
                 (function _flowFollow() {
-                    positionGesichtenAndBox2();
-                    positionMythusBlock();
-                    positionRivusAndBox3();
+                    if (_followEl) _followEl.style.marginTop = (_m0 + (box.offsetHeight - _h0)) + 'px';
                     _collapseFlowRAF = (performance.now() - _tf0 < 560) ? requestAnimationFrame(_flowFollow) : null;
                 })();
                 _collapseSettleTimer = setTimeout(() => {
